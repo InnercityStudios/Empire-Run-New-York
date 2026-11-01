@@ -241,6 +241,9 @@ func _select(sel: Dictionary, focus := false) -> void:
 				ring.show_at(v.lead_position, 5.0)
 				if focus:
 					camera.focus_on(v.lead_position(), minf(camera.target_distance, 150.0))
+					# A moving crew is only useful to look at if the camera keeps up.
+					if Game.world.crews[sel["id"]].is_moving():
+						_set_follow(sel["id"])
 
 
 func _landmark_of(sel: Dictionary) -> String:

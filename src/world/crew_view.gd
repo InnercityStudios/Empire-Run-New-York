@@ -44,7 +44,7 @@ func lead_position() -> Vector3:
 
 func set_highlighted(on: bool) -> void:
 	for c in cars:
-		c.set_instance_shader_parameter("highlight", 0.7 if on else 0.0)
+		c.set_instance_shader_parameter("highlight", 0.3 if on else 0.0)
 
 
 func update_from(crew: CrewState, roads: RoadGraph, now_ms: float, delta: float) -> void:

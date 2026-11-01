@@ -97,6 +97,10 @@ func _notification(what: int) -> void:
 		save()
 
 
+func _exit_tree() -> void:
+	save()
+
+
 func save() -> void:
 	if world == null:
 		return
