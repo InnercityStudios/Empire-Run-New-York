@@ -1,0 +1,3584 @@
+{
+ "id": "nyc_1977",
+ "version": 1,
+ "schema": "geography-v1",
+ "frame": {
+  "units": "metres",
+  "x": "east",
+  "z": "south",
+  "notes": "Little Italy keeps its current coordinates (translation 0,0). Variable compression: Lower Manhattan ~1:1.3, Midtown ~1:2, outer boroughs ~1:2.5-3, rivers ~1:1.5."
+ },
+ "extent": [
+  -3600,
+  -8900,
+  9200,
+  6400
+ ],
+ "playable": [
+  [
+   -1500,
+   2100
+  ],
+  [
+   -1700,
+   -400
+  ],
+  [
+   -700,
+   -4000
+  ],
+  [
+   1200,
+   -7800
+  ],
+  [
+   3300,
+   -9700
+  ],
+  [
+   7600,
+   -9700
+  ],
+  [
+   7600,
+   5000
+  ],
+  [
+   400,
+   5000
+  ],
+  [
+   -200,
+   2600
+  ]
+ ],
+ "chunk_size": 256,
+ "anchors": {
+  "little_italy": {
+   "translation": [
+    0,
+    0
+   ],
+   "rect": [
+    -218,
+    -196,
+    226,
+    198
+   ],
+   "district": "little_italy"
+  }
+ },
+ "landmasses": [
+  {
+   "id": "manhattan",
+   "name": "Manhattan",
+   "borough": "manhattan",
+   "kind": "playable",
+   "polygon": [
+    [
+     -560,
+     1720
+    ],
+    [
+     -350,
+     1790
+    ],
+    [
+     -80,
+     1640
+    ],
+    [
+     200,
+     1480
+    ],
+    [
+     285.0,
+     1300
+    ],
+    [
+     645.0,
+     900
+    ],
+    [
+     800.0,
+     600
+    ],
+    [
+     985.0,
+     300
+    ],
+    [
+     1142.5,
+     150
+    ],
+    [
+     1120.0,
+     0
+    ],
+    [
+     1088.0,
+     -400
+    ],
+    [
+     1266.0,
+     -800
+    ],
+    [
+     1494.0,
+     -1200
+    ],
+    [
+     1706.0,
+     -1800
+    ],
+    [
+     1928.0,
+     -2400
+    ],
+    [
+     2140.0,
+     -3000
+    ],
+    [
+     2342.0,
+     -3600
+    ],
+    [
+     2654.0,
+     -4200
+    ],
+    [
+     2742.0,
+     -4600
+    ],
+    [
+     2794.0,
+     -5200
+    ],
+    [
+     2986.0,
+     -5800
+    ],
+    [
+     3168.0,
+     -6400
+    ],
+    [
+     3278.0,
+     -6900
+    ],
+    [
+     3265.0,
+     -7250
+    ],
+    [
+     3179.0,
+     -7450
+    ],
+    [
+     2915.0,
+     -7250
+    ],
+    [
+     2618.0,
+     -6900
+    ],
+    [
+     2288.0,
+     -6400
+    ],
+    [
+     1946.0,
+     -5800
+    ],
+    [
+     1634.0,
+     -5200
+    ],
+    [
+     1322.0,
+     -4600
+    ],
+    [
+     1094.0,
+     -4200
+    ],
+    [
+     792.0,
+     -3600
+    ],
+    [
+     490.0,
+     -3000
+    ],
+    [
+     178.0,
+     -2400
+    ],
+    [
+     -94.0,
+     -1800
+    ],
+    [
+     -396.0,
+     -1200
+    ],
+    [
+     -674.0,
+     -800
+    ],
+    [
+     -962.0,
+     -400
+    ],
+    [
+     -1260.0,
+     0
+    ],
+    [
+     -1287.5,
+     150
+    ],
+    [
+     -1355.0,
+     300
+    ],
+    [
+     -1480.0,
+     600
+    ],
+    [
+     -1505.0,
+     900
+    ],
+    [
+     -1375.0,
+     1300
+    ]
+   ]
+  },
+  {
+   "id": "brooklyn",
+   "name": "Brooklyn",
+   "borough": "brooklyn",
+   "kind": "playable",
+   "polygon": [
+    [
+     560,
+     5000
+    ],
+    [
+     760,
+     4300
+    ],
+    [
+     640,
+     3500
+    ],
+    [
+     760,
+     2900
+    ],
+    [
+     960,
+     2350
+    ],
+    [
+     1080,
+     1850
+    ],
+    [
+     1170,
+     1420
+    ],
+    [
+     1420,
+     1100
+    ],
+    [
+     1580,
+     760
+    ],
+    [
+     1770,
+     640
+    ],
+    [
+     1720,
+     240
+    ],
+    [
+     1690,
+     -150
+    ],
+    [
+     1760,
+     -520
+    ],
+    [
+     1880,
+     -900
+    ],
+    [
+     2040,
+     -1180
+    ],
+    [
+     2160,
+     -1430
+    ],
+    [
+     2600,
+     -1360
+    ],
+    [
+     3100,
+     -1420
+    ],
+    [
+     3700,
+     -1330
+    ],
+    [
+     4300,
+     -1520
+    ],
+    [
+     4700,
+     -1100
+    ],
+    [
+     5200,
+     -400
+    ],
+    [
+     5900,
+     300
+    ],
+    [
+     6600,
+     900
+    ],
+    [
+     7600,
+     1100
+    ],
+    [
+     7600,
+     5000
+    ]
+   ]
+  },
+  {
+   "id": "queens",
+   "name": "Queens",
+   "borough": "queens",
+   "kind": "playable",
+   "polygon": [
+    [
+     2160,
+     -1430
+    ],
+    [
+     2330,
+     -1980
+    ],
+    [
+     2450,
+     -2560
+    ],
+    [
+     2640,
+     -3150
+    ],
+    [
+     2860,
+     -3620
+    ],
+    [
+     3020,
+     -3950
+    ],
+    [
+     3150,
+     -4320
+    ],
+    [
+     3420,
+     -4620
+    ],
+    [
+     3900,
+     -4760
+    ],
+    [
+     4500,
+     -4840
+    ],
+    [
+     4760,
+     -5180
+    ],
+    [
+     5280,
+     -5320
+    ],
+    [
+     5900,
+     -5300
+    ],
+    [
+     6200,
+     -4980
+    ],
+    [
+     6150,
+     -4600
+    ],
+    [
+     6450,
+     -4420
+    ],
+    [
+     6800,
+     -4700
+    ],
+    [
+     7600,
+     -4900
+    ],
+    [
+     7600,
+     1100
+    ],
+    [
+     6600,
+     900
+    ],
+    [
+     5900,
+     300
+    ],
+    [
+     5200,
+     -400
+    ],
+    [
+     4700,
+     -1100
+    ],
+    [
+     4300,
+     -1520
+    ],
+    [
+     3700,
+     -1330
+    ],
+    [
+     3100,
+     -1420
+    ],
+    [
+     2600,
+     -1360
+    ]
+   ]
+  },
+  {
+   "id": "bronx",
+   "name": "The Bronx",
+   "borough": "bronx",
+   "kind": "playable",
+   "polygon": [
+    [
+     3014.0,
+     -4700
+    ],
+    [
+     3350,
+     -4980
+    ],
+    [
+     3900,
+     -5150
+    ],
+    [
+     4150,
+     -5650
+    ],
+    [
+     4500,
+     -5400
+    ],
+    [
+     5100,
+     -5800
+    ],
+    [
+     5800,
+     -5880
+    ],
+    [
+     6400,
+     -5650
+    ],
+    [
+     7600,
+     -5900
+    ],
+    [
+     7600,
+     -8900
+    ],
+    [
+     3516.0,
+     -8900
+    ],
+    [
+     3516.0,
+     -7300
+    ],
+    [
+     3488.0,
+     -6900
+    ],
+    [
+     3378.0,
+     -6400
+    ],
+    [
+     3196.0,
+     -5800
+    ],
+    [
+     3004.0,
+     -5200
+    ]
+   ]
+  },
+  {
+   "id": "roosevelt_island",
+   "name": "Roosevelt Island",
+   "borough": "manhattan",
+   "kind": "playable",
+   "polygon": [
+    [
+     2503.2,
+     -3281.9
+    ],
+    [
+     2420.2,
+     -3316.7
+    ],
+    [
+     1916.8,
+     -2118.1
+    ],
+    [
+     1999.8,
+     -2083.3
+    ]
+   ]
+  },
+  {
+   "id": "randalls_island",
+   "name": "Randall's Island",
+   "borough": "manhattan",
+   "kind": "playable",
+   "polygon": [
+    [
+     2980,
+     -4520
+    ],
+    [
+     3280,
+     -4560
+    ],
+    [
+     3360,
+     -4880
+    ],
+    [
+     3120,
+     -5000
+    ],
+    [
+     2900,
+     -4800
+    ]
+   ]
+  },
+  {
+   "id": "governors_island",
+   "name": "Governors Island",
+   "borough": "manhattan",
+   "kind": "scenery",
+   "polygon": [
+    [
+     200,
+     2250
+    ],
+    [
+     520,
+     2180
+    ],
+    [
+     560,
+     2460
+    ],
+    [
+     300,
+     2560
+    ],
+    [
+     150,
+     2420
+    ]
+   ]
+  },
+  {
+   "id": "liberty_island",
+   "name": "Liberty Island",
+   "borough": "scenery",
+   "kind": "scenery",
+   "polygon": [
+    [
+     -1150,
+     2620
+    ],
+    [
+     -1020,
+     2600
+    ],
+    [
+     -1000,
+     2720
+    ],
+    [
+     -1140,
+     2740
+    ]
+   ]
+  },
+  {
+   "id": "new_jersey",
+   "name": "New Jersey",
+   "borough": "scenery",
+   "kind": "scenery",
+   "polygon": [
+    [
+     2638.0,
+     -8900
+    ],
+    [
+     1945.0,
+     -7250
+    ],
+    [
+     1468.0,
+     -6400
+    ],
+    [
+     814.0,
+     -5200
+    ],
+    [
+     274.0,
+     -4200
+    ],
+    [
+     -330.0,
+     -3000
+    ],
+    [
+     -914.0,
+     -1800
+    ],
+    [
+     -1494.0,
+     -800
+    ],
+    [
+     -2080.0,
+     0
+    ],
+    [
+     -2300.0,
+     600
+    ],
+    [
+     -2220.0,
+     1200
+    ],
+    [
+     -1700,
+     1900
+    ],
+    [
+     -1500,
+     2800
+    ],
+    [
+     -1900,
+     3900
+    ],
+    [
+     -2300,
+     5000
+    ],
+    [
+     -3600,
+     5000
+    ],
+    [
+     -3600,
+     -8900
+    ]
+   ]
+  },
+  {
+   "id": "staten_island",
+   "name": "Staten Island (future)",
+   "borough": "staten_island",
+   "kind": "scenery",
+   "polygon": [
+    [
+     -3600,
+     5300
+    ],
+    [
+     -1300,
+     5000
+    ],
+    [
+     100,
+     5600
+    ],
+    [
+     0,
+     6400
+    ],
+    [
+     -3600,
+     6400
+    ]
+   ]
+  },
+  {
+   "id": "long_island",
+   "name": "Long Island",
+   "borough": "scenery",
+   "kind": "scenery",
+   "polygon": [
+    [
+     7600,
+     -8900
+    ],
+    [
+     9200,
+     -8900
+    ],
+    [
+     9200,
+     7000
+    ],
+    [
+     7600,
+     6400
+    ]
+   ]
+  },
+  {
+   "id": "coney_area",
+   "name": "South Brooklyn",
+   "borough": "scenery",
+   "kind": "scenery",
+   "polygon": [
+    [
+     560,
+     5000
+    ],
+    [
+     7600,
+     5000
+    ],
+    [
+     7600,
+     7000
+    ],
+    [
+     300,
+     6400
+    ]
+   ]
+  }
+ ],
+ "waterways": [
+  {
+   "id": "hudson_river",
+   "name": "Hudson River",
+   "label_at": [
+    236.0,
+    -3300
+   ],
+   "angle": 22.78240573048169
+  },
+  {
+   "id": "east_river",
+   "name": "East River",
+   "label_at": [
+    1500,
+    300
+   ],
+   "angle": 0
+  },
+  {
+   "id": "harlem_river",
+   "name": "Harlem River",
+   "label_at": [
+    3150,
+    -6200
+   ],
+   "angle": 28.78240573048169
+  },
+  {
+   "id": "upper_bay",
+   "name": "Upper New York Bay",
+   "label_at": [
+    -450,
+    3500
+   ],
+   "angle": 0
+  },
+  {
+   "id": "newtown_creek",
+   "name": "Newtown Creek",
+   "label_at": [
+    3200,
+    -1460
+   ],
+   "angle": 0
+  },
+  {
+   "id": "flushing_bay",
+   "name": "Flushing Bay",
+   "label_at": [
+    6250,
+    -5050
+   ],
+   "angle": 0
+  },
+  {
+   "id": "hell_gate",
+   "name": "Hell Gate",
+   "label_at": [
+    3150,
+    -4300
+   ],
+   "angle": 0
+  }
+ ],
+ "parks": [
+  {
+   "id": "central_park",
+   "name": "Central Park",
+   "kind": "landmark_park",
+   "polygon": [
+    [
+     2018.7,
+     -4151.9
+    ],
+    [
+     1585.4,
+     -4333.9
+    ],
+    [
+     919.3,
+     -2748.1
+    ],
+    [
+     1352.6,
+     -2566.1
+    ]
+   ],
+   "lakes": [
+    [
+     [
+      1869.2,
+      -4010.6
+     ],
+     [
+      1657.1,
+      -4099.7
+     ],
+     [
+      1510.0,
+      -3749.4
+     ],
+     [
+      1722.1,
+      -3660.3
+     ]
+    ],
+    [
+     [
+      1347.6,
+      -3235.0
+     ],
+     [
+      1258.3,
+      -3223.7
+     ],
+     [
+      1278.4,
+      -3065.0
+     ],
+     [
+      1367.7,
+      -3076.3
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "prospect_park",
+   "name": "Prospect Park",
+   "kind": "park",
+   "polygon": [
+    [
+     2350,
+     2650
+    ],
+    [
+     3000,
+     2500
+    ],
+    [
+     3250,
+     3100
+    ],
+    [
+     2850,
+     3550
+    ],
+    [
+     2300,
+     3300
+    ]
+   ],
+   "lakes": [
+    [
+     [
+      2550,
+      3150
+     ],
+     [
+      2850,
+      3050
+     ],
+     [
+      2900,
+      3300
+     ],
+     [
+      2650,
+      3380
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "flushing_meadows",
+   "name": "Flushing Meadows",
+   "kind": "park",
+   "polygon": [
+    [
+     5850,
+     -3400
+    ],
+    [
+     6450,
+     -3500
+    ],
+    [
+     6600,
+     -2300
+    ],
+    [
+     6200,
+     -1700
+    ],
+    [
+     5750,
+     -2200
+    ]
+   ],
+   "lakes": [
+    [
+     [
+      6050,
+      -2500
+     ],
+     [
+      6350,
+      -2550
+     ],
+     [
+      6350,
+      -2100
+     ],
+     [
+      6100,
+      -2050
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "riverside_park",
+   "name": "Riverside Park",
+   "kind": "park",
+   "polygon": [
+    [
+     508.0,
+     -2900.0
+    ],
+    [
+     634.0,
+     -3200.0
+    ],
+    [
+     760.0,
+     -3500.0
+    ],
+    [
+     886.0,
+     -3800.0
+    ],
+    [
+     1012.0,
+     -4100.0
+    ],
+    [
+     1138.0,
+     -4400.0
+    ],
+    [
+     1264.0,
+     -4700.0
+    ],
+    [
+     1344.0,
+     -4700.0
+    ],
+    [
+     1218.0,
+     -4400.0
+    ],
+    [
+     1092.0,
+     -4100.0
+    ],
+    [
+     966.0,
+     -3800.0
+    ],
+    [
+     840.0,
+     -3500.0
+    ],
+    [
+     714.0,
+     -3200.0
+    ],
+    [
+     588.0,
+     -2900.0
+    ]
+   ],
+   "lakes": []
+  },
+  {
+   "id": "washington_square",
+   "name": "Washington Sq",
+   "kind": "square",
+   "polygon": [
+    [
+     -470,
+     -920
+    ],
+    [
+     -360,
+     -920
+    ],
+    [
+     -360,
+     -830
+    ],
+    [
+     -470,
+     -830
+    ]
+   ],
+   "lakes": []
+  },
+  {
+   "id": "tompkins_square",
+   "name": "Tompkins Sq",
+   "kind": "square",
+   "polygon": [
+    [
+     780.0,
+     -975.0
+    ],
+    [
+     660.0,
+     -975.0
+    ],
+    [
+     660.0,
+     -825.0
+    ],
+    [
+     780.0,
+     -825.0
+    ]
+   ],
+   "lakes": []
+  },
+  {
+   "id": "van_cortlandt",
+   "name": "Bronx Park",
+   "kind": "park",
+   "polygon": [
+    [
+     4700,
+     -7800
+    ],
+    [
+     5600,
+     -7900
+    ],
+    [
+     5800,
+     -7000
+    ],
+    [
+     5100,
+     -6700
+    ],
+    [
+     4600,
+     -7100
+    ]
+   ],
+   "lakes": []
+  },
+  {
+   "id": "mccarren_park",
+   "name": "McCarren Park",
+   "kind": "park",
+   "polygon": [
+    [
+     2350,
+     -850
+    ],
+    [
+     2600,
+     -900
+    ],
+    [
+     2650,
+     -650
+    ],
+    [
+     2400,
+     -620
+    ]
+   ],
+   "lakes": []
+  }
+ ],
+ "districts": [
+  {
+   "id": "little_italy",
+   "name": "Little Italy",
+   "borough": "manhattan",
+   "style": "li_tenement",
+   "polygon": [
+    [
+     -218,
+     -196
+    ],
+    [
+     226,
+     -196
+    ],
+    [
+     226,
+     198
+    ],
+    [
+     -218,
+     198
+    ]
+   ],
+   "territory": "player",
+   "preserved": true,
+   "seed": [
+    4,
+    1
+   ],
+   "area_km2": 0.17
+  },
+  {
+   "id": "financial_district",
+   "name": "Financial District",
+   "borough": "manhattan",
+   "style": "highrise_old",
+   "grid": {
+    "angle": -12,
+    "pitch": [
+     85,
+     70
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    50,
+    1350
+   ],
+   "area_km2": 0.6
+  },
+  {
+   "id": "chinatown",
+   "name": "Chinatown",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     80,
+     92
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    150,
+    650
+   ],
+   "area_km2": 0.69
+  },
+  {
+   "id": "tribeca",
+   "name": "Tribeca",
+   "borough": "manhattan",
+   "style": "loft_industrial",
+   "grid": {
+    "angle": -8,
+    "pitch": [
+     110,
+     80
+    ]
+   },
+   "territory": "rival",
+   "seed": [
+    -750,
+    550
+   ],
+   "area_km2": 0.71
+  },
+  {
+   "id": "the_docks",
+   "name": "The Docks",
+   "borough": "manhattan",
+   "style": "waterfront",
+   "grid": {
+    "angle": -8,
+    "pitch": [
+     160,
+     120
+    ]
+   },
+   "territory": "rival",
+   "seed": [
+    -1150,
+    1050
+   ],
+   "area_km2": 0.64
+  },
+  {
+   "id": "soho",
+   "name": "SoHo",
+   "borough": "manhattan",
+   "style": "cast_iron",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     80,
+     92
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    -560,
+    -120
+   ],
+   "area_km2": 0.61
+  },
+  {
+   "id": "lower_east_side",
+   "name": "Lower East Side",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     80,
+     92
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    640,
+    60
+   ],
+   "area_km2": 0.67
+  },
+  {
+   "id": "nolita",
+   "name": "Nolita",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     80,
+     92
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    10,
+    -470
+   ],
+   "area_km2": 0.41
+  },
+  {
+   "id": "greenwich_village",
+   "name": "Greenwich Village",
+   "borough": "manhattan",
+   "style": "village_irregular",
+   "grid": {
+    "angle": -38,
+    "pitch": [
+     70,
+     60
+    ],
+    "irregular": true
+   },
+   "territory": "neutral",
+   "seed": [
+    -440,
+    -860
+   ],
+   "area_km2": 0.42
+  },
+  {
+   "id": "east_village",
+   "name": "East Village",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     90,
+     70
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    600,
+    -800
+   ],
+   "area_km2": 0.74
+  },
+  {
+   "id": "chelsea",
+   "name": "Chelsea",
+   "borough": "manhattan",
+   "style": "rowhouse_mix",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     230,
+     70
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    120,
+    -1720
+   ],
+   "area_km2": 0.55
+  },
+  {
+   "id": "gramercy",
+   "name": "Gramercy",
+   "borough": "manhattan",
+   "style": "rowhouse_mix",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     200,
+     70
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    950,
+    -1500
+   ],
+   "area_km2": 0.66
+  },
+  {
+   "id": "hells_kitchen",
+   "name": "Hell's Kitchen",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     240,
+     70
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    420,
+    -2500
+   ],
+   "area_km2": 0.42
+  },
+  {
+   "id": "midtown",
+   "name": "Midtown",
+   "borough": "manhattan",
+   "style": "highrise",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     220,
+     70
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    1050,
+    -2250
+   ],
+   "area_km2": 0.58
+  },
+  {
+   "id": "times_square",
+   "name": "Times Square",
+   "borough": "manhattan",
+   "style": "theatre",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     220,
+     70
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    700,
+    -2150
+   ],
+   "area_km2": 0.29
+  },
+  {
+   "id": "murray_hill",
+   "name": "Murray Hill",
+   "borough": "manhattan",
+   "style": "highrise",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     200,
+     70
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    1500,
+    -1950
+   ],
+   "area_km2": 0.52
+  },
+  {
+   "id": "upper_west_side",
+   "name": "Upper West Side",
+   "borough": "manhattan",
+   "style": "prewar_apartments",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     230,
+     75
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    950,
+    -3600
+   ],
+   "area_km2": 1.0
+  },
+  {
+   "id": "upper_east_side",
+   "name": "Upper East Side",
+   "borough": "manhattan",
+   "style": "prewar_apartments",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     200,
+     75
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    2100,
+    -3200
+   ],
+   "area_km2": 0.91
+  },
+  {
+   "id": "harlem",
+   "name": "Harlem",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     220,
+     75
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    2050,
+    -4800
+   ],
+   "area_km2": 1.41
+  },
+  {
+   "id": "east_harlem",
+   "name": "East Harlem",
+   "borough": "manhattan",
+   "style": "tenement",
+   "grid": {
+    "angle": 22.78240573048169,
+    "pitch": [
+     200,
+     75
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    2550,
+    -4400
+   ],
+   "area_km2": 0.59
+  },
+  {
+   "id": "washington_heights",
+   "name": "Washington Heights",
+   "borough": "manhattan",
+   "style": "prewar_apartments",
+   "grid": {
+    "angle": 26.78240573048169,
+    "pitch": [
+     200,
+     80
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    2650,
+    -6300
+   ],
+   "area_km2": 1.45
+  },
+  {
+   "id": "brooklyn_heights",
+   "name": "Brooklyn Heights",
+   "borough": "brooklyn",
+   "style": "brownstone",
+   "grid": {
+    "angle": 8,
+    "pitch": [
+     90,
+     80
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    1450,
+    1700
+   ],
+   "area_km2": 1.03
+  },
+  {
+   "id": "dumbo_navy_yard",
+   "name": "Brooklyn Navy Yard",
+   "borough": "brooklyn",
+   "style": "shipyard",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     180,
+     140
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    2000,
+    850
+   ],
+   "area_km2": 1.19
+  },
+  {
+   "id": "williamsburg",
+   "name": "Williamsburg",
+   "borough": "brooklyn",
+   "style": "industrial_mix",
+   "grid": {
+    "angle": 26,
+    "pitch": [
+     120,
+     85
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    2350,
+    -150
+   ],
+   "area_km2": 1.44
+  },
+  {
+   "id": "greenpoint",
+   "name": "Greenpoint",
+   "borough": "brooklyn",
+   "style": "rowhouse_mix",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     100,
+     80
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    2500,
+    -1100
+   ],
+   "area_km2": 1.19
+  },
+  {
+   "id": "bushwick",
+   "name": "Bushwick",
+   "borough": "brooklyn",
+   "style": "rowhouse_mix",
+   "grid": {
+    "angle": 32,
+    "pitch": [
+     110,
+     80
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    3900,
+    -100
+   ],
+   "area_km2": 4.43
+  },
+  {
+   "id": "bed_stuy",
+   "name": "Bedford-Stuyvesant",
+   "borough": "brooklyn",
+   "style": "brownstone",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     230,
+     90
+    ]
+   },
+   "territory": "contested",
+   "seed": [
+    3300,
+    1350
+   ],
+   "area_km2": 2.67
+  },
+  {
+   "id": "crown_heights",
+   "name": "Crown Heights",
+   "borough": "brooklyn",
+   "style": "brownstone",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     230,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    3900,
+    2700
+   ],
+   "area_km2": 5.69
+  },
+  {
+   "id": "park_slope",
+   "name": "Park Slope",
+   "borough": "brooklyn",
+   "style": "brownstone",
+   "grid": {
+    "angle": -24,
+    "pitch": [
+     100,
+     220
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    1900,
+    2700
+   ],
+   "area_km2": 2.05
+  },
+  {
+   "id": "red_hook",
+   "name": "Red Hook Port",
+   "borough": "brooklyn",
+   "style": "waterfront",
+   "grid": {
+    "angle": -24,
+    "pitch": [
+     160,
+     120
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    1150,
+    2950
+   ],
+   "area_km2": 1.04
+  },
+  {
+   "id": "east_new_york",
+   "name": "East New York",
+   "borough": "brooklyn",
+   "style": "lowrise_residential",
+   "grid": {
+    "angle": 10,
+    "pitch": [
+     150,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    5600,
+    2400
+   ],
+   "area_km2": 11.6
+  },
+  {
+   "id": "sunset_park",
+   "name": "Sunset Park",
+   "borough": "brooklyn",
+   "style": "industrial_mix",
+   "grid": {
+    "angle": -24,
+    "pitch": [
+     100,
+     220
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    1500,
+    4200
+   ],
+   "area_km2": 3.58
+  },
+  {
+   "id": "long_island_city",
+   "name": "Long Island City",
+   "borough": "queens",
+   "style": "industrial_mix",
+   "grid": {
+    "angle": 18,
+    "pitch": [
+     150,
+     100
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    2850,
+    -2250
+   ],
+   "area_km2": 1.48
+  },
+  {
+   "id": "astoria",
+   "name": "Astoria",
+   "borough": "queens",
+   "style": "lowrise_residential",
+   "grid": {
+    "angle": 40,
+    "pitch": [
+     120,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    3400,
+    -3500
+   ],
+   "area_km2": 2.26
+  },
+  {
+   "id": "sunnyside",
+   "name": "Sunnyside",
+   "borough": "queens",
+   "style": "lowrise_residential",
+   "grid": {
+    "angle": 12,
+    "pitch": [
+     130,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    3800,
+    -2200
+   ],
+   "area_km2": 1.42
+  },
+  {
+   "id": "maspeth",
+   "name": "Maspeth Industrial",
+   "borough": "queens",
+   "style": "heavy_industrial",
+   "grid": {
+    "angle": 6,
+    "pitch": [
+     220,
+     160
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    4300,
+    -1150
+   ],
+   "area_km2": 0.41
+  },
+  {
+   "id": "jackson_heights",
+   "name": "Jackson Heights",
+   "borough": "queens",
+   "style": "garden_apartments",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     160,
+     100
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    4900,
+    -3300
+   ],
+   "area_km2": 1.77
+  },
+  {
+   "id": "elmhurst",
+   "name": "Elmhurst",
+   "borough": "queens",
+   "style": "lowrise_residential",
+   "grid": {
+    "angle": -10,
+    "pitch": [
+     140,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    5000,
+    -2000
+   ],
+   "area_km2": 2.42
+  },
+  {
+   "id": "corona",
+   "name": "Corona",
+   "borough": "queens",
+   "style": "lowrise_residential",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     130,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    5500,
+    -3800
+   ],
+   "area_km2": 2.35
+  },
+  {
+   "id": "flushing",
+   "name": "Flushing",
+   "borough": "queens",
+   "style": "suburban_queens",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     170,
+     110
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    7000,
+    -3300
+   ],
+   "area_km2": 4.42
+  },
+  {
+   "id": "laguardia",
+   "name": "LaGuardia Airport",
+   "borough": "queens",
+   "style": "airport",
+   "territory": "neutral",
+   "polygon": [
+    [
+     4700,
+     -4850
+    ],
+    [
+     5250,
+     -5300
+    ],
+    [
+     5900,
+     -5280
+    ],
+    [
+     6150,
+     -4950
+    ],
+    [
+     6100,
+     -4550
+    ],
+    [
+     4900,
+     -4500
+    ]
+   ],
+   "seed": [
+    5300,
+    -4900
+   ],
+   "area_km2": 0.91
+  },
+  {
+   "id": "ridgewood",
+   "name": "Ridgewood",
+   "borough": "queens",
+   "style": "lowrise_residential",
+   "grid": {
+    "angle": 20,
+    "pitch": [
+     130,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    5200,
+    -600
+   ],
+   "area_km2": 4.86
+  },
+  {
+   "id": "south_bronx",
+   "name": "South Bronx",
+   "borough": "bronx",
+   "style": "tenement",
+   "grid": {
+    "angle": 30,
+    "pitch": [
+     150,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    3600,
+    -5700
+   ],
+   "area_km2": 1.06
+  },
+  {
+   "id": "hunts_point",
+   "name": "Hunts Point",
+   "borough": "bronx",
+   "style": "heavy_industrial",
+   "grid": {
+    "angle": -10,
+    "pitch": [
+     200,
+     150
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    4300,
+    -5600
+   ],
+   "area_km2": 0.9
+  },
+  {
+   "id": "concourse",
+   "name": "Grand Concourse",
+   "borough": "bronx",
+   "style": "prewar_apartments",
+   "grid": {
+    "angle": 8,
+    "pitch": [
+     160,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    3700,
+    -7000
+   ],
+   "area_km2": 1.36
+  },
+  {
+   "id": "fordham",
+   "name": "Fordham",
+   "borough": "bronx",
+   "style": "tenement",
+   "grid": {
+    "angle": 14,
+    "pitch": [
+     150,
+     90
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    4100,
+    -8100
+   ],
+   "area_km2": 3.4
+  },
+  {
+   "id": "soundview",
+   "name": "Soundview",
+   "borough": "bronx",
+   "style": "towers_in_park",
+   "grid": {
+    "angle": 0,
+    "pitch": [
+     220,
+     140
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    5700,
+    -6400
+   ],
+   "area_km2": 2.78
+  },
+  {
+   "id": "throgs_neck",
+   "name": "Throgs Neck",
+   "borough": "bronx",
+   "style": "suburban_queens",
+   "grid": {
+    "angle": -20,
+    "pitch": [
+     170,
+     120
+    ]
+   },
+   "territory": "neutral",
+   "seed": [
+    6900,
+    -6600
+   ],
+   "area_km2": 4.4
+  },
+  {
+   "id": "randalls",
+   "name": "Randall's Island",
+   "borough": "manhattan",
+   "style": "park",
+   "territory": "neutral",
+   "seed": [
+    3130,
+    -4760
+   ],
+   "area_km2": 0.15
+  },
+  {
+   "id": "roosevelt",
+   "name": "Roosevelt Island",
+   "borough": "manhattan",
+   "style": "towers_in_park",
+   "territory": "neutral",
+   "seed": [
+    2210,
+    -2700
+   ],
+   "area_km2": 0.12
+  }
+ ],
+ "styles": {
+  "li_tenement": {
+   "label": "Little Italy (preserved)",
+   "color": "#8a3f2e",
+   "floors": [
+    3,
+    6
+   ],
+   "density": 1.0,
+   "kinds": [
+    "midblock",
+    "corner_left",
+    "corner_right"
+   ]
+  },
+  "tenement": {
+   "label": "Tenements",
+   "color": "#7e4b3a",
+   "floors": [
+    4,
+    7
+   ],
+   "density": 0.95
+  },
+  "highrise_old": {
+   "label": "Financial towers",
+   "color": "#8a8478",
+   "floors": [
+    12,
+    40
+   ],
+   "density": 0.85
+  },
+  "highrise": {
+   "label": "Midtown office & hotels",
+   "color": "#8f8a80",
+   "floors": [
+    10,
+    60
+   ],
+   "density": 0.8
+  },
+  "theatre": {
+   "label": "Theatres & neon",
+   "color": "#9a6a4a",
+   "floors": [
+    4,
+    30
+   ],
+   "density": 0.9
+  },
+  "cast_iron": {
+   "label": "Cast-iron lofts",
+   "color": "#8a7a68",
+   "floors": [
+    5,
+    8
+   ],
+   "density": 0.85
+  },
+  "loft_industrial": {
+   "label": "Warehouse lofts",
+   "color": "#6f655c",
+   "floors": [
+    3,
+    8
+   ],
+   "density": 0.7
+  },
+  "village_irregular": {
+   "label": "Village rowhouses",
+   "color": "#8a5b45",
+   "floors": [
+    3,
+    6
+   ],
+   "density": 0.85
+  },
+  "rowhouse_mix": {
+   "label": "Rowhouses & walk-ups",
+   "color": "#86604a",
+   "floors": [
+    3,
+    6
+   ],
+   "density": 0.75
+  },
+  "prewar_apartments": {
+   "label": "Pre-war apartments",
+   "color": "#9a7d62",
+   "floors": [
+    6,
+    15
+   ],
+   "density": 0.8
+  },
+  "brownstone": {
+   "label": "Brownstones",
+   "color": "#7a5240",
+   "floors": [
+    3,
+    4
+   ],
+   "density": 0.75
+  },
+  "industrial_mix": {
+   "label": "Mixed industry",
+   "color": "#6c6660",
+   "floors": [
+    2,
+    6
+   ],
+   "density": 0.6
+  },
+  "heavy_industrial": {
+   "label": "Heavy industry & rail",
+   "color": "#5f5b56",
+   "floors": [
+    1,
+    4
+   ],
+   "density": 0.45
+  },
+  "shipyard": {
+   "label": "Shipyard & docks",
+   "color": "#5c5f63",
+   "floors": [
+    1,
+    5
+   ],
+   "density": 0.4
+  },
+  "waterfront": {
+   "label": "Piers & warehouses",
+   "color": "#606468",
+   "floors": [
+    1,
+    5
+   ],
+   "density": 0.45
+  },
+  "lowrise_residential": {
+   "label": "Low-rise residential",
+   "color": "#8a7462",
+   "floors": [
+    2,
+    4
+   ],
+   "density": 0.65
+  },
+  "garden_apartments": {
+   "label": "Garden apartments",
+   "color": "#86765e",
+   "floors": [
+    3,
+    6
+   ],
+   "density": 0.55
+  },
+  "suburban_queens": {
+   "label": "Detached houses",
+   "color": "#7d8463",
+   "floors": [
+    1,
+    2
+   ],
+   "density": 0.4
+  },
+  "towers_in_park": {
+   "label": "Towers in parkland",
+   "color": "#7f8670",
+   "floors": [
+    12,
+    20
+   ],
+   "density": 0.3
+  },
+  "airport": {
+   "label": "Airport",
+   "color": "#6b6e6a",
+   "floors": [
+    1,
+    3
+   ],
+   "density": 0.1
+  },
+  "park": {
+   "label": "Park",
+   "color": "#4d6e38",
+   "floors": [
+    0,
+    0
+   ],
+   "density": 0.0
+  }
+ },
+ "roads": [
+  {
+   "id": "fdr_drive",
+   "name": "FDR Drive",
+   "class": "expressway",
+   "width": 22,
+   "speed": 1800,
+   "path": [
+    [
+     120,
+     1400
+    ],
+    [
+     535.0,
+     900
+    ],
+    [
+     690.0,
+     600
+    ],
+    [
+     875.0,
+     300
+    ],
+    [
+     1032.5,
+     150
+    ],
+    [
+     1010.0,
+     0
+    ],
+    [
+     978.0,
+     -400
+    ],
+    [
+     1156.0,
+     -800
+    ],
+    [
+     1384.0,
+     -1200
+    ],
+    [
+     1596.0,
+     -1800
+    ],
+    [
+     1818.0,
+     -2400
+    ],
+    [
+     2030.0,
+     -3000
+    ],
+    [
+     2232.0,
+     -3600
+    ],
+    [
+     2544.0,
+     -4200
+    ],
+    [
+     2632.0,
+     -4600
+    ]
+   ]
+  },
+  {
+   "id": "west_side_hwy",
+   "name": "West Side Highway",
+   "class": "expressway",
+   "width": 22,
+   "speed": 1800,
+   "path": [
+    [
+     -450,
+     1640
+    ],
+    [
+     -1265.0,
+     1300
+    ],
+    [
+     -1395.0,
+     900
+    ],
+    [
+     -1370.0,
+     600
+    ],
+    [
+     -1245.0,
+     300
+    ],
+    [
+     -1177.5,
+     150
+    ],
+    [
+     -1150.0,
+     0
+    ],
+    [
+     -852.0,
+     -400
+    ],
+    [
+     -564.0,
+     -800
+    ],
+    [
+     -286.0,
+     -1200
+    ],
+    [
+     16.0,
+     -1800
+    ],
+    [
+     288.0,
+     -2400
+    ],
+    [
+     600.0,
+     -3000
+    ],
+    [
+     902.0,
+     -3600
+    ],
+    [
+     1204.0,
+     -4200
+    ],
+    [
+     1432.0,
+     -4600
+    ],
+    [
+     1744.0,
+     -5200
+    ],
+    [
+     2056.0,
+     -5800
+    ],
+    [
+     2398.0,
+     -6400
+    ],
+    [
+     2728.0,
+     -6900
+    ]
+   ]
+  },
+  {
+   "id": "broadway",
+   "name": "Broadway",
+   "class": "avenue",
+   "width": 18,
+   "speed": 1300,
+   "path": [
+    [
+     -300,
+     1550
+    ],
+    [
+     -340,
+     900
+    ],
+    [
+     -360,
+     300
+    ],
+    [
+     -330,
+     -300
+    ],
+    [
+     -250,
+     -900
+    ],
+    [
+     80,
+     -1500
+    ],
+    [
+     400,
+     -1900
+    ],
+    [
+     650,
+     -2200
+    ],
+    [
+     850,
+     -2600
+    ],
+    [
+     930.0,
+     -3000
+    ],
+    [
+     1310.0,
+     -4000
+    ],
+    [
+     1820.0,
+     -5000
+    ],
+    [
+     2320.0,
+     -6000
+    ],
+    [
+     2830.0,
+     -7000
+    ]
+   ]
+  },
+  {
+   "id": "bowery_3rd_ave",
+   "name": "Bowery / Third Ave",
+   "class": "avenue",
+   "width": 20,
+   "speed": 1300,
+   "path": [
+    [
+     168,
+     900
+    ],
+    [
+     168,
+     198
+    ],
+    [
+     168,
+     -196
+    ],
+    [
+     250,
+     -700
+    ],
+    [
+     674.0,
+     -1200
+    ],
+    [
+     1288.0,
+     -2400
+    ],
+    [
+     2032.0,
+     -3600
+    ],
+    [
+     2502.0,
+     -4600
+    ]
+   ]
+  },
+  {
+   "id": "houston_st",
+   "name": "Houston St",
+   "class": "arterial",
+   "width": 18,
+   "speed": 1400,
+   "path": [
+    [
+     -800,
+     -560
+    ],
+    [
+     -500,
+     -550
+    ],
+    [
+     0,
+     -560
+    ],
+    [
+     500,
+     -560
+    ],
+    [
+     1050,
+     -550
+    ]
+   ]
+  },
+  {
+   "id": "canal_st",
+   "name": "Canal St",
+   "class": "arterial",
+   "width": 20,
+   "speed": 1300,
+   "path": [
+    [
+     -1300,
+     230
+    ],
+    [
+     -700,
+     180
+    ],
+    [
+     -218,
+     140
+    ],
+    [
+     226,
+     140
+    ],
+    [
+     420,
+     260
+    ]
+   ]
+  },
+  {
+   "id": "delancey_st",
+   "name": "Delancey St",
+   "class": "arterial",
+   "width": 20,
+   "speed": 1300,
+   "path": [
+    [
+     226,
+     -230
+    ],
+    [
+     600,
+     -260
+    ],
+    [
+     1000,
+     -300
+    ]
+   ]
+  },
+  {
+   "id": "42nd_st",
+   "name": "42nd St",
+   "class": "arterial",
+   "width": 18,
+   "speed": 1300,
+   "path": [
+    [
+     157.0,
+     -2350
+    ],
+    [
+     1037.0,
+     -2350
+    ],
+    [
+     1927.0,
+     -2350
+    ]
+   ]
+  },
+  {
+   "id": "125th_st",
+   "name": "125th St",
+   "class": "arterial",
+   "width": 18,
+   "speed": 1300,
+   "path": [
+    [
+     1384.0,
+     -4700
+    ],
+    [
+     2024.0,
+     -4700
+    ],
+    [
+     2784.0,
+     -4700
+    ]
+   ]
+  },
+  {
+   "id": "bqe",
+   "name": "Brooklyn-Queens Expwy",
+   "class": "expressway",
+   "width": 24,
+   "speed": 1800,
+   "path": [
+    [
+     1150,
+     3300
+    ],
+    [
+     1250,
+     2400
+    ],
+    [
+     1350,
+     1700
+    ],
+    [
+     1650,
+     1150
+    ],
+    [
+     2100,
+     800
+    ],
+    [
+     2250,
+     200
+    ],
+    [
+     2300,
+     -400
+    ],
+    [
+     2450,
+     -1000
+    ],
+    [
+     2700,
+     -1500
+    ],
+    [
+     3300,
+     -2100
+    ],
+    [
+     3900,
+     -2800
+    ],
+    [
+     4300,
+     -3500
+    ],
+    [
+     4400,
+     -4300
+    ]
+   ]
+  },
+  {
+   "id": "atlantic_ave",
+   "name": "Atlantic Ave",
+   "class": "arterial",
+   "width": 20,
+   "speed": 1400,
+   "path": [
+    [
+     1200,
+     2050
+    ],
+    [
+     2200,
+     2000
+    ],
+    [
+     3300,
+     1950
+    ],
+    [
+     4500,
+     1900
+    ],
+    [
+     5900,
+     1850
+    ],
+    [
+     7500,
+     1800
+    ]
+   ]
+  },
+  {
+   "id": "eastern_pkwy",
+   "name": "Eastern Pkwy",
+   "class": "parkway",
+   "width": 22,
+   "speed": 1500,
+   "path": [
+    [
+     3000,
+     2600
+    ],
+    [
+     3800,
+     2500
+    ],
+    [
+     4700,
+     2300
+    ],
+    [
+     5500,
+     1900
+    ],
+    [
+     6200,
+     1200
+    ]
+   ]
+  },
+  {
+   "id": "broadway_brooklyn",
+   "name": "Broadway (Bklyn)",
+   "class": "avenue",
+   "width": 18,
+   "speed": 1300,
+   "path": [
+    [
+     1750,
+     -350
+    ],
+    [
+     2600,
+     100
+    ],
+    [
+     3400,
+     500
+    ],
+    [
+     4300,
+     1000
+    ],
+    [
+     5300,
+     1500
+    ]
+   ]
+  },
+  {
+   "id": "lie",
+   "name": "Long Island Expwy",
+   "class": "expressway",
+   "width": 24,
+   "speed": 1900,
+   "path": [
+    [
+     2500,
+     -2000
+    ],
+    [
+     3400,
+     -1900
+    ],
+    [
+     4300,
+     -1900
+    ],
+    [
+     5100,
+     -2100
+    ],
+    [
+     5900,
+     -2300
+    ],
+    [
+     6600,
+     -2600
+    ],
+    [
+     7600,
+     -2800
+    ]
+   ]
+  },
+  {
+   "id": "queens_blvd",
+   "name": "Queens Blvd",
+   "class": "arterial",
+   "width": 26,
+   "speed": 1500,
+   "path": [
+    [
+     2550,
+     -2650
+    ],
+    [
+     3300,
+     -2600
+    ],
+    [
+     4100,
+     -2500
+    ],
+    [
+     4800,
+     -2300
+    ],
+    [
+     5500,
+     -1900
+    ],
+    [
+     6400,
+     -1400
+    ],
+    [
+     7500,
+     -1000
+    ]
+   ]
+  },
+  {
+   "id": "grand_central_pkwy",
+   "name": "Grand Central Pkwy",
+   "class": "parkway",
+   "width": 22,
+   "speed": 1700,
+   "path": [
+    [
+     3250,
+     -4560
+    ],
+    [
+     3700,
+     -4400
+    ],
+    [
+     4300,
+     -4300
+    ],
+    [
+     4800,
+     -4400
+    ],
+    [
+     5400,
+     -4400
+    ],
+    [
+     5950,
+     -3900
+    ],
+    [
+     6400,
+     -3300
+    ],
+    [
+     6900,
+     -2600
+    ],
+    [
+     7600,
+     -2400
+    ]
+   ]
+  },
+  {
+   "id": "northern_blvd",
+   "name": "Northern Blvd",
+   "class": "arterial",
+   "width": 20,
+   "speed": 1400,
+   "path": [
+    [
+     2600,
+     -2900
+    ],
+    [
+     3500,
+     -3000
+    ],
+    [
+     4400,
+     -3100
+    ],
+    [
+     5300,
+     -3300
+    ],
+    [
+     6100,
+     -3500
+    ],
+    [
+     7600,
+     -3600
+    ]
+   ]
+  },
+  {
+   "id": "bruckner_expwy",
+   "name": "Bruckner Expwy",
+   "class": "expressway",
+   "width": 22,
+   "speed": 1800,
+   "path": [
+    [
+     3200,
+     -4950
+    ],
+    [
+     3800,
+     -5300
+    ],
+    [
+     4250,
+     -5750
+    ],
+    [
+     4600,
+     -5800
+    ],
+    [
+     5000,
+     -6000
+    ],
+    [
+     5700,
+     -6150
+    ],
+    [
+     6500,
+     -6100
+    ],
+    [
+     7500,
+     -6200
+    ]
+   ]
+  },
+  {
+   "id": "major_deegan",
+   "name": "Major Deegan Expwy",
+   "class": "expressway",
+   "width": 22,
+   "speed": 1800,
+   "path": [
+    [
+     3094.0,
+     -5200
+    ],
+    [
+     3286.0,
+     -5800
+    ],
+    [
+     3468.0,
+     -6400
+    ],
+    [
+     3578.0,
+     -6900
+    ],
+    [
+     3565.0,
+     -7250
+    ],
+    [
+     3700,
+     -8000
+    ],
+    [
+     3850,
+     -8850
+    ]
+   ]
+  },
+  {
+   "id": "cross_bronx",
+   "name": "Cross Bronx Expwy",
+   "class": "expressway",
+   "width": 24,
+   "speed": 1800,
+   "path": [
+    [
+     3450,
+     -6800
+    ],
+    [
+     4200,
+     -6900
+    ],
+    [
+     5000,
+     -6800
+    ],
+    [
+     5900,
+     -6700
+    ],
+    [
+     6700,
+     -6500
+    ],
+    [
+     7500,
+     -6400
+    ]
+   ]
+  },
+  {
+   "id": "grand_concourse",
+   "name": "Grand Concourse",
+   "class": "parkway",
+   "width": 22,
+   "speed": 1500,
+   "path": [
+    [
+     3400,
+     -5600
+    ],
+    [
+     3650,
+     -6400
+    ],
+    [
+     3850,
+     -7200
+    ],
+    [
+     4050,
+     -8000
+    ],
+    [
+     4250,
+     -8800
+    ]
+   ]
+  }
+ ],
+ "bridges": [
+  {
+   "id": "brooklyn_bridge",
+   "name": "Brooklyn Bridge",
+   "kind": "suspension",
+   "width": 26,
+   "speed": 1600,
+   "path": [
+    [
+     520,
+     1080
+    ],
+    [
+     820,
+     1220
+    ],
+    [
+     1180,
+     1420
+    ],
+    [
+     1450,
+     1580
+    ]
+   ],
+   "connects": [
+    "financial_district",
+    "brooklyn_heights"
+   ]
+  },
+  {
+   "id": "manhattan_bridge",
+   "name": "Manhattan Bridge",
+   "kind": "suspension",
+   "width": 28,
+   "speed": 1600,
+   "path": [
+    [
+     168,
+     300
+    ],
+    [
+     520,
+     520
+    ],
+    [
+     1050,
+     760
+    ],
+    [
+     1600,
+     900
+    ],
+    [
+     1950,
+     950
+    ]
+   ],
+   "connects": [
+    "chinatown",
+    "dumbo_navy_yard"
+   ]
+  },
+  {
+   "id": "williamsburg_bridge",
+   "name": "Williamsburg Bridge",
+   "kind": "suspension",
+   "width": 28,
+   "speed": 1600,
+   "path": [
+    [
+     1000,
+     -300
+    ],
+    [
+     1250,
+     -330
+    ],
+    [
+     1700,
+     -360
+    ],
+    [
+     2050,
+     -340
+    ]
+   ],
+   "connects": [
+    "lower_east_side",
+    "williamsburg"
+   ]
+  },
+  {
+   "id": "queensboro_bridge",
+   "name": "Queensboro Bridge",
+   "kind": "cantilever",
+   "width": 28,
+   "speed": 1600,
+   "path": [
+    [
+     1792.0,
+     -2600
+    ],
+    [
+     2210,
+     -2690
+    ],
+    [
+     2560,
+     -2660
+    ],
+    [
+     2800,
+     -2640
+    ]
+   ],
+   "connects": [
+    "midtown",
+    "long_island_city"
+   ]
+  },
+  {
+   "id": "triborough_bridge",
+   "name": "Triborough Bridge",
+   "kind": "suspension",
+   "width": 26,
+   "speed": 1700,
+   "path": [
+    [
+     2640,
+     -4500
+    ],
+    [
+     3000,
+     -4650
+    ],
+    [
+     3200,
+     -4700
+    ],
+    [
+     3500,
+     -4600
+    ],
+    [
+     3800,
+     -4450
+    ]
+   ],
+   "connects": [
+    "east_harlem",
+    "astoria"
+   ],
+   "branch": [
+    [
+     3200,
+     -4700
+    ],
+    [
+     3250,
+     -5050
+    ]
+   ]
+  },
+  {
+   "id": "willis_ave_bridge",
+   "name": "Willis Ave Bridge",
+   "kind": "swing",
+   "width": 18,
+   "speed": 1300,
+   "path": [
+    [
+     2689.0,
+     -4950
+    ],
+    [
+     2929.0,
+     -4950
+    ]
+   ],
+   "connects": [
+    "east_harlem",
+    "south_bronx"
+   ]
+  },
+  {
+   "id": "macombs_dam_bridge",
+   "name": "Macombs Dam Bridge",
+   "kind": "swing",
+   "width": 16,
+   "speed": 1300,
+   "path": [
+    [
+     2988.0,
+     -5900
+    ],
+    [
+     3248.0,
+     -5900
+    ]
+   ],
+   "connects": [
+    "harlem",
+    "concourse"
+   ]
+  },
+  {
+   "id": "pulaski_bridge",
+   "name": "Pulaski Bridge",
+   "kind": "bascule",
+   "width": 18,
+   "speed": 1300,
+   "path": [
+    [
+     2700,
+     -1250
+    ],
+    [
+     2720,
+     -1520
+    ]
+   ],
+   "connects": [
+    "greenpoint",
+    "long_island_city"
+   ]
+  },
+  {
+   "id": "kosciuszko_bridge",
+   "name": "Kosciuszko Bridge",
+   "kind": "truss",
+   "width": 22,
+   "speed": 1700,
+   "path": [
+    [
+     3300,
+     -1300
+    ],
+    [
+     3380,
+     -1550
+    ]
+   ],
+   "connects": [
+    "bushwick",
+    "maspeth"
+   ]
+  }
+ ],
+ "landmarks": [
+  {
+   "id": "empire_state",
+   "name": "Empire State Bldg",
+   "pos": [
+    1283.0,
+    -2150
+   ],
+   "kind": "skyscraper"
+  },
+  {
+   "id": "chrysler",
+   "name": "Chrysler Bldg",
+   "pos": [
+    1609.6,
+    -2380
+   ],
+   "kind": "skyscraper"
+  },
+  {
+   "id": "world_trade_center",
+   "name": "World Trade Center",
+   "pos": [
+    -520,
+    1100
+   ],
+   "kind": "skyscraper"
+  },
+  {
+   "id": "statue_of_liberty",
+   "name": "Statue of Liberty",
+   "pos": [
+    -1080,
+    2670
+   ],
+   "kind": "monument"
+  },
+  {
+   "id": "yankee_stadium",
+   "name": "Yankee Stadium",
+   "pos": [
+    3420,
+    -6050
+   ],
+   "kind": "stadium"
+  },
+  {
+   "id": "shea_stadium",
+   "name": "Shea Stadium",
+   "pos": [
+    6100,
+    -3700
+   ],
+   "kind": "stadium"
+  },
+  {
+   "id": "grand_central",
+   "name": "Grand Central",
+   "pos": [
+    1396.0,
+    -2300
+   ],
+   "kind": "station"
+  },
+  {
+   "id": "navy_yard_cranes",
+   "name": "Navy Yard cranes",
+   "pos": [
+    2050,
+    700
+   ],
+   "kind": "industry"
+  },
+  {
+   "id": "maspeth_gasholders",
+   "name": "Gas holders",
+   "pos": [
+    4150,
+    -1250
+   ],
+   "kind": "industry"
+  }
+ ],
+ "territory_seed": {
+  "little_italy": "player",
+  "financial_district": "neutral",
+  "chinatown": "neutral",
+  "tribeca": "rival",
+  "the_docks": "rival",
+  "soho": "neutral",
+  "lower_east_side": "neutral",
+  "nolita": "neutral",
+  "greenwich_village": "neutral",
+  "east_village": "contested",
+  "chelsea": "neutral",
+  "gramercy": "neutral",
+  "hells_kitchen": "contested",
+  "midtown": "neutral",
+  "times_square": "neutral",
+  "murray_hill": "neutral",
+  "upper_west_side": "neutral",
+  "upper_east_side": "neutral",
+  "harlem": "contested",
+  "east_harlem": "neutral",
+  "washington_heights": "neutral",
+  "brooklyn_heights": "neutral",
+  "dumbo_navy_yard": "neutral",
+  "williamsburg": "contested",
+  "greenpoint": "contested",
+  "bushwick": "contested",
+  "bed_stuy": "contested",
+  "crown_heights": "neutral",
+  "park_slope": "neutral",
+  "red_hook": "neutral",
+  "east_new_york": "neutral",
+  "sunset_park": "neutral",
+  "long_island_city": "neutral",
+  "astoria": "neutral",
+  "sunnyside": "neutral",
+  "maspeth": "neutral",
+  "jackson_heights": "neutral",
+  "elmhurst": "neutral",
+  "corona": "neutral",
+  "flushing": "neutral",
+  "laguardia": "neutral",
+  "ridgewood": "neutral",
+  "south_bronx": "neutral",
+  "hunts_point": "neutral",
+  "concourse": "neutral",
+  "fordham": "neutral",
+  "soundview": "neutral",
+  "throgs_neck": "neutral",
+  "randalls": "neutral",
+  "roosevelt": "neutral"
+ }
+}
