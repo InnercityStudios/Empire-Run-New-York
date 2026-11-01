@@ -170,13 +170,16 @@ func _respawn(car: Dictionary, scatter: bool) -> void:
 	# Start at a random junction near the camera.
 	var focus := _focus()
 	var start := -1
+	var near := layout.nodes_near(focus, ACTIVE_RADIUS)
 	for attempt in 24:
-		var n: int = _rng.randi() % layout.graph_nodes.size()
-		if (layout.graph_nodes[n] as Vector2).distance_to(focus) < ACTIVE_RADIUS and _adj[n].size() >= 2:
+		if near.is_empty():
+			break
+		var n: int = near[_rng.randi() % near.size()]
+		if _adj[n].size() >= 2:
 			start = n
 			break
 	if start < 0:
-		start = _rng.randi() % layout.graph_nodes.size()
+		start = near[0] if not near.is_empty() else _rng.randi() % layout.graph_nodes.size()
 	_new_route(car, start, -1, scatter)
 
 

@@ -30,7 +30,10 @@ var chunks: Dictionary = {}          ## loaded detail + landmarks: key -> {insta
 var camera: StrategyCamera
 var stats := {"build_ms": 0, "far_chunks": 0, "detail_loaded": 0, "detail_built": 0, "detail_ms_total": 0}
 
-var _far: Dictionary = {}            ## chunk key -> Node3D
+var _far: Dictionary = {}            ## chunk key -> Node3D (legacy: resident; geography: streamed mid tier)
+var _mid_tasks: Dictionary = {}
+var _overview: OverviewBuilder
+var _geo := false
 var _detail: Dictionary = {}         ## chunk key -> Node3D
 var _tasks: Dictionary = {}          ## chunk key -> WorkerThreadPool task id
 var _results: Array = []
@@ -48,11 +51,20 @@ func build(p_layout: WorldLayout) -> void:
 	var shell := Node3D.new()
 	shell.name = "Shell"
 	add_child(shell)
-	stats.merge(WorldShellBuilder.build(layout, shell), true)
+	_geo = layout.is_geo
+	stats.merge(GeoShellBuilder.build(layout, shell) if _geo else WorldShellBuilder.build(layout, shell), true)
 	var far_root := Node3D.new()
 	far_root.name = "FarCity"
 	add_child(far_root)
-	for key in layout.chunk_keys():
+	_far_root = far_root
+	if _geo:
+		# Geography worlds: the overview tier is resident; mid-distance massing
+		# and full detail stream around the camera.
+		_overview = OverviewBuilder.build(layout, self)
+		stats["overview_instances"] = _overview.instance_count
+		stats["overview_tiles"] = _overview.tiles
+		_landmark_models()
+	for key in ([] if _geo else layout.chunk_keys()):
 		var node := Node3D.new()
 		node.name = "Far_%d_%d" % [key.x, key.y]
 		far_root.add_child(node)
@@ -66,7 +78,7 @@ func build(p_layout: WorldLayout) -> void:
 		if not trees.is_empty():
 			node.add_child(_tree_multimesh(trees, _tree_far_mesh, false))
 		_far[key] = node
-	stats["far_chunks"] = _far.size()
+	stats["far_chunks"] = layout.chunk_keys().size() if _geo else _far.size()
 	_detail_root = Node3D.new()
 	_detail_root.name = "Detail"
 	add_child(_detail_root)
@@ -91,6 +103,24 @@ func _prewarm() -> void:
 	_tree_far_mesh = AssetLibrary.prop_mesh("tree_far")
 
 
+## Skyline landmarks with licensed models: always visible, centred on their
+## site (models stand with the facade on z = 0 and the building behind it).
+func _landmark_models() -> void:
+	var root := Node3D.new()
+	root.name = "Skyline"
+	add_child(root)
+	for t in layout.towers:
+		if not t.has("model"):
+			continue
+		var mi := MeshInstance3D.new()
+		mi.name = String(t["id"])
+		mi.mesh = AssetLibrary.building_mesh(t["model"])
+		var basis := Basis(Vector3.UP, -float(t["yaw"]))
+		var pos: Vector2 = t["pos"]
+		mi.transform = Transform3D(basis, Vector3(pos.x, 0.0, pos.y) + basis * Vector3(0, 0, float(t["size"].y) * 0.5))
+		root.add_child(mi)
+
+
 func _build_landmarks() -> void:
 	var root := Node3D.new()
 	root.name = "Landmarks"
@@ -105,10 +135,17 @@ func _build_landmarks() -> void:
 
 
 # --- Streaming --------------------------------------------------------------------------
+var _far_root: Node3D
+
+
 func _process(_delta: float) -> void:
-	if layout == null or camera == null or not detail_enabled or QualityFlags.off("detail"):
+	if layout == null or camera == null:
 		return
 	var focus := Vector2(camera.focus.x, camera.focus.z)
+	if _geo:
+		_stream_mid(focus)
+	if not detail_enabled or QualityFlags.off("detail"):
+		return
 	var radius := detail_radius(camera.distance)
 	_apply_results()
 	# Unload far-away detail.
@@ -122,20 +159,97 @@ func _process(_delta: float) -> void:
 	for dx in range(-cr, cr + 1):
 		for dz in range(-cr, cr + 1):
 			var key := center + Vector2i(dx, dz)
-			if not _far.has(key) or _detail.has(key) or _tasks.has(key):
+			if not layout.chunk(key).has("blocks") or _detail.has(key) or _tasks.has(key):
 				continue
 			var d := _chunk_distance(key, focus)
 			if d <= radius:
 				wanted.append([d, key])
 	wanted.sort_custom(func(a, b): return a[0] < b[0])
 	for w in wanted:
-		if _tasks.size() >= MAX_TASKS:
+		if _tasks.size() + _mid_tasks.size() >= MAX_TASKS + 1:
 			break
 		var key: Vector2i = w[1]
 		_tasks[key] = WorkerThreadPool.add_task(_build_task.bind(key), false, "chunk %s" % key)
 	if not _initial_signalled and wanted.is_empty() and _tasks.is_empty() and (not _detail.is_empty() or radius == 0.0):
 		_initial_signalled = true
 		initial_detail_ready.emit()
+
+
+## Mid-distance massing (one box per building) reaches into the fog; above
+## MID_CUTOFF the province overview alone is drawn.
+const MID_CUTOFF := 1300.0
+
+
+static func mid_radius(camera_distance: float) -> float:
+	if camera_distance > MID_CUTOFF:
+		return 0.0
+	return clampf(camera_distance * 2.2 + 450.0, 700.0, 2000.0)
+
+
+func _stream_mid(focus: Vector2) -> void:
+	var radius := mid_radius(camera.distance)
+	for key in _mid_tasks.keys():
+		var t: int = _mid_tasks[key][0]
+		if WorkerThreadPool.is_task_completed(t):
+			WorkerThreadPool.wait_for_task_completion(t)
+			var holder: Array = _mid_tasks[key][1]
+			_mid_tasks.erase(key)
+			if radius > 0.0 and _chunk_distance(key, focus) <= radius + HYSTERESIS:
+				_attach_mid(key, holder[0] if not holder.is_empty() else [])
+	for key in _far.keys():
+		if radius == 0.0 or _chunk_distance(key, focus) > radius + HYSTERESIS:
+			(_far[key] as Node3D).queue_free()
+			_far.erase(key)
+			_refresh(key)
+	if radius == 0.0:
+		return
+	var wanted: Array = []
+	var cr := int(ceil(radius / layout.chunk_size)) + 1
+	var center := layout.chunk_of(focus)
+	for dx in range(-cr, cr + 1):
+		for dz in range(-cr, cr + 1):
+			var key := center + Vector2i(dx, dz)
+			if _far.has(key) or _mid_tasks.has(key) or layout.chunk(key).is_empty():
+				continue
+			var d := _chunk_distance(key, focus)
+			if d <= radius:
+				wanted.append([d, key])
+	wanted.sort_custom(func(a, b): return a[0] < b[0])
+	for w in wanted:
+		if _mid_tasks.size() >= MAX_TASKS:
+			break
+		var key: Vector2i = w[1]
+		var holder: Array = []
+		var task := WorkerThreadPool.add_task(func(): holder.append(FarCityBuilder.build_arrays(layout, key, Content.db.building_catalog)),
+			false, "mid %s" % key)
+		_mid_tasks[key] = [task, holder]
+
+
+func _attach_mid(key: Vector2i, arrays: Array) -> void:
+	var node := Node3D.new()
+	node.name = "Mid_%d_%d" % [key.x, key.y]
+	_far_root.add_child(node)
+	var mesh := FarCityBuilder.to_mesh(arrays)
+	if mesh:
+		var mi := MeshInstance3D.new()
+		mi.mesh = mesh
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node.add_child(mi)
+	var trees: Array = layout.chunk(key).get("trees", [])
+	if not trees.is_empty():
+		node.add_child(_tree_multimesh(trees, _tree_far_mesh, false))
+	_far[key] = node
+	stats["mid_loaded"] = _far.size()
+	_refresh(key)
+
+
+## Tier visibility for one chunk: detail > mid massing > province overview.
+func _refresh(key: Vector2i) -> void:
+	var has_detail := _detail.has(key)
+	if _far.has(key):
+		(_far[key] as Node3D).visible = not has_detail
+	if _overview:
+		_overview.set_chunk_visible(key, not has_detail and not _far.has(key))
 
 
 static func detail_radius(camera_distance: float) -> float:
@@ -151,6 +265,16 @@ func _chunk_distance(key: Vector2i, p: Vector2) -> float:
 	var r := layout.chunk_rect(key)
 	var q := Vector2(clampf(p.x, r.position.x, r.end.x), clampf(p.y, r.position.y, r.end.y))
 	return q.distance_to(p)
+
+
+## Worker tasks reference this node: let them finish before it is freed.
+func _exit_tree() -> void:
+	for t in _tasks.values():
+		WorkerThreadPool.wait_for_task_completion(t)
+	for entry in _mid_tasks.values():
+		WorkerThreadPool.wait_for_task_completion(entry[0])
+	_tasks.clear()
+	_mid_tasks.clear()
 
 
 func _build_task(key: Vector2i) -> void:
@@ -201,8 +325,7 @@ func _attach(r: Dictionary) -> void:
 	if not r["parked"].is_empty():
 		_add_parked(root, r["parked"], key)
 	_detail[key] = root
-	if _far.has(key):
-		(_far[key] as Node3D).visible = false
+	_refresh(key)
 	stats["detail_loaded"] = _detail.size()
 	stats["detail_built"] += 1
 	stats["detail_ms_total"] += int(r.get("ms", 0))
@@ -215,8 +338,7 @@ func _unload(key: Vector2i) -> void:
 	node.queue_free()
 	_detail.erase(key)
 	chunks.erase("detail:%d,%d" % [key.x, key.y])
-	if _far.has(key):
-		(_far[key] as Node3D).visible = true
+	_refresh(key)
 	stats["detail_loaded"] = _detail.size()
 
 

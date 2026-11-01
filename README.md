@@ -61,13 +61,13 @@ $GODOT --path . -- --new-game --capture=/tmp/shot.png --capture-delay=5 --stats 
 
 ## The world
 
-The game streams **Greater New York**, an original 3.4 × 3.1 km province
-(`data/world/greater_new_york.json`) of 18 neighbourhoods around Little Italy,
-with arterials, piers, a park, a bridge to a future city and backdrop
-districts. `docs/world_map.png` is a top-down render
-(`Godot --headless --path . -s tests/tools_world_map.gd`). Open
-`scenes/world/world_preview.tscn` to inspect the world in the editor (set
-`focus`/`detail_radius`, toggle `rebuild`).
+The game streams **Greater New York 1977** (`data/world/nyc_1977.json`, a
+12.8 × 15.3 km compressed New York: Manhattan, Brooklyn, Queens, the Bronx,
+rivers, nine bridges, 50 neighbourhoods) with Little Italy preserved at its
+original coordinates. The data is authored by `tools/geography/nyc_blueprint.py`
+(see `docs/GEOGRAPHY_BLUEPRINT.md`); `tools/geography/render_world.py` renders the
+generated in-game layout (dump it with `tests/tools_geo_dump.gd`). The first
+province is still available: `-- --world=greater_new_york`.
 
 ## Regenerating art (Blender 5.2)
 
@@ -78,6 +78,8 @@ $BLENDER -b --factory-startup --python tools/blender/build_props.py      # vehic
 $BLENDER -b --factory-startup --python tools/blender/build_buildings.py  # buildings and data/building_catalog.json
 $BLENDER -b --factory-startup --python tools/blender/build_licensed_vehicles.py  # licensed cars (+ lean traffic variants)
 $BLENDER -b --factory-startup --python tools/blender/build_pbr_textures.py       # Poly Haven 2K -> 1K PBR sets
+$BLENDER -b --factory-startup --python tools/blender/build_licensed_buildings.py  # licensed skyscrapers + Brooklyn building
+python3 tools/geography/nyc_blueprint.py                                 # geography data + blueprint maps
 python3 tools/configure_imports.py                                       # mobile texture import presets (idempotent)
 ```
 

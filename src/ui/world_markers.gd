@@ -124,6 +124,8 @@ func _draw() -> void:
 
 
 func _draw_pin(p: Vector2, icon_name: String, col: Color, is_sel: bool) -> void:
+	if not p.is_finite():
+		return  # projected from behind the camera
 	var r := 17.0 if not is_sel else 20.0
 	var c := p + Vector2(0, -30)
 	draw_colored_polygon(PackedVector2Array([c + Vector2(-6, r - 3), c + Vector2(6, r - 3), p + Vector2(0, -6)]),

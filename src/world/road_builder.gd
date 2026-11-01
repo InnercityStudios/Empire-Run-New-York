@@ -54,11 +54,26 @@ static func build_chunk_roads(segments: Array, intersections_list: Array) -> Arr
 	for seg in segments:
 		_add_segment(st, seg)
 	for inter in intersections_list:
-		_add_flat_quad(st, inter["rect"], 0.0, 0.0)
+		if inter.has("poly"):
+			_add_flat_poly(st, inter["poly"])
+		else:
+			_add_flat_quad(st, inter["rect"], 0.0, 0.0)
 	var mesh := st.commit()
 	if mesh.get_surface_count() > 0:
 		mesh.surface_set_material(0, Materials.get_road_material())
 	return mesh
+
+
+## Convex paved polygon (junctions and bends of non-axis-aligned roads).
+static func _add_flat_poly(st: SurfaceTool, poly: PackedVector2Array) -> void:
+	var p := Array(poly)
+	var zero := []
+	var idx := []
+	for i in p.size():
+		zero.append(0.0)
+	for i in range(1, p.size() - 1):
+		idx.append_array([0, i, i + 1])
+	_emit(st, p, zero, zero, idx, Vector2.ZERO, 0.0)
 
 
 static func _add_flat_quad(st: SurfaceTool, r: Rect2, y: float, style: float) -> void:
@@ -87,20 +102,22 @@ static func _emit(st: SurfaceTool, p: Array, lat: Array, along: Array, idx: Arra
 
 ## Raised sidewalk slab for a block: rounded corners, granite curb lip and face.
 ## Geometry is added to `tools` ({material_name: SurfaceTool}) for chunk merging.
+## `xform` places blocks of rotated district grids (identity for Little Italy).
 static func add_sidewalk(tools: Dictionary, rect: Rect2, curb_h: float, radius: float, lawn := false,
-		sidewalk_w := 4.0) -> void:
-	var outer := _rounded_rect(rect, radius)
-	var inner := _rounded_rect(rect.grow(-CURB_LIP), maxf(radius - CURB_LIP, 0.5))
+		sidewalk_w := 4.0, xform := Transform2D.IDENTITY, yard := "") -> void:
+	var outer := xform * _rounded_rect(rect, radius)
+	var inner := xform * _rounded_rect(rect.grow(-CURB_LIP), maxf(radius - CURB_LIP, 0.5))
 	var top: SurfaceTool = _tool(tools, "M_Sidewalk")
 	var curb: SurfaceTool = _tool(tools, "M_Curb")
-	var c := rect.get_center()
-	if lawn:
-		# Front lawns and yards: grass inside a pavement ring.
-		var grass := _tool(tools, "M_Grass")
+	var c := xform * rect.get_center()
+	if lawn or yard != "":
+		# Lawns, backyards and work yards inside a pavement ring.
+		var grass := _tool(tools, yard if yard != "" else "M_Grass")
 		var g := rect.grow(-sidewalk_w)
 		var gy := curb_h + 0.01
-		_tri(grass, Vector3(g.position.x, gy, g.position.y), Vector3(g.end.x, gy, g.position.y), Vector3(g.end.x, gy, g.end.y), Vector3.UP, 6.0)
-		_tri(grass, Vector3(g.position.x, gy, g.position.y), Vector3(g.end.x, gy, g.end.y), Vector3(g.position.x, gy, g.end.y), Vector3.UP, 6.0)
+		var q := xform * PackedVector2Array([g.position, Vector2(g.end.x, g.position.y), g.end, Vector2(g.position.x, g.end.y)])
+		_tri(grass, Vector3(q[0].x, gy, q[0].y), Vector3(q[1].x, gy, q[1].y), Vector3(q[2].x, gy, q[2].y), Vector3.UP, 6.0)
+		_tri(grass, Vector3(q[0].x, gy, q[0].y), Vector3(q[2].x, gy, q[2].y), Vector3(q[3].x, gy, q[3].y), Vector3.UP, 6.0)
 	# Sidewalk top (convex fan)
 	for i in inner.size():
 		var j := (i + 1) % inner.size()

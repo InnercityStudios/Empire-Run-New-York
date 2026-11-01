@@ -7,6 +7,8 @@ extends RefCounted
 
 const SHADER := preload("res://src/world/shaders/far_building.gdshader")
 const PAVEMENT := Color(0.6, 0.58, 0.54)
+const YARD_GRASS := Color(0.34, 0.4, 0.27)
+const YARD_GRAVEL := Color(0.46, 0.44, 0.4)
 
 static var _material: ShaderMaterial
 
@@ -20,18 +22,29 @@ static func material() -> ShaderMaterial:
 
 
 static func build_chunk(world: WorldLayout, key: Vector2i, catalog: Dictionary) -> ArrayMesh:
+	return to_mesh(build_arrays(world, key, catalog))
+
+
+## Mesh arrays only (safe on worker threads); `to_mesh` uploads on the main thread.
+static func build_arrays(world: WorldLayout, key: Vector2i, catalog: Dictionary) -> Array:
 	var c: Dictionary = world.chunk(key)
 	if c.is_empty():
-		return null
+		return []
 	var verts := PackedVector3Array()
 	var normals := PackedVector3Array()
 	var colors := PackedColorArray()
+	var lots: Array = []
+	for li in c["lots"]:
+		lots.append(world.lots[li])
 	for bi in c["blocks"]:
 		var b: Dictionary = world.blocks[bi]
 		if b["sidewalks"]:
-			_flat(verts, normals, colors, b["rect"], world.curb_height, PAVEMENT)
-	for li in c["lots"]:
-		var lot: Dictionary = world.lots[li]
+			var yard: String = b.get("yard", "")
+			_flat(verts, normals, colors, WorldLayout.block_corners(b), world.curb_height,
+				YARD_GRASS if yard == "M_Grass" else YARD_GRAVEL if yard == "M_Gravel" else PAVEMENT)
+		if b.get("gen", false):
+			lots.append_array(BlockFiller.fill(b, world.sidewalk, world.curb_height, false)["lots"])
+	for lot in lots:
 		var def: Dictionary = catalog.get(lot["building"], {})
 		if def.is_empty():
 			continue
@@ -50,25 +63,34 @@ static func build_chunk(world: WorldLayout, key: Vector2i, catalog: Dictionary) 
 		_box(verts, normals, colors, t, Vector3(-r.size.x * 0.5, 0, -r.size.y * 0.5),
 			Vector3(r.size.x * 0.5, box["height"], r.size.y * 0.5), tone)
 	if verts.is_empty():
-		return null
+		return []
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = verts
 	arrays[Mesh.ARRAY_NORMAL] = normals
 	arrays[Mesh.ARRAY_COLOR] = colors
+	return arrays
+
+
+static func to_mesh(arrays: Array) -> ArrayMesh:
+	if arrays.is_empty():
+		return null
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh.surface_set_material(0, material())
 	return mesh
 
 
-static func _flat(v: PackedVector3Array, n: PackedVector3Array, c: PackedColorArray, r: Rect2, y: float, col: Color) -> void:
-	var a := Vector3(r.position.x, y, r.position.y)
-	var b := Vector3(r.end.x, y, r.position.y)
-	var cc := Vector3(r.end.x, y, r.end.y)
-	var d := Vector3(r.position.x, y, r.end.y)
+static func _flat(v: PackedVector3Array, n: PackedVector3Array, c: PackedColorArray, q: PackedVector2Array, y: float,
+		col: Color) -> void:
+	var a := Vector3(q[0].x, y, q[0].y)
+	var b := Vector3(q[1].x, y, q[1].y)
+	var cc := Vector3(q[2].x, y, q[2].y)
+	var d := Vector3(q[3].x, y, q[3].y)
 	var pav := Color(col.r, col.g, col.b, 0.6)
-	for p in [a, b, cc, a, cc, d]:
+	# Clockwise seen from above (Godot front faces).
+	var order := [a, b, cc, a, cc, d] if (b - a).cross(cc - a).y < 0.0 else [a, cc, b, a, d, cc]
+	for p in order:
 		v.append(p)
 		n.append(Vector3.UP)
 		c.append(pav)

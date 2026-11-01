@@ -14,11 +14,22 @@ static func build(world: WorldLayout, key: Vector2i) -> Dictionary:
 	if c.is_empty():
 		return out
 	var tools := {}
+	var merger := MeshMerger.new()
+	var parked: Array = c["parking"].duplicate()
 	for bi in c["blocks"]:
 		var b: Dictionary = world.blocks[bi]
 		if b["sidewalks"]:
-			RoadBuilder.add_sidewalk(tools, b["rect"], world.curb_height, world.corner_radius, b["lawn"], world.sidewalk)
-	var merger := MeshMerger.new()
+			RoadBuilder.add_sidewalk(tools, b["rect"], world.curb_height, world.corner_radius, b["lawn"], world.sidewalk,
+				b.get("xform", Transform2D.IDENTITY), b.get("yard", ""))
+		if b.get("gen", false):
+			# Generated districts: contents derived on demand from the block seed.
+			var f := BlockFiller.fill(b, world.sidewalk, world.curb_height)
+			for lot in f["lots"]:
+				_append(merger, AssetLibrary.building_mesh(lot["building"]), lot["transform"])
+				out["lots"] += 1
+			for p in f["props"]:
+				_append(merger, AssetLibrary.prop_mesh(p["prop"]), p["transform"])
+			parked.append_array(f["parking"])
 	for li in c["lots"]:
 		var lot: Dictionary = world.lots[li]
 		_append(merger, AssetLibrary.building_mesh(lot["building"]), lot["transform"])
@@ -42,7 +53,7 @@ static func build(world: WorldLayout, key: Vector2i) -> Dictionary:
 		var sc := 0.8 + float(h % 1000) / 2500.0
 		var basis := Basis(Vector3.UP, float(h % 6283) / 1000.0).scaled(Vector3(sc, sc, sc))
 		out["trees"].append(Transform3D(basis, Vector3(p.x, 0.0, p.y)))
-	out["parked"] = c["parking"]
+	out["parked"] = parked
 	return out
 
 

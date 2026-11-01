@@ -95,6 +95,11 @@ func _benchmark(seconds: float) -> void:
 
 
 func _apply_setup() -> void:
+	# Measurements must not be disturbed by a mouse or trackpad over the window.
+	var cam_node := get_tree().get_first_node_in_group("strategy_camera")
+	if cam_node:
+		cam_node.input_enabled = false
+		cam_node.set_process_unhandled_input(false)
 	if _args.has("view"):
 		var p := (_args["view"] as String).split(",")
 		var cam := get_tree().get_first_node_in_group("strategy_camera")
@@ -111,3 +116,7 @@ func _apply_setup() -> void:
 		var main := get_tree().get_first_node_in_group("main")
 		if main and main.has_method("dev_select"):
 			main.dev_select(_args["select"])
+	if _args.has("follow"):
+		var main_node := get_tree().get_first_node_in_group("main")
+		if main_node and main_node.has_method("_set_follow"):
+			main_node._set_follow(_args["follow"])

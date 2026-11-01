@@ -45,6 +45,20 @@ func has_material(mat_name: String) -> bool:
 	return _defs.has(mat_name)
 
 
+## Textured materials of licensed assets (not in the library). Registered by
+## AssetLibrary under a unique name so chunk merging can key surfaces by name.
+func register_external(mat_name: String, mat: Material) -> void:
+	if mat is BaseMaterial3D:
+		var m := (mat as BaseMaterial3D)
+		m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+		m.metallic = 0.0
+		m.roughness = maxf(m.roughness, 0.75)
+	mat.set_meta("library_name", mat_name)
+	_materials[mat_name] = mat
+	_cutout[mat_name] = mat
+	_instanced[mat_name] = mat
+
+
 ## Shared material for a pipeline material name.
 func get_material(mat_name: String) -> Material:
 	if not _materials.has(mat_name):

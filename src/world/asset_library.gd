@@ -40,6 +40,11 @@ static func mesh_at(path: String) -> ArrayMesh:
 		if mi and mi.mesh is ArrayMesh:
 			mesh = mi.mesh
 			Materials.apply_to_mesh(mesh)
+			# Licensed assets keep their own textured materials.
+			for i in mesh.get_surface_count():
+				var m := mesh.surface_get_material(i)
+				if m != null and Materials.material_name_of(m) == "":
+					Materials.register_external("ext:%s:%d" % [path.get_file().get_basename(), i], m)
 			var names := PackedStringArray()
 			for i in mesh.get_surface_count():
 				names.append(Materials.material_name_of(mesh.surface_get_material(i)))

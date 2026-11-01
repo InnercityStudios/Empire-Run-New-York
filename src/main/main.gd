@@ -36,10 +36,16 @@ func _ready() -> void:
 	add_to_group("main")
 	_show_loading()
 	await get_tree().process_frame
-	var layout := WorldLayout.build(Content.db.worlds["greater_new_york"], Content.db)
+	var world_id := GameContent.DEFAULT_WORLD
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--world="):
+			world_id = a.get_slice("=", 1)
+	var layout := WorldLayout.build(Content.db.worlds[world_id], Content.db)
 	world.build(layout)
 	world.camera = camera
 	camera.set_bounds(layout.playable)
+	if layout.is_geo:
+		camera.max_distance = 3200.0
 	camera.distance_changed.connect(atmosphere.on_camera_distance)
 	camera.tapped.connect(_on_tap)
 	camera.follow_cancelled.connect(func(): _set_follow(""))

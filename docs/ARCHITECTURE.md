@@ -98,6 +98,22 @@ the views stay the same. The server should use the server clock for timestamps
   roads, and the Delancey Bridge ends at a future-city portal node. Building
   lots have stable ids (`<region>:<n>`); road locations persist by node key,
   so saves survive world growth (save v2, v1 migrates).
+- **Geography worlds** (`schema: geography-v1`, `GeographyBuilder`): coastlines,
+  borough and district polygons, parks, polyline arterials and bridges from
+  `data/world/nyc_1977.json`. Little Italy is built unchanged at its original
+  coordinates. Districts sharing a grid (Manhattan's) share one lattice; blocks
+  shrink to fit coastlines, district borders, parks and plazas, and split where
+  an arterial crosses them. Streets, Little Italy's edges, arterial and bridge
+  ends are stitched into one graph; leftover islands are linked or dropped.
+  Generated blocks store no lots: `BlockFiller` derives buildings, props and
+  parking per chunk from the block seed (only Little Italy's 381 lots are
+  stored). Save v3 records the world id; loading a save from another map keeps
+  every crew, soldier and destination and re-routes travelling convoys.
+- **Three presentation tiers** (geography worlds): province overview (one
+  MultiMesh of block massing per 1 km tile plus scenery backdrop and landmark
+  towers, resident), mid-distance massing (one box per building, streamed to
+  `mid_radius`), full detail (streamed to `detail_radius`). Each chunk shows
+  exactly one tier, swapped when the finer one is ready, so there are no gaps.
 - **Chunks**: 256 m cells with stable integer coordinates.
 - **Always resident** (`WorldShellBuilder`, `FarCityBuilder`): water, land and
   region grounds, quays, per-chunk road meshes, bridge, park lake/paths and a
@@ -122,6 +138,24 @@ city build in ~0.3 s, and detail chunks are meshed on worker threads (≤0.35 s
 each on the M3 Pro). Baking detail chunk meshes to disk was rejected: a dense
 chunk is ~0.54 M triangles (~10 MB), which would add hundreds of MB to the
 app. Next step if devices need it: a first-visit on-device chunk cache.
+
+## Greater New York 1977 (Phase 2), Apple M3 Pro, 1600×900, `--benchmark=5`
+
+Frame times are at the display cap and do not discriminate on this Mac.
+Not measured on phones.
+
+| View | Avg / p95 frame | Draw calls | Primitives (incl. shadows) | VRAM |
+|---|---|---|---|---|
+| Close, Little Italy (80 m) | 8.9 / 9.8 ms | 174 | 2.84 M | 914 MB* |
+| Mid, Little Italy (200 m) | 8.3 / 11.9 ms | 181 | 3.49 M | 389 MB |
+| Close, Bed-Stuy (90 m) | 8.4 / 12.7 ms | 164 | 1.62 M | 395 MB |
+| Strategic (700 m) | 8.9 / 23.4 ms | 136 | 61 k | 321 MB |
+| Province overview (2.6 km) | 8.4 / 13.0 ms | 132 | 40 k | 311 MB |
+
+\*One run; repeat runs at the same view report ~400 MB. Peaks of 800–950 MB
+also appear in the first province after heavy chunk streaming, so this is a
+pre-existing streaming/VRAM accounting issue to investigate on device.
+Layout build: 2–4 s (desktop); 5,269 generated blocks, 10,115 road nodes.
 
 ## Measured on an Apple M3 Pro (desktop, 1600×900)
 

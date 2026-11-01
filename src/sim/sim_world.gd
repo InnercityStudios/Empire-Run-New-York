@@ -11,15 +11,20 @@ extends RefCounted
 ##   in timestamp order, so results never depend on frame rate.
 ## - Changes are reported as event dictionaries collected via `drain_events()`.
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 ## v1 stored road locations as edge indices of the Little Italy-only graph.
 const LEGACY_SAVE_VERSION := 1
+## v2 saves predate the world id; they were written in the first province.
+const V2_WORLD := "greater_new_york"
+## Rival patrols stay near the crew (the province is many kilometres wide).
+const PATROL_RADIUS_CM := 60_000
 const NEUTRAL_FACTION := "independent"
 const AI_INTERVAL_MS := 12_000
 const PURCHASE_LEVEL_STEP_PERMILLE := 500
 
 var content: GameContent
 var roads: RoadGraph
+var world_id := ""                       ## map the road graph belongs to (saved; drives migration)
 var landmark_locations: Dictionary = {}  ## landmark id -> road location
 var now_ms := 0
 var rng: SimRng
@@ -403,11 +408,10 @@ func _ai_tick() -> void:
 				if target.landmark_id != c.at_landmark:
 					_start_route(c, landmark_locations[target.landmark_id], target.landmark_id)
 			else:
-				var node := rng.range_int(roads.nodes.size())
-				var adj: Array = roads.neighbours(node)
-				if not adj.is_empty():
-					var e: int = adj[0][0]
-					_start_route(c, {"edge": e, "offset": int(roads.edges[e]["length"]) / 2}, "")
+				var here := Vector2i(c.position_cm(now_ms, roads))
+				var target := here + Vector2i(rng.range_int(PATROL_RADIUS_CM * 2) - PATROL_RADIUS_CM,
+					rng.range_int(PATROL_RADIUS_CM * 2) - PATROL_RADIUS_CM)
+				_start_route(c, roads.locate(target), "")
 
 
 func _emit(type: String, data: Dictionary) -> void:
@@ -419,7 +423,7 @@ func _emit(type: String, data: Dictionary) -> void:
 # --- Persistence ------------------------------------------------------------------------
 func to_dict() -> Dictionary:
 	var d := {
-		"version": SAVE_VERSION, "now_ms": now_ms, "rng": rng.state, "player": player_faction_id,
+		"version": SAVE_VERSION, "world": world_id, "now_ms": now_ms, "rng": rng.state, "player": player_faction_id,
 		"ai_next_ms": ai_next_ms, "factions": [], "businesses": [], "crews": [], "headquarters": [],
 	}
 	for k in _sorted(factions):
@@ -437,14 +441,22 @@ func to_dict() -> Dictionary:
 
 ## `legacy_roads` is the graph v1 saves were written against (Little Italy
 ## only); v1 crew locations are converted to points and re-located.
+## `p_world_id` is the map being loaded: a save written on another map keeps
+## every crew, soldier, vehicle and destination, but crews on the road get a
+## new route from where they are now (their old route may cross what is now
+## water or buildings). Locations missing from the new graph snap to the
+## nearest road.
 static func from_dict(d: Dictionary, p_content: GameContent, p_roads: RoadGraph, locations: Dictionary,
-		legacy_roads: RoadGraph = null) -> SimWorld:
+		legacy_roads: RoadGraph = null, p_world_id := "") -> SimWorld:
 	var version := int(d.get("version", 0))
-	if version != SAVE_VERSION and not (version == LEGACY_SAVE_VERSION and legacy_roads != null):
+	if not version in [SAVE_VERSION, 2] and not (version == LEGACY_SAVE_VERSION and legacy_roads != null):
 		return null
+	var saved_world: String = d.get("world", V2_WORLD if version <= 2 else p_world_id)
+	var migrate := p_world_id != "" and saved_world != p_world_id
 	var w := SimWorld.new()
 	w.content = p_content
 	w.roads = p_roads
+	w.world_id = p_world_id if p_world_id != "" else saved_world
 	w.landmark_locations = locations
 	w.now_ms = int(d["now_ms"])
 	w.rng = SimRng.new(1)
@@ -467,14 +479,45 @@ static func from_dict(d: Dictionary, p_content: GameContent, p_roads: RoadGraph,
 		else:
 			cs.location = p_roads.location_from_key(loc)
 			if cs.location.is_empty():
-				cs.location = p_roads.locate(Vector2i(0, 0))
+				cs.location = p_roads.locate(_key_midpoint(loc))
 		if cs.at_landmark != "" and locations.has(cs.at_landmark) and not cs.is_moving():
 			cs.location = locations[cs.at_landmark].duplicate()
 		w.crews[cs.id] = cs
 	for h in d.get("headquarters", []):
 		var hs := HeadquartersState.from_dict(h)
 		w.headquarters[hs.faction_id] = hs
+	if migrate:
+		w._reroute_after_migration()
 	return w
+
+
+## Midpoint of a saved location key's two node positions ("x,z" in cm).
+static func _key_midpoint(loc: Dictionary) -> Vector2i:
+	var pts: Array = []
+	for k in ["a", "b"]:
+		var parts := String(loc.get(k, "0,0")).split(",")
+		pts.append(Vector2i(int(parts[0]), int(parts[1])) if parts.size() == 2 else Vector2i.ZERO)
+	return (pts[0] + pts[1]) / 2
+
+
+func _reroute_after_migration() -> void:
+	for cid in _sorted(crews):
+		var c: CrewState = crews[cid]
+		if not c.is_moving():
+			continue
+		var dest: Dictionary = landmark_locations.get(c.dest_landmark, c.location)
+		var dest_landmark := c.dest_landmark
+		var result := _start_route(c, dest, dest_landmark)
+		if not result.get("ok", false):
+			# No road to the destination any more: stop where the crew is.
+			var here := c.position_cm(now_ms, roads)
+			c.location = roads.locate(Vector2i(roundi(here.x), roundi(here.y)))
+			c.status = "idle"
+			c.route_points = []
+			c.route_costs = []
+			c.at_landmark = ""
+			c.dest_landmark = ""
+	_events.clear()
 
 
 static func _sorted(dict: Dictionary) -> Array:

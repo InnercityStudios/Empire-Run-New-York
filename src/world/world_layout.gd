@@ -50,6 +50,19 @@ var backdrops: Array = []        ## {rect, boxes: Array[{rect: Rect2, height: fl
 var region_grounds: Array = []   ## {rect: Rect2, ground: String}
 var portals: Array = []          ## future-city connection points {node, name}
 
+## Geography worlds (`schema: geography-v1`, see GeographyBuilder).
+var is_geo := false
+var geo: GeoMap
+var districts: Array = []        ## district definitions (id, name, borough, style, territory...)
+var kits: Dictionary = {}        ## style -> BlockFiller kit (read-only after build)
+var land_polygons: Array = []    ## {id, kind, polygon: PackedVector2Array}
+var park_areas: Array = []       ## {name, polygon, lakes: Array[PackedVector2Array], paths, trees}
+var bridge_paths: Array = []     ## {id, name, kind, width, path: PackedVector2Array, towers: Array[Vector2]}
+var grounds: Array = []          ## {polygon: PackedVector2Array, material}
+var towers: Array = []           ## landmark silhouettes {pos: Vector2, size: Vector2, height, color, yaw}
+var backdrop_boxes: Array = []   ## scenery massing {pos: Vector2, size: Vector2, height, yaw}
+var labels: Array = []           ## {text, pos: Vector2, kind}
+
 var _catalog: Dictionary
 var _node_index: Dictionary = {}
 var _chunks: Dictionary = {}
@@ -57,7 +70,10 @@ var _chunks: Dictionary = {}
 
 static func build(def: Dictionary, content: GameContent) -> WorldLayout:
 	var w := WorldLayout.new()
-	w._build(def, content)
+	if def.get("schema", "") == "geography-v1":
+		GeographyBuilder.populate(w, def, content)
+	else:
+		w._build(def, content)
 	return w
 
 
@@ -98,6 +114,10 @@ static func _rect(a: Array) -> Rect2:
 
 
 # --- Regions ------------------------------------------------------------------------
+func add_region(r: Dictionary, def: Dictionary, content: GameContent) -> void:
+	_add_region(r, def, content)
+
+
 func _add_region(r: Dictionary, def: Dictionary, content: GameContent) -> void:
 	var dl: DistrictLayout
 	if r.has("district"):
@@ -217,6 +237,18 @@ func _filter_lines(lines: Array, key: String, lo: float, hi: float) -> Array:
 # --- Graph helpers -------------------------------------------------------------------
 static func _key(p: Vector2) -> Vector2i:
 	return Vector2i(roundi(p.x * 100.0), roundi(p.y * 100.0))
+
+
+func node(p: Vector2) -> int:
+	return _node(p)
+
+
+func edge(a: int, b: int, street: String, width: float, speed := 1000) -> void:
+	_edge(a, b, street, width, speed)
+
+
+func add_segment(street: String, from: Vector2, to: Vector2, width: float, style: int) -> void:
+	_add_segment(street, from, to, width, style)
 
 
 func _node(p: Vector2) -> int:
@@ -458,9 +490,13 @@ func _chunk(c: Vector2i) -> Dictionary:
 	return _chunks[c]
 
 
+func index_chunks() -> void:
+	_index_chunks()
+
+
 func _index_chunks() -> void:
 	for bi in blocks.size():
-		_chunk(chunk_of(blocks[bi]["rect"].get_center()))["blocks"].append(bi)
+		_chunk(chunk_of(block_center(blocks[bi])))["blocks"].append(bi)
 	for li in lots.size():
 		var lot: Dictionary = lots[li]
 		if lot["landmark"] != "":
@@ -478,11 +514,54 @@ func _index_chunks() -> void:
 	for pk in parks:
 		for t in pk["trees"]:
 			_chunk(chunk_of(t))["trees"].append(t)
+	for pk in park_areas:
+		for t in pk["trees"]:
+			_chunk(chunk_of(t))["trees"].append(t)
 	for pr in piers:
 		_chunk(chunk_of((pr["deck"] as Rect2).get_center()))["piers"].append(pr)
 	for bd in backdrops:
 		for box in bd["boxes"]:
 			_chunk(chunk_of((box["rect"] as Rect2).get_center()))["backdrop"].append(box)
+	_node_cells.clear()
+	for i in graph_nodes.size():
+		var c := Vector2i(((graph_nodes[i] as Vector2) / NODE_CELL).floor())
+		var cell: PackedInt32Array = _node_cells.get(c, PackedInt32Array())
+		cell.append(i)
+		_node_cells[c] = cell  # packed arrays are values: write back
+
+
+const NODE_CELL := 128.0
+var _node_cells: Dictionary = {}
+
+
+## Road nodes within `radius` metres of `p` (spatial index, sorted by index).
+func nodes_near(p: Vector2, radius: float) -> PackedInt32Array:
+	var out := PackedInt32Array()
+	var c0 := Vector2i(((p - Vector2(radius, radius)) / NODE_CELL).floor())
+	var c1 := Vector2i(((p + Vector2(radius, radius)) / NODE_CELL).floor())
+	for cx in range(c0.x, c1.x + 1):
+		for cz in range(c0.y, c1.y + 1):
+			for i in _node_cells.get(Vector2i(cx, cz), PackedInt32Array()):
+				if (graph_nodes[i] as Vector2).distance_to(p) <= radius:
+					out.append(i)
+	out.sort()
+	return out
+
+
+## World-space corners of a block (generated blocks are rotated rectangles).
+static func block_corners(b: Dictionary) -> PackedVector2Array:
+	var r: Rect2 = b["rect"]
+	var pts := PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)])
+	if b.has("xform"):
+		var x: Transform2D = b["xform"]
+		for i in 4:
+			pts[i] = x * pts[i]
+	return pts
+
+
+static func block_center(b: Dictionary) -> Vector2:
+	var c: Vector2 = (b["rect"] as Rect2).get_center()
+	return (b["xform"] as Transform2D) * c if b.has("xform") else c
 
 
 func chunk_keys() -> Array:
@@ -505,6 +584,14 @@ func street_widths() -> Dictionary:
 	for k in streets:
 		out[k] = streets[k]["width"]
 	return out
+
+
+## District (geography worlds) or region (legacy province) under a point.
+func district_name_at(p: Vector2) -> String:
+	if is_geo:
+		var di := geo.district_at(p)
+		return districts[di]["name"] if di >= 0 else ""
+	return region_at(p).get("name", "")
 
 
 func region_at(p: Vector2) -> Dictionary:

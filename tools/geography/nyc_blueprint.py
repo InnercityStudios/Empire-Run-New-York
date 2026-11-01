@@ -31,6 +31,8 @@ FONT_UI = os.path.join(ROOT, "assets", "fonts", "Inter-Variable.ttf")
 LI_RECT = (-218, -196, 226, 198)
 AXIS_SLOPE = 0.42  # Manhattan's long axis leans east going north (~23 degrees)
 GRID_ANGLE = math.degrees(math.atan(AXIS_SLOPE))
+# One Commissioners' grid for Manhattan above Houston/14th (shared lattice).
+MANHATTAN_PITCH = (220, 72)
 
 
 # ---------------------------------------------------------------------------
@@ -129,7 +131,7 @@ def rotated_rect(cx, cz, length, width, angle_deg):
             (cx - ux * hl - vx * hw, cz - uz * hl - vz * hw), (cx - ux * hl + vx * hw, cz - uz * hl + vz * hw)]
 
 
-LANDMASSES = [
+BOROUGHS = [
     {"id": "manhattan", "name": "Manhattan", "borough": "manhattan", "kind": "playable", "polygon": manhattan()},
     {"id": "brooklyn", "name": "Brooklyn", "borough": "brooklyn", "kind": "playable", "polygon": brooklyn()},
     {"id": "queens", "name": "Queens", "borough": "queens", "kind": "playable", "polygon": queens()},
@@ -138,18 +140,73 @@ LANDMASSES = [
      "polygon": rotated_rect(2210, -2700, 1300, 90, GRID_ANGLE)},
     {"id": "randalls_island", "name": "Randall's Island", "borough": "manhattan", "kind": "playable",
      "polygon": [(2980, -4520), (3280, -4560), (3360, -4880), (3120, -5000), (2900, -4800)]},
-    {"id": "governors_island", "name": "Governors Island", "borough": "manhattan", "kind": "scenery",
-     "polygon": [(200, 2250), (520, 2180), (560, 2460), (300, 2560), (150, 2420)]},
-    {"id": "liberty_island", "name": "Liberty Island", "borough": "scenery", "kind": "scenery",
-     "polygon": [(-1150, 2620), (-1020, 2600), (-1000, 2720), (-1140, 2740)]},
-    {"id": "new_jersey", "name": "New Jersey", "borough": "scenery", "kind": "scenery", "polygon": new_jersey()},
-    {"id": "staten_island", "name": "Staten Island (future)", "borough": "staten_island", "kind": "scenery",
+    {"id": "staten_island", "name": "Staten Island (future)", "borough": "staten_island", "kind": "future",
      "polygon": [(-3600, 5300), (-1300, 5000), (100, 5600), (0, 6400), (-3600, 6400)]},
-    {"id": "long_island", "name": "Long Island", "borough": "scenery", "kind": "scenery",
-     "polygon": [(7600, -8900), (9200, -8900), (9200, 7000), (7600, 6400)]},
-    {"id": "coney_area", "name": "South Brooklyn", "borough": "scenery", "kind": "scenery",
-     "polygon": [(560, 5000), (7600, 5000), (7600, 7000), (300, 6400)]},
 ]
+
+PAD = 1500  # scenery land runs this far past the extent so no map edge is ever visible
+
+
+def chaikin(poly, iterations=2, jitter=14.0, seed=0):
+    """Rounded, slightly irregular shoreline: Chaikin corner cutting plus a
+    deterministic sideways wobble on new vertices."""
+    rng = random.Random(seed)
+    pts = list(poly)
+    for _ in range(iterations):
+        out = []
+        n = len(pts)
+        for i in range(n):
+            a, b = pts[i], pts[(i + 1) % n]
+            for t in (0.25, 0.75):
+                x, z = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+                dx, dz = b[0] - a[0], b[1] - a[1]
+                ln = math.hypot(dx, dz) or 1.0
+                w = rng.uniform(-jitter, jitter) if ln > 120 else 0.0
+                out.append((x - dz / ln * w, z + dx / ln * w))
+        pts = out
+    return pts
+
+
+def _coast_long_island():
+    west = brooklyn()[:16]          # Bay Ridge -> Newtown Creek mouth
+    river = queens()[:18]           # East River shore -> Flushing Bay
+    return [(300, 6400 + PAD)] + west + river[1:] + [(9200 + PAD, -4500), (9200 + PAD, 6400 + PAD)]
+
+
+def _coast_bronx():
+    b = bronx()
+    hr0 = b[0]
+    south = b[1:9]
+    hr_rest = b[11:]
+    west_x = hr_rest[0][0]
+    return [hr0] + south + [(8200, -6500), (9200 + PAD, -6900), (9200 + PAD, -8900 - PAD),
+                            (west_x, -8900 - PAD)] + hr_rest
+
+
+def _coast_new_jersey():
+    pts = new_jersey()
+    return [(x if x > -3600 else -3600 - PAD, z if z > -8900 else -8900 - PAD) for x, z in pts[:-2]] + \
+        [(-2300, 6400 + PAD), (-3600 - PAD, 6400 + PAD), (-3600 - PAD, -8900 - PAD)]
+
+
+COASTS = [
+    {"id": "manhattan", "name": "Manhattan", "kind": "playable", "polygon": manhattan()},
+    {"id": "long_island", "name": "Brooklyn / Queens / Long Island", "kind": "playable", "polygon": _coast_long_island()},
+    {"id": "bronx", "name": "The Bronx / Westchester", "kind": "playable", "polygon": _coast_bronx()},
+    {"id": "roosevelt_island", "name": "Roosevelt Island", "kind": "playable", "polygon": BOROUGHS[4]["polygon"]},
+    {"id": "randalls_island", "name": "Randall's Island", "kind": "playable", "polygon": BOROUGHS[5]["polygon"]},
+    {"id": "governors_island", "name": "Governors Island", "kind": "scenery",
+     "polygon": [(200, 2250), (520, 2180), (560, 2460), (300, 2560), (150, 2420)]},
+    {"id": "liberty_island", "name": "Liberty Island", "kind": "scenery",
+     "polygon": [(-1150, 2620), (-1020, 2600), (-1000, 2720), (-1140, 2740)]},
+    {"id": "new_jersey", "name": "New Jersey", "kind": "scenery", "polygon": _coast_new_jersey()},
+    {"id": "staten_island", "name": "Staten Island", "kind": "scenery",
+     "polygon": [(-3600 - PAD, 5300), (-1300, 5000), (100, 5600), (0, 6400 + PAD), (-3600 - PAD, 6400 + PAD)]},
+]
+for _i, _c in enumerate(COASTS):
+    _c["polygon"] = chaikin(_c["polygon"], seed=_i + 1)
+# Kept for the renderer: everything drawn as land.
+LANDMASSES = COASTS
 
 WATERWAYS = [
     {"id": "hudson_river", "name": "Hudson River", "label_at": (manhattan_center(-3300) - 1200, -3300), "angle": GRID_ANGLE},
@@ -211,25 +268,25 @@ DISTRICTS = [
     {"id": "east_village", "name": "East Village", "borough": "manhattan", "seed": (600, -800), "style": "tenement",
      "grid": {"angle": GRID_ANGLE, "pitch": (90, 70)}, "territory": "contested"},
     {"id": "chelsea", "name": "Chelsea", "borough": "manhattan", "seed": (120, -1720), "style": "rowhouse_mix",
-     "grid": {"angle": GRID_ANGLE, "pitch": (230, 70)}, "territory": "neutral"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "gramercy", "name": "Gramercy", "borough": "manhattan", "seed": (950, -1500), "style": "rowhouse_mix",
-     "grid": {"angle": GRID_ANGLE, "pitch": (200, 70)}, "territory": "neutral"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "hells_kitchen", "name": "Hell's Kitchen", "borough": "manhattan", "seed": (420, -2500),
-     "style": "tenement", "grid": {"angle": GRID_ANGLE, "pitch": (240, 70)}, "territory": "contested"},
+     "style": "tenement", "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "contested"},
     {"id": "midtown", "name": "Midtown", "borough": "manhattan", "seed": (1050, -2250), "style": "highrise",
-     "grid": {"angle": GRID_ANGLE, "pitch": (220, 70)}, "territory": "neutral"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "times_square", "name": "Times Square", "borough": "manhattan", "seed": (700, -2150), "style": "theatre",
-     "grid": {"angle": GRID_ANGLE, "pitch": (220, 70)}, "territory": "neutral"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "murray_hill", "name": "Murray Hill", "borough": "manhattan", "seed": (1500, -1950), "style": "highrise",
-     "grid": {"angle": GRID_ANGLE, "pitch": (200, 70)}, "territory": "neutral"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "upper_west_side", "name": "Upper West Side", "borough": "manhattan", "seed": (950, -3600),
-     "style": "prewar_apartments", "grid": {"angle": GRID_ANGLE, "pitch": (230, 75)}, "territory": "neutral"},
+     "style": "prewar_apartments", "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "upper_east_side", "name": "Upper East Side", "borough": "manhattan", "seed": (2100, -3200),
-     "style": "prewar_apartments", "grid": {"angle": GRID_ANGLE, "pitch": (200, 75)}, "territory": "neutral"},
+     "style": "prewar_apartments", "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "harlem", "name": "Harlem", "borough": "manhattan", "seed": (2050, -4800), "style": "tenement",
-     "grid": {"angle": GRID_ANGLE, "pitch": (220, 75)}, "territory": "contested"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "contested"},
     {"id": "east_harlem", "name": "East Harlem", "borough": "manhattan", "seed": (2550, -4400), "style": "tenement",
-     "grid": {"angle": GRID_ANGLE, "pitch": (200, 75)}, "territory": "neutral"},
+     "grid": {"angle": GRID_ANGLE, "pitch": MANHATTAN_PITCH}, "territory": "neutral"},
     {"id": "washington_heights", "name": "Washington Heights", "borough": "manhattan", "seed": (2650, -6300),
      "style": "prewar_apartments", "grid": {"angle": GRID_ANGLE + 4, "pitch": (200, 80)}, "territory": "neutral"},
     # Brooklyn
@@ -322,6 +379,49 @@ STYLES = {
     "park": {"label": "Park", "color": "#4d6e38", "floors": [0, 0], "density": 0.0},
 }
 
+# Block fill rules per style (consumed by the game's BlockFiller): building
+# kinds from the catalogue, corner buildings, setback, gaps between buildings,
+# street trees, lawns, and whether side streets get frontages.
+FILL = {
+    "tenement": {"kinds": ["midblock", "walkup"], "corners": True, "gap": [0, 0], "trees": 0.55},
+    "highrise_old": {"kinds": ["midblock_tall", "midblock", "apartment"], "corners": True, "gap": [0, 0], "trees": 0.2,
+                     "tower_kinds": ["highrise"], "tower_chance": 0.6},
+    "highrise": {"kinds": ["apartment", "midblock_tall", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.25,
+                 "tower_kinds": ["highrise"], "tower_chance": 0.8},
+    "theatre": {"kinds": ["midblock", "midblock_tall", "midblock_low"], "corners": True, "gap": [0, 0], "trees": 0.1,
+                "tower_kinds": ["highrise"], "tower_chance": 0.3},
+    "cast_iron": {"kinds": ["industrial", "midblock"], "corners": False, "gap": [0, 2], "trees": 0.3},
+    "loft_industrial": {"kinds": ["industrial"], "corners": False, "gap": [1, 6], "trees": 0.15},
+    "village_irregular": {"kinds": ["rowhouse", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.9},
+    "rowhouse_mix": {"kinds": ["rowhouse", "midblock", "midblock_low", "brooklyn", "walkup"], "corners": False,
+                     "gap": [0, 0], "trees": 0.75},
+    "prewar_apartments": {"kinds": ["midblock_tall", "apartment", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.8},
+    "brownstone": {"kinds": ["rowhouse", "brooklyn"], "corners": False, "gap": [0, 0], "trees": 0.9, "primary_only": True},
+    "industrial_mix": {"kinds": ["industrial", "midblock_low", "brooklyn"], "corners": False, "gap": [3, 12], "trees": 0.15},
+    "heavy_industrial": {"kinds": ["industrial"], "corners": False, "gap": [6, 22], "trees": 0.05},
+    "shipyard": {"kinds": ["industrial"], "corners": False, "gap": [10, 30], "trees": 0.0},
+    "waterfront": {"kinds": ["industrial"], "corners": False, "gap": [6, 18], "trees": 0.0},
+    "lowrise_residential": {"kinds": ["rowhouse", "house", "midblock_low", "brooklyn"], "corners": False, "gap": [1, 4],
+                            "trees": 0.85},
+    "garden_apartments": {"kinds": ["midblock_tall", "apartment"], "corners": False, "gap": [14, 26], "setback": 8, "trees": 0.9,
+                          "lawns": True},
+    "suburban_queens": {"kinds": ["house"], "corners": False, "gap": [5, 11], "setback": 7, "trees": 0.9, "lawns": True},
+    "towers_in_park": {"kinds": ["midblock_tall", "apartment"], "corners": False, "gap": [24, 44], "setback": 14, "trees": 0.9,
+                       "lawns": True},
+    "airport": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
+    "park": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
+    "li_tenement": {"kinds": ["midblock"], "corners": True, "gap": [0, 0], "trees": 0.62},
+}
+# Block interiors behind the frontage: backyards, work yards or paved plazas.
+YARDS = {"M_Grass": ["tenement", "village_irregular", "rowhouse_mix", "prewar_apartments", "brownstone",
+                     "lowrise_residential", "garden_apartments", "suburban_queens", "towers_in_park"],
+         "M_Gravel": ["cast_iron", "loft_industrial", "industrial_mix", "heavy_industrial", "shipyard", "waterfront"]}
+for _k, _v in FILL.items():
+    for _mat, _styles in YARDS.items():
+        if _k in _styles:
+            _v["yard"] = _mat
+    STYLES[_k]["fill"] = _v
+
 TERRITORY_COLORS = {"player": "#d9473a", "rival": "#4f8fd9", "contested": "#a36fd1"}
 
 
@@ -409,6 +509,8 @@ BRIDGES = [
 LANDMARKS = [
     {"id": "empire_state", "name": "Empire State Bldg", "pos": mc(-2150, 330), "kind": "skyscraper"},
     {"id": "chrysler", "name": "Chrysler Bldg", "pos": mc(-2380, 560), "kind": "skyscraper"},
+    {"id": "pan_am", "name": "Pan Am Bldg", "pos": mc(-2420, 330), "kind": "skyscraper"},
+    {"id": "woolworth", "name": "Woolworth Bldg", "pos": (-240, 1010), "kind": "skyscraper"},
     {"id": "world_trade_center", "name": "World Trade Center", "pos": (-520, 1100), "kind": "skyscraper"},
     {"id": "statue_of_liberty", "name": "Statue of Liberty", "pos": (-1080, 2670), "kind": "monument"},
     {"id": "yankee_stadium", "name": "Yankee Stadium", "pos": (3420, -6050), "kind": "stadium"},
@@ -445,7 +547,8 @@ def export_json(path, district_cells):
         "playable": [r2(p) for p in PLAYABLE],
         "chunk_size": 256,
         "anchors": {"little_italy": {"translation": [0, 0], "rect": list(LI_RECT), "district": "little_italy"}},
-        "landmasses": [dict(l, polygon=[r2(p) for p in l["polygon"]]) for l in LANDMASSES],
+        "landmasses": [dict(l, polygon=[r2(p) for p in l["polygon"]]) for l in COASTS],
+        "boroughs": [dict(l, polygon=[r2(p) for p in l["polygon"]]) for l in BOROUGHS],
         "waterways": [dict(w, label_at=r2(w["label_at"])) for w in WATERWAYS],
         "parks": [dict(p, polygon=[r2(q) for q in p["polygon"]], lakes=[[r2(q) for q in lake] for lake in p.get("lakes", [])])
                   for p in PARKS],
@@ -456,6 +559,9 @@ def export_json(path, district_cells):
                     for b in BRIDGES],
         "landmarks": [dict(l, pos=r2(l["pos"])) for l in LANDMARKS],
         "territory_seed": {d["id"]: d.get("territory", "neutral") for d in DISTRICTS},
+        "seed": 1977, "water_level": -1.6,
+        "defaults": {"sidewalk_width": 4.0, "curb_height": 0.15, "corner_radius": 3.2, "lot_depth": 20.0,
+                     "lane_offset": 1.9, "street_width": 12},
     }
     for d in DISTRICTS:
         e = {k: v for k, v in d.items() if k != "seed"}
@@ -524,7 +630,7 @@ def assign_districts(scale, ext):
     idx = Image.new("L", (w, h), 0)
     px = idx.load()
     borough_masks = {}
-    for l in LANDMASSES:
+    for l in BOROUGHS:
         if l["kind"] != "playable":
             continue
         m = Image.new("L", (w, h), 0)
@@ -874,7 +980,7 @@ def validate():
     report.append(("Little Italy fully inside Manhattan", all(point_in_poly(x, z, man) for x, z in corners)))
     bad = []
     for dd in DISTRICTS:
-        lms = [l for l in LANDMASSES if l["kind"] == "playable" and point_in_poly(dd["seed"][0], dd["seed"][1], l["polygon"])]
+        lms = [l for l in BOROUGHS if l["kind"] == "playable" and point_in_poly(dd["seed"][0], dd["seed"][1], l["polygon"])]
         if not lms:
             bad.append(dd["id"])
     report.append(("District seeds on land (%d districts)" % len(DISTRICTS), not bad or bad))
@@ -897,7 +1003,7 @@ def main():
     os.makedirs(os.path.join(ROOT, "docs", "geography"), exist_ok=True)
     render_province(os.path.join(ROOT, "docs", "geography", "nyc_1977_blueprint.png"), counts)
     render_lower_manhattan(os.path.join(ROOT, "docs", "geography", "lower_manhattan.png"))
-    export_json(os.path.join(ROOT, "data", "world", "nyc_1977_blueprint.json"), counts)
+    export_json(os.path.join(ROOT, "data", "world", "nyc_1977.json"), counts)
     for name, ok in validate():
         print("CHECK %-45s %s" % (name, ok))
     land_area = sum(counts.values()) * CELL * CELL / 1e6

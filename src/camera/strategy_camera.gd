@@ -82,10 +82,20 @@ func stop_follow(emit := true) -> void:
 	follow_target = null
 
 
+## Street-level views look across the city; the angle steepens smoothly while
+## zooming out, and the province overview (beyond STRATEGIC_DISTANCE) tilts
+## further toward a map view.
+const STRATEGIC_DISTANCE := 720.0
+@export var pitch_overview_deg := 70.0
+
+
 func pitch_for(d: float) -> float:
-	var t := inverse_lerp(min_distance, max_distance, d)
-	t = clampf(t, 0.0, 1.0)
-	return deg_to_rad(lerpf(pitch_near_deg, pitch_far_deg, ease(t, 0.8)))
+	var t := clampf(inverse_lerp(min_distance, STRATEGIC_DISTANCE, d), 0.0, 1.0)
+	var pitch := lerpf(pitch_near_deg, pitch_far_deg, ease(t, 0.8))
+	if d > STRATEGIC_DISTANCE and max_distance > STRATEGIC_DISTANCE:
+		var u := clampf(inverse_lerp(STRATEGIC_DISTANCE, max_distance, d), 0.0, 1.0)
+		pitch = lerpf(pitch_far_deg, pitch_overview_deg, smoothstep(0.0, 1.0, u))
+	return deg_to_rad(pitch)
 
 
 ## Ground-plane (y = 0) point under a screen position.
@@ -122,6 +132,8 @@ func _apply(force := false) -> void:
 	var b := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, -pitch)
 	global_position = focus
 	camera.global_transform = Transform3D(b, focus + b * Vector3(0, 0, distance))
+	# Far plane tracks the fog (WorldAtmosphere: fog ends at 4 x distance + 500).
+	camera.far = maxf(1200.0, distance * 4.4 + 900.0)
 	if force or absf(distance - _last_distance) > 0.5:
 		_last_distance = distance
 		distance_changed.emit(distance)

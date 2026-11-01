@@ -101,7 +101,11 @@ func location_point(loc: Dictionary) -> Vector2i:
 	var a: Vector2i = nodes[e["a"]]
 	var b: Vector2i = nodes[e["b"]]
 	var off: int = clampi(loc["offset"], 0, e["length"])
-	return a + (b - a) * off / e["length"]
+	var length: int = maxi(int(e["length"]), 1)
+	# 64-bit ints: Vector2i maths is 32-bit and overflows on long edges (bridges).
+	var dx: int = b.x - a.x
+	var dz: int = b.y - a.y
+	return Vector2i(a.x + dx * off / length, a.y + dz * off / length)
 
 
 ## Serialisable form of a location, independent of edge indices.

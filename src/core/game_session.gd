@@ -40,6 +40,7 @@ func start(p_layout: WorldLayout) -> void:
 		world = _load(content, roads, locations)
 	if world == null:
 		world = SimWorld.create_new(content, roads, locations, content.scenarios["new_game"], now_ms())
+		world.world_id = layout.id
 		_dirty = true
 	player_id = world.player_faction_id
 	world.advance_to(now_ms())
@@ -129,7 +130,7 @@ func _load(content: GameContent, roads: RoadGraph, locations: Dictionary) -> Sim
 	if not parsed is Dictionary or not parsed.has("world"):
 		push_warning("Game: ignoring incompatible save")
 		return null
-	var w := SimWorld.from_dict(parsed["world"], content, roads, locations, SimBootstrap.legacy_roads(content))
+	var w := SimWorld.from_dict(parsed["world"], content, roads, locations, SimBootstrap.legacy_roads(content), layout.id)
 	if w == null:
 		push_warning("Game: save version mismatch, starting a new game")
 	return w

@@ -18,6 +18,8 @@ var characters: Dictionary = {}
 var abilities: Dictionary = {}
 var headquarters: Dictionary = {}
 var building_catalog: Dictionary = {}
+## World the client plays (override with `-- --world=<id>`).
+const DEFAULT_WORLD := "nyc_1977"
 var districts: Dictionary = {}
 var scenarios: Dictionary = {}
 var worlds: Dictionary = {}
@@ -46,9 +48,13 @@ func load_all(root: String) -> void:
 	headquarters = _read(root + "defs/headquarters.json")
 	for b in _read(root + "building_catalog.json").get("buildings", []):
 		building_catalog[b["id"]] = b
+	# Licensed third-party buildings (tools/blender/build_licensed_buildings.py).
+	for b in _read(root + "building_catalog_licensed.json").get("buildings", []):
+		building_catalog[b["id"]] = b
 	districts["little_italy"] = _read(root + "districts/little_italy.json")
 	scenarios["new_game"] = _read(root + "scenarios/new_game.json")
 	worlds["greater_new_york"] = _read(root + "world/greater_new_york.json")
+	worlds["nyc_1977"] = _read(root + "world/nyc_1977.json")
 	_validate()
 	for e in errors:
 		push_error("Content: " + e)
