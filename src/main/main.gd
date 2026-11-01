@@ -105,10 +105,25 @@ func _street_widths() -> Dictionary:
 
 
 # --- Loading screen and ambience ----------------------------------------------------
+const TITLE_THEME := preload("res://assets/audio/music/title_theme.wav")
+const TITLE_THEME_DB := -14.0  # subtle: a backdrop to the art, not a fanfare
+const TITLE_THEME_UNDER_DB := -22.0  # sits under the city bed once play begins
+const TITLE_THEME_FADE := 6.0
+
 var _loading: CanvasLayer
+var _title_music: AudioStreamPlayer
+var _title_fade: Tween
 
 
 func _show_loading() -> void:
+	_title_music = AudioStreamPlayer.new()
+	_title_music.name = "TitleTheme"
+	_title_music.stream = TITLE_THEME
+	_title_music.volume_db = -40.0
+	add_child(_title_music)
+	_title_music.play()
+	_title_fade = create_tween()
+	_title_fade.tween_property(_title_music, "volume_db", TITLE_THEME_DB, 2.0)
 	_loading = CanvasLayer.new()
 	_loading.layer = 50
 	add_child(_loading)
@@ -146,6 +161,25 @@ func _hide_loading() -> void:
 	for c in layer.get_children():
 		tw.parallel().tween_property(c, "modulate:a", 0.0, 0.6)
 	tw.tween_callback(layer.queue_free)
+	_settle_title_music()
+
+
+## The theme plays through once: it drops under the city when play begins and
+## fades out before its last bar instead of cutting off.
+func _settle_title_music() -> void:
+	if _title_music == null or not _title_music.playing:
+		return
+	var music := _title_music
+	if _title_fade:
+		_title_fade.kill()
+	create_tween().tween_property(music, "volume_db", TITLE_THEME_UNDER_DB, 2.5)
+	var remaining := TITLE_THEME.get_length() - music.get_playback_position() - TITLE_THEME_FADE
+	get_tree().create_timer(maxf(remaining, 0.0)).timeout.connect(func():
+		if not is_instance_valid(music):
+			return
+		var out := create_tween()
+		out.tween_property(music, "volume_db", -60.0, TITLE_THEME_FADE)
+		out.tween_callback(music.queue_free))
 
 
 var ambience: AmbienceDirector

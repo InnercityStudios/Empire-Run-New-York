@@ -92,7 +92,7 @@ python3 tools/configure_imports.py                                       # mobil
 | `src/ui/` | HUD, selection panels, world markers, theme. |
 | `src/main/`, `scenes/` | Entry scene and world-map controller. |
 | `data/` | Data-driven content. `materials.json` and `building_catalog.json` are generated. |
-| `assets/` | Models (generated + `vehicles/licensed`), textures (generated + `pbr/`), audio (`ambience/`, `events/`, `sfx/`), fonts (OFL), branding, UI icons. |
+| `assets/` | Models (generated + `vehicles/licensed`), textures (generated + `pbr/`), audio (`ambience/`, `events/`, `music/`, `sfx/`), fonts (OFL), branding, UI icons. |
 | `data/world/` | Province definitions (regions, arterials, piers, bridges, backdrops). |
 | `tools/blender/` | Python asset pipeline. |
 | `tests/` | Headless test suite. |
