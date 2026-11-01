@@ -87,7 +87,65 @@ the views stay the same. The server should use the server clock for timestamps
 - `tools/configure_imports.py` pins texture import settings: ASTC/ETC2 VRAM compression
   on mobile, mipmaps, and normal-map handling.
 
+## World and streaming (`src/world`, `src/world/stream`)
+
+- **WorldLayout** composes a province from `data/world/*.json`. Grid regions
+  reuse `DistrictLayout` with fill styles (tenement, industrial, rowhouse,
+  towers, civic, suburban, waterfront, park). Little Italy is built from its
+  unchanged definition: a golden fingerprint test proves its 381 lots are
+  bit-identical inside the world. Road nodes merge by integer-cm position,
+  arterials are stitched to every region road that meets them, piers get
+  roads, and the Delancey Bridge ends at a future-city portal node. Building
+  lots have stable ids (`<region>:<n>`); road locations persist by node key,
+  so saves survive world growth (save v2, v1 migrates).
+- **Chunks**: 256 m cells with stable integer coordinates.
+- **Always resident** (`WorldShellBuilder`, `FarCityBuilder`): water, land and
+  region grounds, quays, per-chunk road meshes, bridge, park lake/paths and a
+  far-city LOD (one ~10-triangle box per building, procedural windows) for the
+  whole province: ~125 k triangles. There is never empty terrain or a hard
+  edge; backdrop districts fill the far shores and the north.
+- **Streamed detail** (`WorldStreamer`, `ChunkDetailBuilder`, `MeshMerger`):
+  full-detail chunks inside a zoom-dependent radius (220 m when close, none at
+  the strategic zoom), built on `WorkerThreadPool` from cached asset arrays
+  without touching the RenderingServer, uploaded on the main thread, unloaded
+  with hysteresis. Landmarks, crews and traffic are always present.
+- **Routing** is independent of visuals: the simulation's road graph covers
+  the whole province regardless of which chunks are loaded.
+- **Inspection**: `scenes/world/world_preview.tscn` (@tool) and
+  `tests/tools_world_map.gd` (top-down PNG).
+
+### Preparation: build time vs runtime
+Expensive generation is export-time: Blender produces all models, LOD
+vehicle variants, textures and the material library. At runtime the layout
+is deterministic and cheap (0.25–0.45 s for the province), the shell and far
+city build in ~0.3 s, and detail chunks are meshed on worker threads (≤0.35 s
+each on the M3 Pro). Baking detail chunk meshes to disk was rejected: a dense
+chunk is ~0.54 M triangles (~10 MB), which would add hundreds of MB to the
+app. Next step if devices need it: a first-visit on-device chunk cache.
+
 ## Measured on an Apple M3 Pro (desktop, 1600×900)
+
+Greater New York streaming build (`--benchmark=5`, forced 1600×900). Frame
+times sit at the 120 Hz display cap and do not discriminate on this Mac;
+primitives, draw calls and VRAM are the meaningful numbers.
+
+| Zoom | Avg frame | Draw calls | Primitives (incl. shadows) | VRAM |
+|---|---|---|---|---|
+| Close (80 m) | 6.9 ms | 163 | 2.47 M | 377 MB |
+| Mid (200 m) | 8.0 ms | 173 | 3.41 M | 362 MB |
+| Strategic (700 m) | 7.2 ms | 154 | 1.57 M | 349 MB |
+
+Profiling results that shaped the design: two shadow cascades cost ~3 M
+primitives (now one, footprint-scaled); `SurfaceTool.append_from` on worker
+threads blocked on the RenderingServer (2.9 s per chunk → 0.2 s with
+`MeshMerger`); the default 64-slot reflection atlas cost ~270 MB VRAM (now
+2 slots); licensed traffic cars at 10 k triangles (now 2.6 k variants).
+
+**Not measured on devices** (no device, export templates or Android SDK in
+this environment). Mobile risks to verify first: 2.5–3.4 M primitives at
+close/mid zoom and ~0.5 M triangles per dense detail chunk.
+
+## Earlier Little Italy measurements (desktop, 1600×900)
 
 | Metric | Value |
 |---|---|
@@ -99,12 +157,11 @@ the views stay the same. The server should use the server clock for timestamps
 
 ## Known gaps and next steps
 
-1. **Mobile performance.** None of this has been run on a phone yet.
-   - Move chunk merging to build time (export pre-merged block meshes) to cut startup time.
-   - Add LOD or impostor roofs for distant blocks to bring primitive counts down.
-   - Profile on a mid-range Android device and an iPhone.
-   - Add export presets, including `data/*.json`, and check that the JSON is packed in an
-     exported build.
+1. **Mobile performance.** Not yet run on a phone.
+   - Profile on a mid-range Android device and an iPhone (presets ready).
+   - If primitives are too high: per-building-variant instancing with a facade
+     texture atlas (1–2 materials per building), or a mid-distance block LOD
+     between detail and the far boxes.
 2. **Combat milestone.** Soldier models and animation, attack/defend/reinforce commands,
    seeded combat resolution in `SimWorld`, battle visuals (muzzle flashes, smoke, retreat),
    and anti-bullying rules (attack cooldowns, shields).

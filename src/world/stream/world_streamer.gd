@@ -113,7 +113,7 @@ func _process(_delta: float) -> void:
 	_apply_results()
 	# Unload far-away detail.
 	for key in _detail.keys():
-		if _chunk_distance(key, focus) > radius + HYSTERESIS:
+		if radius == 0.0 or _chunk_distance(key, focus) > radius + HYSTERESIS:
 			_unload(key)
 	# Request missing chunks, nearest first.
 	var wanted: Array = []

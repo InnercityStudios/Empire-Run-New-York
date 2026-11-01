@@ -1,5 +1,6 @@
 # Godot 4+ specific ignores
+*.blend1
+.DS_Store
 .godot/
 /android/
-.DS_Store
-*.blend1
+build/
