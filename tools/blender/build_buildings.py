@@ -149,6 +149,21 @@ BUILDINGS = [
      "cornice_mat": "M_Cornice_Dark", "fire_escape": True,
      "ground": shop("THE BLUE LANTERN", "M_Shopfront_Black", "M_Sign_White", awning=2, variant=3,
                     blade="BAR", neon="M_Neon_Green")},
+    # Modular towers (detail tier for office and apartment districts).
+    {"id": "tower_curtain_a", "kind": "tower", "builder": "tower", "style": "curtain", "width": 25.2, "depth": 25.2,
+     "floors": 32},
+    {"id": "tower_curtain_b", "kind": "tower", "builder": "tower", "style": "curtain", "width": 32.4, "depth": 19.8,
+     "floors": 24},
+    {"id": "tower_office_a", "kind": "tower", "builder": "tower", "style": "office", "width": 28.8, "depth": 27.0,
+     "floors": 30, "setbacks": [[16, 3.6], [24, 7.2]]},
+    {"id": "tower_office_b", "kind": "tower", "builder": "tower", "style": "office", "width": 21.6, "depth": 21.6,
+     "floors": 20, "setbacks": [[14, 3.6]]},
+    {"id": "tower_office_c", "kind": "tower", "builder": "tower", "style": "office", "width": 25.2, "depth": 23.4,
+     "floors": 24, "setbacks": [[10, 1.8], [18, 5.4]], "podium": "M_Brick_Dark"},
+    {"id": "tower_brick_a", "kind": "tower_residential", "builder": "tower", "style": "bricktower", "width": 25.2,
+     "depth": 18.0, "floors": 20, "setbacks": [[15, 3.6]]},
+    {"id": "tower_brick_b", "kind": "tower_residential", "builder": "tower", "style": "bricktower", "width": 19.8,
+     "depth": 19.8, "floors": 15},
     {"id": "biz_garage_bowery", "kind": "landmark", "width": 14.0, "floors": 2, "brick": "M_Brick_Painted",
      "cornice": "simple", "frame": "M_Frame_Dark", "ac": 0.0,
      "ground": {"type": "garage", "sign": "BOWERY AUTO BODY", "sign_board": "M_Sign_White",
@@ -174,7 +189,7 @@ def main():
         builder = spec.get("builder")
         if builder == "warehouse":
             mb = build_warehouse(spec)
-        elif builder in ("house", "estate", "factory", "pier_shed"):
+        elif builder in ("house", "estate", "factory", "pier_shed", "tower"):
             mb = getattr(buildings_extra, "build_" + builder)(spec)
         else:
             mb = BuildingGenerator(spec).build()

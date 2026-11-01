@@ -17,7 +17,7 @@
       "width": 24.95,
       "depth": 24.26,
       "height": 175.0,
-      "facade": "#b2b4b3",
+      "facade": "#b4b6b4",
       "roof_tone": 0.5,
       "licensed": "New York Buildings"
     },
@@ -32,136 +32,6 @@
       "licensed": "New York Buildings"
     },
     {
-      "id": "lic_pan_am",
-      "kind": "landmark_tower",
-      "width": 90.28,
-      "depth": 37.62,
-      "height": 135.0,
-      "facade": "#bcbcb8",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_office_block",
-      "kind": "highrise",
-      "width": 65.6,
-      "depth": 31.47,
-      "height": 58.0,
-      "facade": "#a4a3a2",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_tower_glass_a",
-      "kind": "highrise",
-      "width": 22.26,
-      "depth": 22.26,
-      "height": 128.0,
-      "facade": "#97a4ae",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_tower_stone",
-      "kind": "highrise",
-      "width": 25.5,
-      "depth": 25.5,
-      "height": 150.0,
-      "facade": "#bcbcb8",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_tower_glass_b",
-      "kind": "highrise",
-      "width": 36.02,
-      "depth": 36.02,
-      "height": 92.0,
-      "facade": "#79888f",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_tower_glass_c",
-      "kind": "highrise",
-      "width": 24.6,
-      "depth": 37.37,
-      "height": 118.0,
-      "facade": "#96a7ba",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_tower_glass_d",
-      "kind": "highrise",
-      "width": 24.75,
-      "depth": 22.68,
-      "height": 140.0,
-      "facade": "#97a4ae",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_apartment_14",
-      "kind": "apartment",
-      "width": 27.94,
-      "depth": 19.65,
-      "height": 46.0,
-      "facade": "#c2bab0",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_apartment_12",
-      "kind": "apartment",
-      "width": 22.16,
-      "depth": 11.0,
-      "height": 40.0,
-      "facade": "#c5ab94",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_apartment_10",
-      "kind": "apartment",
-      "width": 9.89,
-      "depth": 9.89,
-      "height": 34.0,
-      "facade": "#a49d97",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_apartment_9",
-      "kind": "apartment",
-      "width": 27.58,
-      "depth": 15.94,
-      "height": 30.0,
-      "facade": "#a4a3a2",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_walkup_6",
-      "kind": "walkup",
-      "width": 11.43,
-      "depth": 7.35,
-      "height": 21.0,
-      "facade": "#9d8778",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
-      "id": "lic_walkup_5",
-      "kind": "walkup",
-      "width": 21.14,
-      "depth": 7.59,
-      "height": 18.0,
-      "facade": "#c2b7b6",
-      "roof_tone": 0.5,
-      "licensed": "New York Buildings"
-    },
-    {
       "id": "lic_brooklyn_corner",
       "kind": "brooklyn",
       "width": 17.71,
@@ -170,6 +40,16 @@
       "facade": "#dcce93",
       "roof_tone": 0.5,
       "licensed": "Brooklyn Street Building Low Poly"
+    },
+    {
+      "id": "lic_hirise_apartments",
+      "kind": "tower_residential",
+      "width": 41.11,
+      "depth": 41.11,
+      "height": 112.0,
+      "facade": "#9f9d99",
+      "roof_tone": 0.5,
+      "licensed": "New York styled hi rise apartment building"
     }
   ],
   "credits": [
@@ -188,6 +68,14 @@
       "license": "Sketchfab Standard",
       "license_url": "https://sketchfab.com/licenses",
       "source_url": "https://sketchfab.com/3d-models/brooklyn-street-building-low-poly-fa55d25ef06e414c942828c3031ff279"
+    },
+    {
+      "title": "New York styled hi rise apartment building",
+      "author": "aitortilla01",
+      "author_url": "https://sketchfab.com/aitortilla01",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "source_url": "https://sketchfab.com/3d-models/new-york-styled-hi-rise-apartment-building-14e3d5743f7546d5bb7f3befc72c9057"
     }
   ]
 }

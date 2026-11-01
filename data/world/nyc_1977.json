@@ -4342,7 +4342,12 @@
      0,
      0
     ],
-    "trees": 0.62
+    "trees": 0.62,
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "tenement": {
@@ -4355,8 +4360,7 @@
    "density": 0.95,
    "fill": {
     "kinds": [
-     "midblock",
-     "walkup"
+     "midblock"
     ],
     "corners": true,
     "gap": [
@@ -4364,7 +4368,12 @@
      0
     ],
     "trees": 0.55,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "highrise_old": {
@@ -4378,8 +4387,7 @@
    "fill": {
     "kinds": [
      "midblock_tall",
-     "midblock",
-     "apartment"
+     "midblock"
     ],
     "corners": true,
     "gap": [
@@ -4388,9 +4396,14 @@
     ],
     "trees": 0.2,
     "tower_kinds": [
-     "highrise"
+     "tower"
     ],
-    "tower_chance": 0.6
+    "tower_chance": 0.65,
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "highrise": {
@@ -4403,7 +4416,6 @@
    "density": 0.8,
    "fill": {
     "kinds": [
-     "apartment",
      "midblock_tall",
      "midblock"
     ],
@@ -4414,9 +4426,15 @@
     ],
     "trees": 0.25,
     "tower_kinds": [
-     "highrise"
+     "tower",
+     "tower_residential"
     ],
-    "tower_chance": 0.8
+    "tower_chance": 0.85,
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "theatre": {
@@ -4440,9 +4458,14 @@
     ],
     "trees": 0.1,
     "tower_kinds": [
-     "highrise"
+     "tower"
     ],
-    "tower_chance": 0.3
+    "tower_chance": 0.3,
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "cast_iron": {
@@ -4464,7 +4487,12 @@
      2
     ],
     "trees": 0.3,
-    "yard": "M_Gravel"
+    "yard": "M_Gravel",
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "loft_industrial": {
@@ -4485,7 +4513,12 @@
      6
     ],
     "trees": 0.15,
-    "yard": "M_Gravel"
+    "yard": "M_Gravel",
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "village_irregular": {
@@ -4507,7 +4540,8 @@
      0
     ],
     "trees": 0.9,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "rowhouse_mix": {
@@ -4523,8 +4557,7 @@
      "rowhouse",
      "midblock",
      "midblock_low",
-     "brooklyn",
-     "walkup"
+     "brooklyn"
     ],
     "corners": false,
     "gap": [
@@ -4532,7 +4565,8 @@
      0
     ],
     "trees": 0.75,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "prewar_apartments": {
@@ -4546,7 +4580,6 @@
    "fill": {
     "kinds": [
      "midblock_tall",
-     "apartment",
      "midblock"
     ],
     "corners": true,
@@ -4555,7 +4588,16 @@
      0
     ],
     "trees": 0.8,
-    "yard": "M_Grass"
+    "tower_kinds": [
+     "tower_residential"
+    ],
+    "tower_chance": 0.3,
+    "yard": "M_Grass",
+    "interior": "backbuildings",
+    "back_kinds": [
+     "midblock_low",
+     "industrial"
+    ]
    }
   },
   "brownstone": {
@@ -4578,7 +4620,8 @@
     ],
     "trees": 0.9,
     "primary_only": true,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "industrial_mix": {
@@ -4601,7 +4644,8 @@
      12
     ],
     "trees": 0.15,
-    "yard": "M_Gravel"
+    "yard": "M_Gravel",
+    "interior": "yard_parking"
    }
   },
   "heavy_industrial": {
@@ -4622,7 +4666,8 @@
      22
     ],
     "trees": 0.05,
-    "yard": "M_Gravel"
+    "yard": "M_Gravel",
+    "interior": "yard_parking"
    }
   },
   "shipyard": {
@@ -4643,7 +4688,8 @@
      30
     ],
     "trees": 0.0,
-    "yard": "M_Gravel"
+    "yard": "M_Gravel",
+    "interior": "yard_parking"
    }
   },
   "waterfront": {
@@ -4664,7 +4710,8 @@
      18
     ],
     "trees": 0.0,
-    "yard": "M_Gravel"
+    "yard": "M_Gravel",
+    "interior": "yard_parking"
    }
   },
   "lowrise_residential": {
@@ -4688,7 +4735,8 @@
      4
     ],
     "trees": 0.85,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "garden_apartments": {
@@ -4701,8 +4749,7 @@
    "density": 0.55,
    "fill": {
     "kinds": [
-     "midblock_tall",
-     "apartment"
+     "midblock_tall"
     ],
     "corners": false,
     "gap": [
@@ -4712,7 +4759,8 @@
     "setback": 8,
     "trees": 0.9,
     "lawns": true,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "suburban_queens": {
@@ -4735,7 +4783,8 @@
     "setback": 7,
     "trees": 0.9,
     "lawns": true,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "towers_in_park": {
@@ -4748,9 +4797,12 @@
    "density": 0.3,
    "fill": {
     "kinds": [
-     "midblock_tall",
-     "apartment"
+     "midblock_tall"
     ],
+    "tower_kinds": [
+     "tower_residential"
+    ],
+    "tower_chance": 0.9,
     "corners": false,
     "gap": [
      24,
@@ -4759,7 +4811,8 @@
     "setback": 14,
     "trees": 0.9,
     "lawns": true,
-    "yard": "M_Grass"
+    "yard": "M_Grass",
+    "interior": "gardens"
    }
   },
   "airport": {
@@ -5895,15 +5948,6 @@
    "pos": [
     1609.6,
     -2380
-   ],
-   "kind": "skyscraper"
-  },
-  {
-   "id": "pan_am",
-   "name": "Pan Am Bldg",
-   "pos": [
-    1396.4,
-    -2420
    ],
    "kind": "skyscraper"
   },

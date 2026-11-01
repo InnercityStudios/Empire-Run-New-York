@@ -35,25 +35,25 @@ BROOKLYN = {"src": "brooklyn_street_building_low_poly.glb", "title": "Brooklyn S
             "source_url": "https://sketchfab.com/3d-models/brooklyn-street-building-low-poly-fa55d25ef06e414c942828c3031ff279"}
 
 # Pack facades face +X; rotate -90 degrees so they face -Y (the street).
+HIRISE = {"src": "new_york_styled_hi_rise_apartment_building.glb", "title": "New York styled hi rise apartment building",
+          "author": "aitortilla01", "author_url": "https://sketchfab.com/aitortilla01", "license": "CC-BY-4.0",
+          "license_url": "http://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://sketchfab.com/3d-models/new-york-styled-hi-rise-apartment-building-14e3d5743f7546d5bb7f3befc72c9057"}
+
+# Kept after review: recognisable landmark silhouettes (skyline use), the
+# Brooklyn building and the hi-rise apartment tower. The pack's generic towers,
+# office block, apartments and walk-ups (12-56 triangle textured boxes) and
+# the Pan Am box were removed: the modular towers in build_buildings.py
+# replace them.
 SPECS = [
-    {"id": "lic_empire_state", "pack": PACK, "objs": ["Object_28"], "height": 205.0, "kind": "landmark_tower", "tex": 1024},
-    {"id": "lic_chrysler", "pack": PACK, "objs": ["Object_35"], "height": 175.0, "kind": "landmark_tower", "tex": 1024},
-    {"id": "lic_woolworth", "pack": PACK, "objs": ["Object_37"], "height": 140.0, "kind": "landmark_tower", "tex": 1024},
-    {"id": "lic_pan_am", "pack": PACK, "objs": ["Object_30"], "height": 135.0, "kind": "landmark_tower", "tex": 1024},
-    {"id": "lic_office_block", "pack": PACK, "objs": ["Object_42", "Object_43"], "height": 58.0, "kind": "highrise"},
-    {"id": "lic_tower_glass_a", "pack": PACK, "objs": ["Object_16"], "height": 128.0, "kind": "highrise"},
-    {"id": "lic_tower_stone", "pack": PACK, "objs": ["Object_20"], "height": 150.0, "kind": "highrise"},
-    {"id": "lic_tower_glass_b", "pack": PACK, "objs": ["Object_22"], "height": 92.0, "kind": "highrise"},
-    {"id": "lic_tower_glass_c", "pack": PACK, "objs": ["Object_24"], "height": 118.0, "kind": "highrise"},
-    {"id": "lic_tower_glass_d", "pack": PACK, "objs": ["Object_26"], "height": 140.0, "kind": "highrise"},
-    {"id": "lic_apartment_14", "pack": PACK, "objs": ["Object_14"], "height": 46.0, "kind": "apartment"},
-    {"id": "lic_apartment_12", "pack": PACK, "objs": ["Object_10"], "height": 40.0, "kind": "apartment"},
-    {"id": "lic_apartment_10", "pack": PACK, "objs": ["Object_4"], "height": 34.0, "kind": "apartment"},
-    {"id": "lic_apartment_9", "pack": PACK, "objs": ["Object_6"], "height": 30.0, "kind": "apartment"},
-    {"id": "lic_walkup_6", "pack": PACK, "objs": ["Object_8"], "height": 21.0, "kind": "walkup"},
-    {"id": "lic_walkup_5", "pack": PACK, "objs": ["Object_12"], "height": 18.0, "kind": "walkup"},
+    {"id": "lic_empire_state", "pack": PACK, "objs": ["Object_28"], "height": 205.0, "kind": "landmark_tower"},
+    {"id": "lic_chrysler", "pack": PACK, "objs": ["Object_35"], "height": 175.0, "kind": "landmark_tower"},
+    {"id": "lic_woolworth", "pack": PACK, "objs": ["Object_37"], "height": 140.0, "kind": "landmark_tower"},
     # Facade faces +Y in the source: turn 180 degrees; real-world scale.
     {"id": "lic_brooklyn_corner", "pack": BROOKLYN, "objs": None, "height": None, "rot": 180, "kind": "brooklyn"},
+    # Podium shopfronts face -Y already; scaled from 147 m to a 1970s 34-storey tower.
+    {"id": "lic_hirise_apartments", "pack": HIRISE, "objs": None, "height": 112.0, "rot": 0, "kind": "tower_residential",
+     "tex": 1024},
 ]
 
 

@@ -34,12 +34,16 @@ static func make_kit(fill: Dictionary, catalog: Dictionary) -> Dictionary:
 	corners_l.sort()
 	corners_r.sort()
 	var towers: Array = []
+	var backs: Array = []
 	for b in catalog.values():
 		if b.get("kind") in fill.get("tower_kinds", []):
 			towers.append(b["id"])
+		if b.get("kind") in fill.get("back_kinds", []):
+			backs.append(b["id"])
 	towers.sort()
+	backs.sort()
 	var dims := {}
-	for id in ids + corners_l + corners_r + towers:
+	for id in ids + corners_l + corners_r + towers + backs:
 		var d: Dictionary = catalog[id]
 		dims[id] = Vector3(float(d["width"]), float(d.get("height", 15.0)), float(d.get("depth", 20.0)))
 	var mean_h := 0.0
@@ -51,7 +55,8 @@ static func make_kit(fill: Dictionary, catalog: Dictionary) -> Dictionary:
 		facade += Color.html(catalog[id].get("facade", "#7a5a48"))
 	facade = facade / ids.size() if not ids.is_empty() else Color("#7a5a48")
 	facade.a = 0.5
-	return {"ids": ids, "corner_left": corners_l, "corner_right": corners_r, "towers": towers, "dims": dims, "fill": fill,
+	return {"ids": ids, "corner_left": corners_l, "corner_right": corners_r, "towers": towers, "backs": backs,
+		"dims": dims, "fill": fill,
 		"mean_height": mean_h, "facade": facade}
 
 
@@ -130,9 +135,64 @@ static func fill(block: Dictionary, sidewalk: float, curb_h: float, with_props :
 				_fill_spaced(block, out, counter, kit, cands, frame, run[0], run[1], rng, gap, setback, curb_h)
 			else:
 				_fill_packed(block, out, counter, kit, cands, frame, run[0], run[1], rng, setback, curb_h)
+	if tower_gap.is_empty():
+		_interior(block, out, counter, kit, inner, side_inset, rng, curb_h, with_props)
 	if with_props:
 		_props(block, out, sidewalk, curb_h, rules)
 	return out
+
+
+## The block core behind the frontage buildings.
+static func _interior(block: Dictionary, out: Dictionary, counter: Array, kit: Dictionary, inner: Rect2,
+		frontage: float, rng: RandomNumberGenerator, curb_h: float, with_props: bool) -> void:
+	var rules: Dictionary = kit["fill"]
+	var mode: String = rules.get("interior", "")
+	var m := frontage + 2.0  # service alley behind the frontage
+	var core := Rect2(inner.position + Vector2(m, m), inner.size - Vector2(m, m) * 2.0)
+	if mode == "" or core.size.x < 10.0 or core.size.y < 10.0:
+		return
+	match mode:
+		"backbuildings":
+			var backs: Array = kit.get("backs", [])
+			if backs.is_empty():
+				return
+			# Two rows back to back (or one in a shallow core), split by alleys.
+			var rows := ["south", "north"] if core.size.y >= 24.0 else ["south"]
+			var max_depth := core.size.y / rows.size() - 0.5
+			var cands: Array = backs.filter(func(id): return (kit["dims"][id] as Vector3).z <= max_depth)
+			if cands.is_empty():
+				return
+			for face in rows:
+				var frame := _frame(core, face)
+				_fill_spaced(block, out, counter, kit, cands, frame, 0.0, float(frame["length"]), rng, [2.5, 6.0], 0.0, 0.0)
+		"yard_parking":
+			if not with_props:
+				return
+			var xform: Transform2D = block["xform"]
+			var rows := int((core.size.y - 2.0) / 6.0)
+			var placed := 0
+			for r in rows:
+				var z := core.position.y + 3.0 + r * 6.0
+				var x := core.position.x + 2.0
+				while x < core.end.x - 2.0 and placed < 36:
+					if rng.randf() < 0.55:
+						var p: Vector2 = xform * Vector2(x, z)
+						var fwd3 := Vector3(xform.y.x, 0, xform.y.y) * (1.0 if r % 2 == 0 else -1.0)
+						out["parking"].append({"transform": Transform3D(Basis(fwd3.cross(Vector3.UP), Vector3.UP, -fwd3),
+							Vector3(p.x, 0.0, p.y))})
+						placed += 1
+					x += 2.9
+		"gardens":
+			if not with_props:
+				return
+			var xform: Transform2D = block["xform"]
+			var n := mini(int(core.get_area() / 140.0), 24)
+			for i in n:
+				var p: Vector2 = xform * Vector2(rng.randf_range(core.position.x + 2.0, core.end.x - 2.0),
+					rng.randf_range(core.position.y + 2.0, core.end.y - 2.0))
+				var s := rng.randf_range(0.8, 1.15)
+				out["props"].append({"prop": "tree_a" if rng.randf() < 0.5 else "tree_b", "transform": Transform3D(
+					Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(s, s, s)), Vector3(p.x, curb_h, p.y))})
 
 
 static func _subtract(runs: Array, a: float, b: float) -> Array:

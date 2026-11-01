@@ -400,7 +400,73 @@ def build_all(out_dir):
         a, n = roof_variant(512, 110 + i, kind)
         write_png(p("roof_%s_albedo.png" % kind), a)
         write_png(p("roof_%s_normal.png" % kind), n)
+    for kind in ("curtain", "office", "bricktower"):
+        a, n, e = tower_facade(512, 170 + len(kind), kind)
+        write_png(p("facade_%s_albedo.png" % kind), a)
+        write_png(p("facade_%s_normal.png" % kind), n)
+        write_png(p("facade_%s_emission.png" % kind), e)
     palette_textures(out_dir)
+
+
+# ---------------------------------------------------------------------------
+# Tower facades: tile = 4 bays (1.8 m) x 2 floors (3.6 m) = 7.2 m square.
+# Built with row 0 at the ground and flipped on return (image rows run down).
+# ---------------------------------------------------------------------------
+def tower_facade(size, seed, kind):
+    rng = _rng(seed)
+    px = size / 7.2  # pixels per metre
+    yy, xx = np.mgrid[0:size, 0:size].astype(float)
+    z = (yy / px) % 3.6       # height within the floor
+    x = (xx / px) % 1.8       # position within the bay
+    floor_i = (yy / px // 3.6).astype(int)
+    bay_i = (xx / px // 1.8).astype(int)
+    cell = rng.random((2, 4, 4))
+    pick = cell[floor_i, bay_i]
+    n = fbm(size, size, 16, 4, rng)
+    height = np.zeros((size, size))
+    lit = (pick[..., 0] > 0.72).astype(float)
+    if kind == "curtain":
+        # International Style: aluminium mullions, dark spandrels, tinted glass
+        # with a soft sky reflection and the odd lowered blind.
+        glass = rgb("#26333d")[None, None, :] * (0.85 + 0.3 * (1.0 - z[..., None] / 3.6))
+        glass += rgb("#7d8d99")[None, None, :] * 0.18 * smoothstep(0.4, 1.0, n)[..., None]
+        blind = (pick[..., 1] > 0.7)[..., None] & (z[..., None] > 3.6 - pick[..., 2:3] * 1.6)
+        glass = np.where(blind, rgb("#b9b3a2")[None, None, :] * 0.8, glass)
+        spandrel = z < 0.95
+        alb = np.where(spandrel[..., None], rgb("#3d4246")[None, None, :] * (0.9 + n[..., None] * 0.2), glass)
+        mullion = (x < 0.07) | (x > 1.73)
+        transom = (np.abs(z - 0.95) < 0.05) | (z < 0.05)
+        frame = mullion | transom
+        alb = np.where(frame[..., None], rgb("#a7aaa6")[None, None, :], alb)
+        height = frame * 1.0 + spandrel * 0.4
+        win = ~spandrel & ~frame & ~blind[..., 0]
+    elif kind == "office":
+        # Limestone office block with punched windows and recessed spandrels.
+        stone = rgb("#cfc5b0")[None, None, :] * (0.86 + n[..., None] * 0.22)
+        win = (x > 0.4) & (x < 1.4) & (z > 0.95) & (z < 2.95)
+        sill = (x > 0.32) & (x < 1.48) & (z > 0.82) & (z <= 0.95)
+        pane = rgb("#1d2328")[None, None, :] * (0.9 + 0.25 * (z[..., None] - 0.95) / 2.0)
+        bar = win & ((np.abs(x - 0.9) < 0.03) | (np.abs(z - 2.2) < 0.03))
+        alb = np.where(win[..., None], pane, stone)
+        alb = np.where(bar[..., None], rgb("#8c8576")[None, None, :], alb)
+        alb = np.where(sill[..., None], rgb("#e0d8c6")[None, None, :], alb)
+        height = 1.0 - win * 0.8 + sill * 0.3
+        win = win & ~bar
+    else:
+        # Tan brick apartment tower: paired windows, the odd air conditioner.
+        brick = brick_albedo(size, "#a9825d", "#a39a8a", seed, variation=0.1)
+        win = (((x > 0.3) & (x < 0.85)) | ((x > 0.95) & (x < 1.5))) & (z > 1.0) & (z < 2.6)
+        pane = rgb("#22272b")[None, None, :] * (0.9 + 0.2 * n[..., None])
+        frame = win & ((x < 0.35) | (x > 1.45) | (np.abs(x - 0.9) < 0.1) | (z < 1.05) | (z > 2.55))
+        alb = np.where(win[..., None], pane, brick)
+        alb = np.where(frame[..., None], rgb("#d2cbbb")[None, None, :], alb)
+        ac = (pick[..., 3] > 0.82) & (x > 0.42) & (x < 0.75) & (z > 1.0) & (z < 1.35)
+        alb = np.where(ac[..., None], rgb("#c8c1ae")[None, None, :], alb)
+        height = 1.0 - win * 0.7 + ac * 0.8
+        win = win & ~frame & ~ac
+    emi = (win * lit)[..., None] * rgb("#ffd9a0")[None, None, :] * (0.7 + 0.3 * n[..., None])
+    nrm = height_to_normal(height * 0.5 + n * 0.05, 2.5)
+    return alb[::-1], nrm[::-1], emi[::-1]
 
 
 def roof_variant(size, seed, kind):

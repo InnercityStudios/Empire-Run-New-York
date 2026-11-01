@@ -34,6 +34,8 @@ func _ready() -> void:
 	await get_tree().create_timer(float(_args.get("capture-delay", "3"))).timeout
 	if _args.has("benchmark"):
 		await _benchmark(float(_args["benchmark"]))
+	if _args.has("sweep"):
+		await _sweep(float(_args["sweep"]))
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	var path: String = _args["capture"]
@@ -59,6 +61,33 @@ func _ready() -> void:
 
 
 ## Uncapped frame-time sampling (vsync off) for comparable performance numbers.
+## Drives the camera across the city and back while logging memory once a
+## second, to tell streaming churn from retained resources.
+func _sweep(seconds: float) -> void:
+	var cam := get_tree().get_first_node_in_group("strategy_camera")
+	var main := get_tree().get_first_node_in_group("main")
+	var start: Vector3 = cam.focus
+	var far := start + Vector3(1600, 0, -2600)
+	var t := 0.0
+	var next_log := 0.0
+	while t < seconds + 6.0:
+		await get_tree().process_frame
+		var dt := get_process_delta_time()
+		t += dt
+		var u := clampf(t / seconds, 0.0, 1.0)
+		var k := 1.0 - absf(u * 2.0 - 1.0)  # out and back
+		cam.target_focus = start.lerp(far, k)
+		if t >= next_log:
+			next_log += 1.0
+			var st: Dictionary = main.world.stats
+			print("SWEEP t=%.0f vram_mb=%.1f tex_mb=%.1f buf_mb=%.1f static_mb=%.1f detail=%d mid=%d built=%d" % [t,
+				RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0,
+				RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED) / 1048576.0,
+				RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_BUFFER_MEM_USED) / 1048576.0,
+				OS.get_static_memory_usage() / 1048576.0, st.get("detail_loaded", 0), st.get("mid_loaded", 0),
+				st.get("detail_built", 0)])
+
+
 func _benchmark(seconds: float) -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = 0

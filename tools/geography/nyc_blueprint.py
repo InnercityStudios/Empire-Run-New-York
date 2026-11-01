@@ -386,19 +386,20 @@ STYLES = {
 # kinds from the catalogue, corner buildings, setback, gaps between buildings,
 # street trees, lawns, and whether side streets get frontages.
 FILL = {
-    "tenement": {"kinds": ["midblock", "walkup"], "corners": True, "gap": [0, 0], "trees": 0.55},
-    "highrise_old": {"kinds": ["midblock_tall", "midblock", "apartment"], "corners": True, "gap": [0, 0], "trees": 0.2,
-                     "tower_kinds": ["highrise"], "tower_chance": 0.6},
-    "highrise": {"kinds": ["apartment", "midblock_tall", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.25,
-                 "tower_kinds": ["highrise"], "tower_chance": 0.8},
+    "tenement": {"kinds": ["midblock"], "corners": True, "gap": [0, 0], "trees": 0.55},
+    "highrise_old": {"kinds": ["midblock_tall", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.2,
+                     "tower_kinds": ["tower"], "tower_chance": 0.65},
+    "highrise": {"kinds": ["midblock_tall", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.25,
+                 "tower_kinds": ["tower", "tower_residential"], "tower_chance": 0.85},
     "theatre": {"kinds": ["midblock", "midblock_tall", "midblock_low"], "corners": True, "gap": [0, 0], "trees": 0.1,
-                "tower_kinds": ["highrise"], "tower_chance": 0.3},
+                "tower_kinds": ["tower"], "tower_chance": 0.3},
     "cast_iron": {"kinds": ["industrial", "midblock"], "corners": False, "gap": [0, 2], "trees": 0.3},
     "loft_industrial": {"kinds": ["industrial"], "corners": False, "gap": [1, 6], "trees": 0.15},
     "village_irregular": {"kinds": ["rowhouse", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.9},
-    "rowhouse_mix": {"kinds": ["rowhouse", "midblock", "midblock_low", "brooklyn", "walkup"], "corners": False,
+    "rowhouse_mix": {"kinds": ["rowhouse", "midblock", "midblock_low", "brooklyn"], "corners": False,
                      "gap": [0, 0], "trees": 0.75},
-    "prewar_apartments": {"kinds": ["midblock_tall", "apartment", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.8},
+    "prewar_apartments": {"kinds": ["midblock_tall", "midblock"], "corners": True, "gap": [0, 0], "trees": 0.8,
+                          "tower_kinds": ["tower_residential"], "tower_chance": 0.3},
     "brownstone": {"kinds": ["rowhouse", "brooklyn"], "corners": False, "gap": [0, 0], "trees": 0.9, "primary_only": True},
     "industrial_mix": {"kinds": ["industrial", "midblock_low", "brooklyn"], "corners": False, "gap": [3, 12], "trees": 0.15},
     "heavy_industrial": {"kinds": ["industrial"], "corners": False, "gap": [6, 22], "trees": 0.05},
@@ -406,14 +407,25 @@ FILL = {
     "waterfront": {"kinds": ["industrial"], "corners": False, "gap": [6, 18], "trees": 0.0},
     "lowrise_residential": {"kinds": ["rowhouse", "house", "midblock_low", "brooklyn"], "corners": False, "gap": [1, 4],
                             "trees": 0.85},
-    "garden_apartments": {"kinds": ["midblock_tall", "apartment"], "corners": False, "gap": [14, 26], "setback": 8, "trees": 0.9,
+    "garden_apartments": {"kinds": ["midblock_tall"], "corners": False, "gap": [14, 26], "setback": 8, "trees": 0.9,
                           "lawns": True},
     "suburban_queens": {"kinds": ["house"], "corners": False, "gap": [5, 11], "setback": 7, "trees": 0.9, "lawns": True},
-    "towers_in_park": {"kinds": ["midblock_tall", "apartment"], "corners": False, "gap": [24, 44], "setback": 14, "trees": 0.9,
+    "towers_in_park": {"kinds": ["midblock_tall"], "tower_kinds": ["tower_residential"], "tower_chance": 0.9,
+                       "corners": False, "gap": [24, 44], "setback": 14, "trees": 0.9,
                        "lawns": True},
     "airport": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
     "park": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
     "li_tenement": {"kinds": ["midblock"], "corners": True, "gap": [0, 0], "trees": 0.62},
+}
+# What fills a block behind its street frontage (as in the reference city
+# model, New York blocks are rarely hollow): low back-buildings split by
+# service alleys, loading yards with parked vehicles, or planted gardens.
+INTERIORS = {
+    "backbuildings": ["tenement", "cast_iron", "theatre", "highrise_old", "highrise", "loft_industrial",
+                      "prewar_apartments", "li_tenement"],
+    "yard_parking": ["industrial_mix", "heavy_industrial", "shipyard", "waterfront"],
+    "gardens": ["brownstone", "rowhouse_mix", "lowrise_residential", "village_irregular", "garden_apartments",
+                "suburban_queens", "towers_in_park"],
 }
 # Block interiors behind the frontage: backyards, work yards or paved plazas.
 YARDS = {"M_Grass": ["tenement", "village_irregular", "rowhouse_mix", "prewar_apartments", "brownstone",
@@ -423,6 +435,11 @@ for _k, _v in FILL.items():
     for _mat, _styles in YARDS.items():
         if _k in _styles:
             _v["yard"] = _mat
+    for _kind, _styles in INTERIORS.items():
+        if _k in _styles:
+            _v["interior"] = _kind
+            if _kind == "backbuildings":
+                _v["back_kinds"] = ["midblock_low", "industrial"]
     STYLES[_k]["fill"] = _v
 
 TERRITORY_COLORS = {"player": "#d9473a", "rival": "#4f8fd9", "contested": "#a36fd1"}
@@ -512,7 +529,6 @@ BRIDGES = [
 LANDMARKS = [
     {"id": "empire_state", "name": "Empire State Bldg", "pos": mc(-2150, 330), "kind": "skyscraper"},
     {"id": "chrysler", "name": "Chrysler Bldg", "pos": mc(-2380, 560), "kind": "skyscraper"},
-    {"id": "pan_am", "name": "Pan Am Bldg", "pos": mc(-2420, 330), "kind": "skyscraper"},
     {"id": "woolworth", "name": "Woolworth Bldg", "pos": (-240, 1010), "kind": "skyscraper"},
     {"id": "world_trade_center", "name": "World Trade Center", "pos": (-520, 1100), "kind": "skyscraper"},
     {"id": "statue_of_liberty", "name": "Statue of Liberty", "pos": (-1080, 2670), "kind": "monument"},

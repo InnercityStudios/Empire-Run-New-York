@@ -177,6 +177,5 @@ func _build(mat_name: String, variant: String) -> Material:
 		m.set_shader_parameter("emission_energy", d.get("emission_energy", 0.0))
 		if d.has("emission_tex"):
 			m.set_shader_parameter("emission_tex", load(d["emission_tex"]))
-	if mat_name == "M_Window":
-		m.set_shader_parameter("night_emission", 1.6)
+	m.set_shader_parameter("night_emission", d.get("night_emission", 1.6 if mat_name == "M_Window" else 0.0))
 	return m

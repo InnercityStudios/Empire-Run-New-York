@@ -212,3 +212,69 @@ def build_pier_shed(spec):
     front = Facade(mb, (x0, 0, 0), (1, 0, 0), W, h)
     front.box(W * 0.1, W * 0.9, h - 1.6, h - 0.4, 0, 0.12, "M_Sign_White")
     return mb
+
+
+def build_tower(spec):
+    """Modular mid-century tower: a stone or brick podium with shopfronts and a
+    lobby, a shaft dressed in a tileable facade (curtain wall, limestone office
+    or brick apartments; one tile = 4 bays x 2 floors so windows land on
+    floors), stepped setbacks with roof terraces, copings and a plant room.
+    A few hundred triangles; the detail lives in the shared facade textures.
+
+    spec: width, depth (multiples of 1.8 m), floors, style (curtain | office |
+    bricktower), setbacks [[floor, inset_m], ...], podium (material)."""
+    mb = MeshBuilder(spec["id"])
+    mb.shade_fn = _ground_ao
+    W, D = spec["width"], spec["depth"]
+    style = spec.get("style", "curtain")
+    facade = {"curtain": "M_Facade_Curtain", "office": "M_Facade_Office", "bricktower": "M_Facade_BrickTower"}[style]
+    podium_mat = spec.get("podium", "M_Stone" if style != "bricktower" else "M_Brick_Tan")
+    coping = "M_MetalGalv" if style == "curtain" else "M_Stone"
+    rng = random.Random(spec["id"])
+    fh = 3.6
+    podium_h = 2 * fh
+    x0, x1 = -W * 0.5, W * 0.5
+    # Podium: shopfront bays between stone piers, lobby in the middle bay.
+    mb.add_box((x0, 0.0, 0.0), (x1, D, podium_h), podium_mat, skip=("nz",))
+    f = Facade(mb, (x0, 0.0, 0.0), (1, 0, 0), W, podium_h)
+    bays = max(3, int(W / 6.5))
+    bay_w = W / bays
+    for i in range(bays):
+        u0, u1 = i * bay_w + 0.5, (i + 1) * bay_w - 0.5
+        if i == bays // 2:
+            f.quad(u0 + 0.8, u1 - 0.8, 0.0, 3.6, 0.03, "M_ShopGlass", atlas_uv(3, 2, 2))
+            f.box(u0 + 0.4, u1 - 0.4, 3.6, 4.1, 0.0, 1.6, coping)  # lobby canopy
+        else:
+            f.quad(u0, u1, 0.3, 4.2, 0.03, "M_ShopGlass", atlas_uv(rng.randrange(3), 2, 2))
+            f.box(u0, u1, 4.2, 4.9, 0.0, 0.12, "M_Sign_Black")
+    f.box(0.0, W, podium_h - 0.5, podium_h, 0.0, 0.3, coping)
+    # Shaft with setbacks.
+    inset0 = 0.0 if style == "bricktower" else 1.8
+    steps = [[0, inset0]] + [list(s) for s in spec.get("setbacks", [])]
+    floors = spec["floors"]
+    for k, (start, inset) in enumerate(steps):
+        end = steps[k + 1][0] if k + 1 < len(steps) else floors
+        z0 = podium_h + start * fh
+        z1 = podium_h + end * fh
+        sx0, sx1 = x0 + inset, x1 - inset
+        sy0, sy1 = inset, D - inset * (0.6 if k else 0.0)
+        mb.add_box((sx0, sy0, z0), (sx1, sy1, z1), facade, skip=("nz",), mats={"pz": "M_Roof_Tar"})
+        mb.add_box((sx0 - 0.25, sy0 - 0.25, z1), (sx1 + 0.25, sy1 + 0.25, z1 + 0.6), coping, skip=("nz",),
+                   mats={"pz": "M_Roof_Tar"})
+        top = (sx0, sx1, sy0, sy1, z1 + 0.6)
+    # Plant room and (for apartments) a timber water tank on the roof.
+    sx0, sx1, sy0, sy1, zt = top
+    pw, pd = (sx1 - sx0) * 0.4, (sy1 - sy0) * 0.4
+    cx, cy = (sx0 + sx1) * 0.5, (sy0 + sy1) * 0.5 + (sy1 - sy0) * 0.12
+    mb.add_box((cx - pw * 0.5, cy - pd * 0.5, zt), (cx + pw * 0.5, cy + pd * 0.5, zt + 4.2),
+               "M_Brick_Tan" if style == "bricktower" else "M_Concrete", skip=("nz",), mats={"pz": "M_Roof_Tar"})
+    if style == "bricktower":
+        mb.add_cylinder((sx0 + 3.0, sy1 - 3.0, zt + 2.5), 1.8, 3.4, 10, "M_Wood", uv_wrap=2.4)
+        for dx, dy in ((-1.2, -1.2), (1.2, -1.2), (1.2, 1.2), (-1.2, 1.2)):
+            mb.add_box((sx0 + 3.0 + dx - 0.1, sy1 - 3.0 + dy - 0.1, zt), (sx0 + 3.0 + dx + 0.1, sy1 - 3.0 + dy + 0.1, zt + 2.5),
+                       "M_Iron", skip=("nz", "pz"))
+    else:
+        for i in range(3):
+            ux = cx - pw * 0.5 - 2.5 - i * 2.2
+            mb.add_box((ux, cy - 0.8, zt), (ux + 1.6, cy + 0.8, zt + 1.4), "M_AC_Unit", skip=("nz",))
+    return mb
