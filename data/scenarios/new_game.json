@@ -147,5 +147,34 @@
       "vehicles": 1,
       "start_landmark": "lm_blue_lantern"
     }
+  ],
+  "objectives": [
+    {
+      "id": "obj_vesuvio_3",
+      "text": "Upgrade Ristorante Vesuvio to Lv 3",
+      "type": "business_level",
+      "business": "biz_vesuvio",
+      "target": 3
+    },
+    {
+      "id": "obj_freight",
+      "text": "Take over Grand Street Freight",
+      "type": "own_business",
+      "business": "biz_grand_freight",
+      "target": 1
+    },
+    {
+      "id": "obj_auto_2",
+      "text": "Upgrade Bowery Auto Body to Lv 2",
+      "type": "business_level",
+      "business": "biz_bowery_auto",
+      "target": 2
+    },
+    {
+      "id": "obj_income",
+      "text": "Raise family income to $5,000/h",
+      "type": "income",
+      "target": 5000
+    }
   ]
 }

@@ -80,6 +80,9 @@ func _ready() -> void:
 	hud.action_requested.connect(_on_action)
 	hud.close_selection.connect(func(): _select({}))
 	hud.move_mode_cancelled.connect(func(): _set_move_mode(""))
+	hud.attach_world(layout, camera)
+	hud.business_card_pressed.connect(func(bid): _select({"kind": "business", "id": bid}, true))
+	hud.focus_requested.connect(_on_focus_requested)
 
 	Game.sim_event.connect(_on_sim_event)
 	Game.command_failed.connect(_on_command_failed)
@@ -104,6 +107,17 @@ func _on_session_started() -> void:
 	hud.markers.crew_views = crew_views
 	hud.rebuild_roster(Game.world)
 	_select({})
+
+
+## Minimap travel and objective "go to": move the camera; select the
+## business at the landmark when there is one.
+func _on_focus_requested(p: Vector2, landmark_id: String) -> void:
+	_set_follow("")
+	camera.focus_on(Vector3(p.x, 0.0, p.y), minf(camera.target_distance, 220.0) if landmark_id != "" else -1.0)
+	if landmark_id != "":
+		var b := Game.world.business_at_landmark(landmark_id)
+		if b:
+			_select({"kind": "business", "id": b.id})
 
 
 func _street_widths() -> Dictionary:
