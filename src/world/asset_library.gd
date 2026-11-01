@@ -17,8 +17,11 @@ static func prop_mesh(id: String) -> ArrayMesh:
 	return mesh_at(PROP_DIR + id + ".glb")
 
 
+## Vehicle mesh by content id (data/defs/units.json), falling back to the
+## procedural model of the same name.
 static func vehicle_mesh(id: String) -> ArrayMesh:
-	return mesh_at(VEHICLE_DIR + id + ".glb")
+	var def: Dictionary = Content.db.vehicles.get(id, {})
+	return mesh_at(def.get("model", VEHICLE_DIR + id + ".glb"))
 
 
 ## Mesh of the first MeshInstance3D in a GLB scene, with materials remapped.

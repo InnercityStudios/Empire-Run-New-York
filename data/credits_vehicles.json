@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "chapman_73_black",
+      "title": "Chapman '73",
+      "source_url": "https://sketchfab.com/3d-models/chapman-73-low-poly-model-f30b644b59b54e809355009dce463d47",
+      "author": "Daniel Zhabotinsky",
+      "author_url": "https://sketchfab.com/DanielZhabotinsky",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "modifications": "Joined, re-oriented, mesh-optimised, textures resized, repainted"
+    },
+    {
+      "id": "chapman_73",
+      "title": "Chapman '73",
+      "source_url": "https://sketchfab.com/3d-models/chapman-73-low-poly-model-f30b644b59b54e809355009dce463d47",
+      "author": "Daniel Zhabotinsky",
+      "author_url": "https://sketchfab.com/DanielZhabotinsky",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "modifications": "Joined, re-oriented, mesh-optimised, textures resized"
+    },
+    {
+      "id": "chapman_73_police",
+      "title": "Chapman '73 Cop cruiser",
+      "source_url": "https://sketchfab.com/3d-models/chapman-73-cop-cruiser-low-poly-model-b71558486d024ecc8dc4abbb1263f022",
+      "author": "Daniel Zhabotinsky",
+      "author_url": "https://sketchfab.com/DanielZhabotinsky",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "modifications": "Joined, re-oriented, mesh-optimised, textures resized"
+    },
+    {
+      "id": "canyon_75_taxi",
+      "title": "Canyon '75 Taxi",
+      "source_url": "https://sketchfab.com/3d-models/canyon-75-taxi-low-poly-model-9e8f92a215784f3d8aaaaeab1bef54c4",
+      "author": "Daniel Zhabotinsky",
+      "author_url": "https://sketchfab.com/DanielZhabotinsky",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "modifications": "Joined, re-oriented, mesh-optimised, textures resized"
+    },
+    {
+      "id": "phoenix_455_71",
+      "title": "Phoenix 455 '71",
+      "source_url": "https://sketchfab.com/3d-models/phoenix-455-71-low-poly-model-955edc733c6d44fabc0ad7c246a15896",
+      "author": "Daniel Zhabotinsky",
+      "author_url": "https://sketchfab.com/DanielZhabotinsky",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "modifications": "Joined, re-oriented, mesh-optimised, textures resized"
+    },
+    {
+      "id": "phoenix_455_71_maroon",
+      "title": "Phoenix 455 '71",
+      "source_url": "https://sketchfab.com/3d-models/phoenix-455-71-low-poly-model-955edc733c6d44fabc0ad7c246a15896",
+      "author": "Daniel Zhabotinsky",
+      "author_url": "https://sketchfab.com/DanielZhabotinsky",
+      "license": "CC-BY-4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "modifications": "Joined, re-oriented, mesh-optimised, textures resized, repainted"
+    }
+  ]
+}

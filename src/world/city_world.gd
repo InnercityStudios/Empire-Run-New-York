@@ -101,7 +101,7 @@ func _build_landmarks() -> void:
 func _build_parked_cars() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = layout.seed_value + 77
-	var kinds := ["sedan_black", "sedan_black", "sedan_black", "taxi", "box_truck"]
+	var kinds := _weighted(Content.db.vehicle_mix("parked_mix"))
 	var buckets := {}
 	for spot in layout.parking:
 		var kind: String = kinds[rng.randi() % kinds.size()]
@@ -116,13 +116,21 @@ func _build_parked_cars() -> void:
 		mm.instance_count = list.size()
 		for i in list.size():
 			mm.set_instance_transform(i, list[i])
-			var tint := Color.html(paints[rng.randi() % paints.size()]) if kind == "sedan_black" else Color.WHITE
+			var tint := Color.html(paints[rng.randi() % paints.size()]) if VehicleMeshes.is_tintable(kind) else Color.WHITE
 			mm.set_instance_custom_data(i, tint)
 		var mmi := MultiMeshInstance3D.new()
 		mmi.name = "Parked_" + kind
 		mmi.multimesh = mm
 		add_child(mmi)
 		stats["parked"] += list.size()
+
+
+static func _weighted(mix: Array) -> Array:
+	var out := []
+	for entry in mix:
+		for i in int(entry[1]):
+			out.append(entry[0])
+	return out
 
 
 ## Closest landmark hit by a world-space ray, or "".

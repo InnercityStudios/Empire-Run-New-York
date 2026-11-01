@@ -39,14 +39,16 @@ func setup(p_layout: DistrictLayout) -> void:
 	for e in layout.graph_edges:
 		_adj[e["a"]].append(e["b"])
 		_adj[e["b"]].append(e["a"])
-	var kinds := {"sedan_black": 0, "taxi": 0, "box_truck": 0}
-	var pick := ["sedan_black", "sedan_black", "taxi", "taxi", "sedan_black", "box_truck"]
+	var pick := CityWorld._weighted(Content.db.vehicle_mix("traffic_mix"))
+	var kinds := {}
+	for k in pick:
+		kinds[k] = 0
 	var paints: Array = Content.db.traffic_paints
 	for i in car_count:
 		var kind: String = pick[i % pick.size()]
 		var car := {"kind": kind, "index": kinds[kind], "speed": 0.0,
 			"cruise": _rng.randf_range(CRUISE_MIN, CRUISE_MAX),
-			"tint": Color.html(paints[_rng.randi() % paints.size()]) if kind == "sedan_black" else Color.WHITE}
+			"tint": Color.html(paints[_rng.randi() % paints.size()]) if VehicleMeshes.is_tintable(kind) else Color.WHITE}
 		kinds[kind] += 1
 		_new_route(car, _rng.randi() % _intersection_count, true)
 		_cars.append(car)

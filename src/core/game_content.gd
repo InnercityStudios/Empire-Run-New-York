@@ -12,6 +12,7 @@ var business_types: Dictionary = {}
 var soldier_tiers: Dictionary = {}
 var vehicles: Dictionary = {}
 var traffic_paints: Array = []
+var vehicle_mixes: Dictionary = {}
 var rarities: Dictionary = {}
 var characters: Dictionary = {}
 var abilities: Dictionary = {}
@@ -35,6 +36,8 @@ func load_all(root: String) -> void:
 	soldier_tiers = units.get("soldier_tiers", {})
 	vehicles = units.get("vehicles", {})
 	traffic_paints = units.get("traffic_paints", [])
+	for key in ["traffic_mix", "parked_mix"]:
+		vehicle_mixes[key] = units.get(key, [])
 	var chars: Dictionary = _read(root + "defs/characters.json")
 	rarities = chars.get("rarities", {})
 	characters = chars.get("capos", {})
@@ -47,6 +50,11 @@ func load_all(root: String) -> void:
 	_validate()
 	for e in errors:
 		push_error("Content: " + e)
+
+
+## Weighted [kind, weight] list for ambient vehicles.
+func vehicle_mix(key: String) -> Array:
+	return vehicle_mixes.get(key, [])
 
 
 func business_type(type_id: String) -> Dictionary:

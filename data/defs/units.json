@@ -1,15 +1,160 @@
 {
   "version": 1,
   "soldier_tiers": {
-    "associate": {"name": "Associate", "tier": 1, "power": 8, "hp": 100, "attack": 10, "defence": 8, "recruit_cost": 150},
-    "soldier": {"name": "Soldier", "tier": 2, "power": 15, "hp": 160, "attack": 18, "defence": 14, "recruit_cost": 400},
-    "enforcer": {"name": "Enforcer", "tier": 3, "power": 28, "hp": 260, "attack": 32, "defence": 24, "recruit_cost": 1100},
-    "made_man": {"name": "Made Man", "tier": 4, "power": 50, "hp": 420, "attack": 55, "defence": 40, "recruit_cost": 3000}
+    "associate": {
+      "name": "Associate",
+      "tier": 1,
+      "power": 8,
+      "hp": 100,
+      "attack": 10,
+      "defence": 8,
+      "recruit_cost": 150
+    },
+    "soldier": {
+      "name": "Soldier",
+      "tier": 2,
+      "power": 15,
+      "hp": 160,
+      "attack": 18,
+      "defence": 14,
+      "recruit_cost": 400
+    },
+    "enforcer": {
+      "name": "Enforcer",
+      "tier": 3,
+      "power": 28,
+      "hp": 260,
+      "attack": 32,
+      "defence": 24,
+      "recruit_cost": 1100
+    },
+    "made_man": {
+      "name": "Made Man",
+      "tier": 4,
+      "power": 50,
+      "hp": 420,
+      "attack": 55,
+      "defence": 40,
+      "recruit_cost": 3000
+    }
   },
   "vehicles": {
-    "sedan_black": {"name": "Black Sedan", "model": "res://assets/models/vehicles/sedan_black.glb", "speed_mps": 12.0, "seats": 5, "power_bonus_permille": 30, "tint": "#101012"},
-    "taxi": {"name": "Taxicab", "model": "res://assets/models/vehicles/taxi.glb", "speed_mps": 11.0, "seats": 4, "power_bonus_permille": 0, "traffic_only": true},
-    "box_truck": {"name": "Box Truck", "model": "res://assets/models/vehicles/box_truck.glb", "speed_mps": 9.0, "seats": 2, "power_bonus_permille": 0, "traffic_only": true}
+    "sedan_black": {
+      "name": "Chapman '73 Sedan",
+      "model": "res://assets/models/vehicles/licensed/chapman_73_black.glb",
+      "speed_mps": 12.0,
+      "seats": 5,
+      "power_bonus_permille": 30,
+      "credit": "chapman_73_black"
+    },
+    "sedan_maroon": {
+      "name": "Phoenix 455 Sedan",
+      "model": "res://assets/models/vehicles/licensed/phoenix_455_71_maroon.glb",
+      "speed_mps": 12.5,
+      "seats": 5,
+      "power_bonus_permille": 30,
+      "credit": "phoenix_455_71_maroon"
+    },
+    "sedan_classic": {
+      "name": "Black Sedan (classic)",
+      "model": "res://assets/models/vehicles/sedan_black.glb",
+      "speed_mps": 12.0,
+      "seats": 5,
+      "power_bonus_permille": 30,
+      "tintable": true,
+      "tint": "#101012"
+    },
+    "traffic_chapman": {
+      "name": "Chapman '73",
+      "model": "res://assets/models/vehicles/licensed/chapman_73.glb",
+      "speed_mps": 11.0,
+      "seats": 5,
+      "traffic_only": true
+    },
+    "traffic_phoenix": {
+      "name": "Phoenix 455",
+      "model": "res://assets/models/vehicles/licensed/phoenix_455_71.glb",
+      "speed_mps": 11.0,
+      "seats": 5,
+      "traffic_only": true
+    },
+    "taxi": {
+      "name": "Canyon '75 Taxi",
+      "model": "res://assets/models/vehicles/licensed/canyon_75_taxi.glb",
+      "speed_mps": 11.0,
+      "seats": 4,
+      "traffic_only": true
+    },
+    "police": {
+      "name": "Chapman '73 Cruiser",
+      "model": "res://assets/models/vehicles/licensed/chapman_73_police.glb",
+      "speed_mps": 13.0,
+      "seats": 4,
+      "traffic_only": true
+    },
+    "box_truck": {
+      "name": "Box Truck",
+      "model": "res://assets/models/vehicles/box_truck.glb",
+      "speed_mps": 9.0,
+      "seats": 2,
+      "traffic_only": true,
+      "tintable": true
+    }
   },
-  "traffic_paints": ["#2b3a52", "#5a1f1a", "#3e4a2c", "#8c7a52", "#c8bfa8", "#5d4632", "#22262a", "#7a2e22", "#4c5a63", "#a4865a"]
+  "traffic_paints": [
+    "#2b3a52",
+    "#5a1f1a",
+    "#3e4a2c",
+    "#8c7a52",
+    "#c8bfa8",
+    "#5d4632",
+    "#22262a",
+    "#7a2e22",
+    "#4c5a63",
+    "#a4865a"
+  ],
+  "traffic_mix": [
+    [
+      "traffic_chapman",
+      4
+    ],
+    [
+      "traffic_phoenix",
+      4
+    ],
+    [
+      "taxi",
+      4
+    ],
+    [
+      "box_truck",
+      2
+    ],
+    [
+      "police",
+      1
+    ]
+  ],
+  "parked_mix": [
+    [
+      "traffic_chapman",
+      4
+    ],
+    [
+      "traffic_phoenix",
+      4
+    ],
+    [
+      "taxi",
+      2
+    ],
+    [
+      "box_truck",
+      1
+    ],
+    [
+      "sedan_classic",
+      3
+    ]
+  ]
 }

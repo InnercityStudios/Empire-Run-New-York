@@ -28,10 +28,12 @@ func setup(crew: CrewState, lane_offset: float, is_player: bool, street_widths: 
 	name = "Crew_" + crew.id
 	_lane_offset = lane_offset
 	var mesh := VehicleMeshes.single(crew.vehicle_id)
+	var tintable := VehicleMeshes.is_tintable(crew.vehicle_id)
 	for i in crew.vehicle_count:
 		var mi := MeshInstance3D.new()
 		mi.mesh = mesh
-		mi.set_instance_shader_parameter("tint", PLAYER_TINT if is_player else RIVAL_TINT)
+		if tintable:
+			mi.set_instance_shader_parameter("tint", PLAYER_TINT if is_player else RIVAL_TINT)
 		add_child(mi)
 		cars.append(mi)
 		_yaws.append(0.0)
@@ -44,7 +46,7 @@ func lead_position() -> Vector3:
 
 func set_highlighted(on: bool) -> void:
 	for c in cars:
-		c.set_instance_shader_parameter("highlight", 0.3 if on else 0.0)
+		c.material_overlay = VehicleMeshes.rim_overlay() if on else null
 
 
 func update_from(crew: CrewState, roads: RoadGraph, now_ms: float, delta: float) -> void:
