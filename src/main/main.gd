@@ -364,3 +364,4 @@ func dev_select(spec: String) -> void:
 	var parts := spec.split(":")
 	if parts.size() == 2:
 		_select({"kind": parts[0], "id": parts[1]}, true)
+		print("DevCapture: selected %s (sheet=%s)" % [spec, str(hud.find_child("SelectionSheet", true, false) != null)])

@@ -1,85 +1,124 @@
 class_name SelectionPanelBuilder
 extends RefCounted
-## Fills the bottom selection card for a business, headquarters or crew.
-## Returns a refresh Callable(world, now_ms) that updates live values.
+## Fills the bottom selection sheet for a business, headquarters or crew.
+## Layout: header (badge, title, owner, status, close) / stats + actions on one
+## row / a thin progress or status line. Returns a refresh Callable(world, now).
 
 const TYPE_ICONS := {"restaurant": "restaurant", "garage": "garage", "warehouse": "warehouse", "bar": "bar"}
 
 
-static func build(panel: DecoPanel, sel: Dictionary, hud: Hud) -> Callable:
+static func build(parent: Control, sel: Dictionary, hud: Hud) -> Callable:
 	var world := Game.world
 	match sel.get("kind", ""):
 		"business":
-			return _business(panel, world, world.businesses[sel["id"]], hud)
+			return _business(parent, world, world.businesses[sel["id"]], hud)
 		"hq":
-			return _hq(panel, world, world.headquarters[sel["id"]], hud)
+			return _hq(parent, world, world.headquarters[sel["id"]], hud)
 		"crew":
-			return _crew(panel, world, world.crews[sel["id"]], hud)
+			return _crew(parent, world, world.crews[sel["id"]], hud)
 	return Callable()
 
 
 # --- Shared layout ---------------------------------------------------------------------
-static func _frame(panel: DecoPanel, icon_name: String, title: String, subtitle: String, sub_color: Color,
+static func _frame(parent: Control, icon_name: String, title: String, subtitle: String, owner_color: Color,
 		hud: Hud) -> Dictionary:
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 14)
-	panel.add_child(v)
+	v.add_theme_constant_override("separation", 10)
+	parent.add_child(v)
 	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 16)
+	head.add_theme_constant_override("separation", 12)
 	v.add_child(head)
 	var badge := PanelContainer.new()
 	var bs := StyleBoxFlat.new()
-	bs.bg_color = Color(0, 0, 0, 0.5)
-	bs.border_color = UiTheme.GOLD
-	bs.set_border_width_all(2)
-	bs.set_corner_radius_all(40)
-	bs.set_content_margin_all(10)
+	bs.bg_color = Color(1, 1, 1, 0.05)
+	bs.border_color = Color(UiTheme.GOLD, 0.6)
+	bs.set_border_width_all(1)
+	bs.set_corner_radius_all(22)
+	bs.set_content_margin_all(9)
+	bs.anti_aliasing = true
 	badge.add_theme_stylebox_override("panel", bs)
-	badge.add_child(UiTheme.icon_rect(icon_name, 46, UiTheme.GOLD_LIGHT))
+	badge.add_child(UiTheme.icon_rect(icon_name, 24, UiTheme.GOLD_LIGHT))
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(badge)
 	var tv := VBoxContainer.new()
-	tv.add_theme_constant_override("separation", 0)
+	tv.add_theme_constant_override("separation", -2)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(tv)
-	tv.add_child(UiTheme.title(title, 36))
+	tv.add_child(UiTheme.title(title, 24))
 	var sub := HBoxContainer.new()
-	sub.add_theme_constant_override("separation", 8)
+	sub.add_theme_constant_override("separation", 7)
 	tv.add_child(sub)
-	var dot := ColorRect.new()
-	dot.color = sub_color
-	dot.custom_minimum_size = Vector2(14, 14)
-	dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	sub.add_child(dot)
-	sub.add_child(UiTheme.label(subtitle, 23, UiTheme.MUTED, "body_bold"))
-	var close := UiTheme.button("", "close", true)
-	close.custom_minimum_size = Vector2(60, 56)
-	close.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	sub.add_child(UiTheme.dot(owner_color, 8))
+	sub.add_child(UiTheme.label(subtitle, 16, UiTheme.MUTED, "body_medium"))
+	var status := _status_pill()
+	head.add_child(status["pill"])
+	var close := UiTheme.icon_button("close", 36)
+	close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	close.pressed.connect(hud.emit_close)
 	head.add_child(close)
-	var sep := ColorRect.new()
-	sep.color = Color(UiTheme.GOLD, 0.35)
-	sep.custom_minimum_size = Vector2(0, 1)
-	v.add_child(sep)
-	var stats := GridContainer.new()
-	stats.columns = 4
-	stats.add_theme_constant_override("h_separation", 34)
-	stats.add_theme_constant_override("v_separation", 6)
-	v.add_child(stats)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 22)
+	v.add_child(line)
+	var stats := HBoxContainer.new()
+	stats.add_theme_constant_override("separation", 22)
+	stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(stats)
 	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 14)
-	actions.alignment = BoxContainer.ALIGNMENT_END
-	v.add_child(actions)
-	return {"root": v, "stats": stats, "actions": actions}
+	actions.add_theme_constant_override("separation", 8)
+	actions.size_flags_vertical = Control.SIZE_SHRINK_END
+	line.add_child(actions)
+	return {"root": v, "stats": stats, "actions": actions, "status": status}
 
 
-static func _stat(grid: GridContainer, caption: String) -> Label:
+static func _status_pill() -> Dictionary:
+	var pill := PanelContainer.new()
+	var s := StyleBoxFlat.new()
+	s.bg_color = Color(1, 1, 1, 0.06)
+	s.set_corner_radius_all(12)
+	s.content_margin_left = 10
+	s.content_margin_right = 10
+	s.content_margin_top = 3
+	s.content_margin_bottom = 3
+	pill.add_theme_stylebox_override("panel", s)
+	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var l := UiTheme.label("", UiTheme.SIZE_CAPTION, UiTheme.MUTED, "caps")
+	pill.add_child(l)
+	return {"pill": pill, "label": l}
+
+
+static func _set_status(status: Dictionary, text: String, color: Color) -> void:
+	var l: Label = status["label"]
+	l.text = text.to_upper()
+	l.add_theme_color_override("font_color", color)
+	(status["pill"] as Control).visible = text != ""
+
+
+static func _stat(row: HBoxContainer, caption: String) -> Label:
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", -2)
-	box.add_child(UiTheme.label(caption.to_upper(), 18, UiTheme.MUTED, "body_bold"))
-	var value := UiTheme.label("-", 28, UiTheme.CREAM, "body_bold")
+	box.add_theme_constant_override("separation", 0)
+	box.add_child(UiTheme.caption(caption))
+	var value := UiTheme.label("-", 22, UiTheme.CREAM, "body_bold")
 	box.add_child(value)
-	grid.add_child(box)
+	row.add_child(box)
 	return value
+
+
+static func _progress_line(root: VBoxContainer, caption: String) -> Dictionary:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	root.add_child(box)
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	row.add_child(UiTheme.caption(caption))
+	var info := UiTheme.label("", UiTheme.SIZE_CAPTION + 1, UiTheme.MUTED, "body_medium")
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(info)
+	var bar := ProgressBar.new()
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(0, 5)
+	box.add_child(bar)
+	return {"info": info, "bar": bar}
 
 
 static func _faction_color(world: SimWorld, fid: String) -> Color:
@@ -88,37 +127,17 @@ static func _faction_color(world: SimWorld, fid: String) -> Color:
 
 
 # --- Business -----------------------------------------------------------------------------
-static func _business(panel: DecoPanel, world: SimWorld, b: BusinessState, hud: Hud) -> Callable:
+static func _business(parent: Control, world: SimWorld, b: BusinessState, hud: Hud) -> Callable:
 	var type_def := world.content.business_type(b.type_id)
 	var owner := world.faction(b.owner_id)
 	var is_player := b.owner_id == world.player_faction_id
 	var sub := "%s  ·  %s" % [type_def.get("name", b.type_id), owner.name if owner else "Unowned"]
-	var f := _frame(panel, TYPE_ICONS.get(b.type_id, "cash"), b.name, sub, _faction_color(world, b.owner_id), hud)
-	var grid: GridContainer = f["stats"]
-	var level_l := _stat(grid, "Level")
-	var income_l := _stat(grid, "Net income")
-	var defence_l := _stat(grid, "Defence")
-	var status_l := _stat(grid, "Status")
-	var storage_box := VBoxContainer.new()
-	storage_box.add_theme_constant_override("separation", 4)
-	(f["root"] as VBoxContainer).add_child(storage_box)
-	(f["root"] as VBoxContainer).move_child(storage_box, 3)
-	var storage_head := HBoxContainer.new()
-	storage_box.add_child(storage_head)
-	storage_head.add_child(UiTheme.label("TAKINGS", 18, UiTheme.MUTED, "body_bold"))
-	var storage_l := UiTheme.label("", 22, UiTheme.CREAM)
-	storage_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	storage_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	storage_head.add_child(storage_l)
-	var bar := ProgressBar.new()
-	bar.show_percentage = false
-	bar.custom_minimum_size = Vector2(0, 16)
-	storage_box.add_child(bar)
-	var desc := UiTheme.label(type_def.get("description", ""), 21, UiTheme.MUTED)
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.custom_minimum_size = Vector2(900, 0)
-	(f["root"] as VBoxContainer).add_child(desc)
-	(f["root"] as VBoxContainer).move_child(desc, 2)
+	var f := _frame(parent, TYPE_ICONS.get(b.type_id, "cash"), b.name, sub, _faction_color(world, b.owner_id), hud)
+	var stats: HBoxContainer = f["stats"]
+	var level_l := _stat(stats, "Level")
+	var income_l := _stat(stats, "Net / hr")
+	var defence_l := _stat(stats, "Defence")
+	var takings := _progress_line(f["root"], "Takings")
 	var actions: HBoxContainer = f["actions"]
 	var collect: Button
 	var upgrade: Button
@@ -134,94 +153,90 @@ static func _business(panel: DecoPanel, world: SimWorld, b: BusinessState, hud: 
 		buy = UiTheme.button("Buy", "buy")
 		buy.pressed.connect(hud.emit_action.bind("buy", {"business": b.id}))
 		actions.add_child(buy)
-	else:
-		var note := UiTheme.label("Moretti territory. Move a crew in to keep watch.", 22, UiTheme.MUTED)
-		note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		actions.add_child(note)
-	var send := UiTheme.button("Send Crew", "move", true)
+	var send := UiTheme.button("Send crew", "move", true)
 	send.pressed.connect(hud.emit_action.bind("send_crew", {"landmark": b.landmark_id}))
 	actions.add_child(send)
 
 	return func(w: SimWorld, now: int) -> void:
-		var producing := b.is_producing()
 		var max_level := w.content.business_max_level(b.type_id)
-		level_l.text = "%d / %d" % [b.level, max_level]
-		income_l.text = "%s/h" % UiTheme.money(b.net_per_hour(w.content))
+		level_l.text = "%d/%d" % [b.level, max_level]
+		income_l.text = UiTheme.money(b.net_per_hour(w.content))
 		defence_l.text = str(PowerCalculator.business_defence(b, w))
-		var vuln := w.vulnerability(b)
 		if b.owner_id == SimWorld.NEUTRAL_FACTION:
-			status_l.text = "Unclaimed"
-			status_l.add_theme_color_override("font_color", UiTheme.MUTED)
+			_set_status(f["status"], "Unclaimed", UiTheme.MUTED)
 		else:
-			status_l.text = {"shielded": "Shielded", "guarded": "Guarded", "exposed": "Exposed"}[vuln]
-			status_l.add_theme_color_override("font_color", UiTheme.RED if vuln == "exposed" else UiTheme.GREEN)
+			var vuln := w.vulnerability(b)
+			_set_status(f["status"], {"shielded": "Shielded", "guarded": "Guarded", "exposed": "Exposed"}[vuln],
+				UiTheme.RED if vuln == "exposed" else UiTheme.GREEN)
 		var stored := b.stored(now, w.content)
 		var cap := b.capacity(w.content)
+		var bar: ProgressBar = takings["bar"]
 		bar.max_value = maxi(cap, 1)
-		bar.value = stored if producing and b.owner_id == w.player_faction_id else 0
+		bar.value = stored if b.owner_id == w.player_faction_id else 0
+		var info: Label = takings["info"]
 		if b.owner_id == w.player_faction_id:
 			var full_in := b.ms_until_full(now, w.content)
-			storage_l.text = "%s / %s  ·  %s" % [UiTheme.money(stored), UiTheme.money(cap),
-				"Full" if full_in == 0 else "full in " + UiTheme.duration(full_in)]
+			info.text = "%s of %s  ·  %s" % [UiTheme.money(stored), UiTheme.money(cap),
+				"full" if full_in == 0 else "full in " + UiTheme.duration(full_in)]
 		elif b.owner_id == SimWorld.NEUTRAL_FACTION:
-			storage_l.text = "Not under family control"
+			info.text = "Not under family control"
 		else:
-			storage_l.text = "Rival books are closed to you"
+			info.text = "Rival books are closed to you"
 		if collect:
-			collect.text = "COLLECT %s" % UiTheme.money(stored)
+			collect.text = "COLLECT %s" % UiTheme.short_money(stored)
 			collect.disabled = stored <= 0
 		if upgrade:
 			if b.is_upgrading(now):
-				upgrade.text = "UPGRADING · %s" % UiTheme.duration(b.upgrade_finish_ms - now)
+				upgrade.text = UiTheme.duration(b.upgrade_finish_ms - now)
 				upgrade.disabled = true
 			elif b.level >= max_level:
 				upgrade.text = "MAX LEVEL"
 				upgrade.disabled = true
 			else:
 				var cost := int(b.level_def(w.content).get("upgrade_cost", 0))
-				upgrade.text = "UPGRADE %s" % UiTheme.money(cost)
+				upgrade.text = "UPGRADE %s" % UiTheme.short_money(cost)
 				upgrade.disabled = w.player().cash < cost
 		if buy:
 			var price := w.purchase_price(b)
-			buy.text = "BUY %s" % UiTheme.money(price)
+			buy.text = "BUY %s" % UiTheme.short_money(price)
 			buy.disabled = w.player().cash < price or b.owner_id != SimWorld.NEUTRAL_FACTION
 
 
 # --- Headquarters ---------------------------------------------------------------------------
-static func _hq(panel: DecoPanel, world: SimWorld, hq: HeadquartersState, hud: Hud) -> Callable:
+static func _hq(parent: Control, world: SimWorld, hq: HeadquartersState, hud: Hud) -> Callable:
 	var owner := world.faction(hq.faction_id)
-	var f := _frame(panel, "hq", hq.name, "Headquarters  ·  %s" % owner.name, _faction_color(world, hq.faction_id), hud)
-	var grid: GridContainer = f["stats"]
-	var level_l := _stat(grid, "HQ Level")
-	var biz_l := _stat(grid, "Businesses")
-	var slots_l := _stat(grid, "Crew slots")
-	var cap_l := _stat(grid, "Soldier capacity")
+	var f := _frame(parent, "hq", hq.name, "Headquarters  ·  %s" % owner.name, _faction_color(world, hq.faction_id), hud)
+	var stats: HBoxContainer = f["stats"]
+	var level_l := _stat(stats, "HQ level")
+	var biz_l := _stat(stats, "Businesses")
+	var slots_l := _stat(stats, "Crew slots")
+	var cap_l := _stat(stats, "Capacity")
 	var fac := HFlowContainer.new()
-	fac.add_theme_constant_override("h_separation", 10)
-	fac.add_theme_constant_override("v_separation", 8)
+	fac.add_theme_constant_override("h_separation", 6)
+	fac.add_theme_constant_override("v_separation", 6)
 	(f["root"] as VBoxContainer).add_child(fac)
-	(f["root"] as VBoxContainer).move_child(fac, 3)
 	var defs: Dictionary = world.content.headquarters.get("facilities", {})
 	for fid in defs:
 		var lvl: int = hq.facilities.get(fid, 0)
 		var chip := PanelContainer.new()
 		var s := StyleBoxFlat.new()
-		s.bg_color = Color(0, 0, 0, 0.45)
-		s.border_color = UiTheme.GOLD_DARK if lvl > 0 else Color(0.25, 0.23, 0.2)
-		s.set_border_width_all(1)
-		s.set_content_margin_all(8)
-		s.content_margin_left = 12
-		s.content_margin_right = 12
+		s.bg_color = Color(1, 1, 1, 0.06 if lvl > 0 else 0.02)
+		s.set_corner_radius_all(10)
+		s.content_margin_left = 10
+		s.content_margin_right = 10
+		s.content_margin_top = 3
+		s.content_margin_bottom = 3
 		chip.add_theme_stylebox_override("panel", s)
 		var unlock: int = defs[fid].get("unlock_hq_level", 1)
-		var text: String = "%s  Lv %d" % [defs[fid]["name"], lvl] if lvl > 0 else "%s  ·  HQ %d" % [defs[fid]["name"], unlock]
-		chip.add_child(UiTheme.label(text, 21, UiTheme.CREAM if lvl > 0 else UiTheme.MUTED, "body_bold"))
+		var text: String = "%s  %d" % [defs[fid]["name"], lvl] if lvl > 0 else "%s  ·  HQ %d" % [defs[fid]["name"], unlock]
+		chip.add_child(UiTheme.label(text, UiTheme.SIZE_CAPTION + 1, UiTheme.CREAM if lvl > 0 else UiTheme.FAINT,
+			"body_medium"))
 		fac.add_child(chip)
 	var actions: HBoxContainer = f["actions"]
-	var collect := UiTheme.button("Collect All", "cash")
+	var collect := UiTheme.button("Collect all", "cash")
 	collect.pressed.connect(hud.emit_action.bind("collect_all", {}))
 	actions.add_child(collect)
-	var recall := UiTheme.button("Recall Crews", "home", true)
+	var recall := UiTheme.button("Recall crews", "home", true)
 	recall.pressed.connect(hud.emit_action.bind("recall_all", {}))
 	actions.add_child(recall)
 
@@ -234,54 +249,44 @@ static func _hq(panel: DecoPanel, world: SimWorld, hq: HeadquartersState, hud: H
 			if b.owner_id == hq.faction_id:
 				owned += 1
 				total += b.stored(now, w.content)
-		biz_l.text = "%d / %d" % [owned, int(ld.get("business_limit", 0))]
+		biz_l.text = "%d/%d" % [owned, int(ld.get("business_limit", 0))]
 		slots_l.text = str(ld.get("crew_slots", 0))
 		cap_l.text = str(ld.get("soldier_capacity", 0))
-		collect.text = "COLLECT ALL %s" % UiTheme.money(total)
+		_set_status(f["status"], "Home turf", UiTheme.GOLD_LIGHT)
+		collect.text = "COLLECT %s" % UiTheme.short_money(total)
 		collect.disabled = total <= 0
 
 
 # --- Crew ------------------------------------------------------------------------------------
-static func _crew(panel: DecoPanel, world: SimWorld, c: CrewState, hud: Hud) -> Callable:
+static func _crew(parent: Control, world: SimWorld, c: CrewState, hud: Hud) -> Callable:
 	var owner := world.faction(c.owner_id)
 	var capo: Dictionary = world.content.characters.get(c.capo_id, {})
 	var rarity: Dictionary = world.content.rarities.get(capo.get("rarity", "common"), {})
-	var f := _frame(panel, "crew", c.name, "%s  ·  Capo %s" % [owner.name, capo.get("name", "?")],
+	var f := _frame(parent, "crew", c.name, "Capo %s  ·  %s" % [capo.get("name", "?"), owner.name],
 		_faction_color(world, c.owner_id), hud)
-	var grid: GridContainer = f["stats"]
-	var power_l := _stat(grid, "Power")
-	var soldiers_l := _stat(grid, "Soldiers")
-	var vehicle_l := _stat(grid, "Vehicles")
-	var rarity_l := _stat(grid, "Capo rarity")
+	var stats: HBoxContainer = f["stats"]
+	var power_l := _stat(stats, "Power")
+	var soldiers_l := _stat(stats, "Soldiers")
+	var vehicle_l := _stat(stats, "Cars")
+	var rarity_l := _stat(stats, "Capo")
 	rarity_l.text = rarity.get("name", "")
 	rarity_l.add_theme_color_override("font_color", Color.html(rarity.get("color", "#ffffff")))
-	var status_l := UiTheme.label("", 24, UiTheme.CREAM)
-	(f["root"] as VBoxContainer).add_child(status_l)
-	(f["root"] as VBoxContainer).move_child(status_l, 3)
-	var hp := ProgressBar.new()
-	hp.show_percentage = false
-	hp.custom_minimum_size = Vector2(0, 14)
+	var health := _progress_line(f["root"], "Strength")
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = UiTheme.GREEN
-	hp.add_theme_stylebox_override("fill", fill)
-	(f["root"] as VBoxContainer).add_child(hp)
-	(f["root"] as VBoxContainer).move_child(hp, 4)
+	fill.set_corner_radius_all(3)
+	(health["bar"] as ProgressBar).add_theme_stylebox_override("fill", fill)
 	var actions: HBoxContainer = f["actions"]
-	var follow: Button
 	if c.owner_id == world.player_faction_id:
 		var move := UiTheme.button("Move", "move")
 		move.pressed.connect(hud.emit_action.bind("move_mode", {"crew": c.id}))
 		actions.add_child(move)
-		var recall := UiTheme.button("Return to HQ", "home", true)
+		var recall := UiTheme.button("To HQ", "home", true)
 		recall.pressed.connect(hud.emit_action.bind("recall", {"crew": c.id}))
 		actions.add_child(recall)
-	else:
-		var bio := UiTheme.label(capo.get("bio", ""), 21, UiTheme.MUTED)
-		bio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		bio.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		actions.add_child(bio)
-	follow = UiTheme.button("Follow", "follow", true)
+	var follow := UiTheme.icon_button("follow", 48)
 	follow.toggle_mode = true
+	follow.tooltip_text = "Follow"
 	follow.toggled.connect(func(on: bool): hud.emit_action("follow", {"crew": c.id, "on": on}))
 	actions.add_child(follow)
 
@@ -291,9 +296,14 @@ static func _crew(panel: DecoPanel, world: SimWorld, c: CrewState, hud: Hud) -> 
 		for tier in c.soldiers:
 			parts.append("%d %s" % [c.soldiers[tier], w.content.soldier_tiers.get(tier, {}).get("name", tier)])
 		soldiers_l.text = str(PowerCalculator.soldier_count(c.soldiers))
-		soldiers_l.tooltip_text = ", ".join(parts)
-		vehicle_l.text = "%d × %s" % [c.vehicle_count, w.content.vehicles.get(c.vehicle_id, {}).get("name", "")]
-		status_l.text = hud.crew_status_text(w, c, now) + "   ·   " + ", ".join(parts)
-		hp.max_value = maxi(c.max_hp, 1)
-		hp.value = c.hp
+		vehicle_l.text = str(c.vehicle_count)
+		var info: Label = health["info"]
+		info.text = hud.crew_status_text(w, c, now) + "   ·   " + ", ".join(parts)
+		var bar: ProgressBar = health["bar"]
+		bar.max_value = maxi(c.max_hp, 1)
+		bar.value = c.hp
+		if c.is_moving():
+			_set_status(f["status"], "On the move", UiTheme.GOLD_LIGHT)
+		else:
+			_set_status(f["status"], "Ready", UiTheme.GREEN)
 		follow.set_pressed_no_signal(hud.get_meta("following", "") == c.id)
