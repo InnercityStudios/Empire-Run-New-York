@@ -108,7 +108,6 @@ func _street_widths() -> Dictionary:
 const TITLE_THEME := preload("res://assets/audio/music/title_theme.wav")
 const TITLE_THEME_DB := -14.0  # subtle: a backdrop to the art, not a fanfare
 const TITLE_THEME_UNDER_DB := -22.0  # sits under the city bed once play begins
-const TITLE_THEME_FADE := 6.0
 
 var _loading: CanvasLayer
 var _title_music: AudioStreamPlayer
@@ -164,22 +163,13 @@ func _hide_loading() -> void:
 	_settle_title_music()
 
 
-## The theme plays through once: it drops under the city when play begins and
-## fades out before its last bar instead of cutting off.
+## The theme loops for the session; it drops under the city when play begins.
 func _settle_title_music() -> void:
-	if _title_music == null or not _title_music.playing:
+	if _title_music == null:
 		return
-	var music := _title_music
 	if _title_fade:
 		_title_fade.kill()
-	create_tween().tween_property(music, "volume_db", TITLE_THEME_UNDER_DB, 2.5)
-	var remaining := TITLE_THEME.get_length() - music.get_playback_position() - TITLE_THEME_FADE
-	get_tree().create_timer(maxf(remaining, 0.0)).timeout.connect(func():
-		if not is_instance_valid(music):
-			return
-		var out := create_tween()
-		out.tween_property(music, "volume_db", -60.0, TITLE_THEME_FADE)
-		out.tween_callback(music.queue_free))
+	create_tween().tween_property(_title_music, "volume_db", TITLE_THEME_UNDER_DB, 2.5)
 
 
 var ambience: AmbienceDirector
