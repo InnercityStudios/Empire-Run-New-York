@@ -16,6 +16,8 @@ uniform vec4 paint_white : source_color = vec4(0.82, 0.8, 0.74, 1.0);
 uniform vec4 paint_yellow : source_color = vec4(0.84, 0.62, 0.18, 1.0);
 uniform float crosswalk_start = 0.6;
 uniform float crosswalk_end = 4.0;
+// Rain puddles: share of the road surface that holds standing water (0..1).
+uniform float wetness = 0.35;
 
 varying vec3 v_world;
 varying vec2 v_info;
@@ -104,9 +106,15 @@ void fragment() {
 	yellow *= mix(0.5, 0.95, wear);
 	vec3 col = mix(base, paint_white.rgb, white);
 	col = mix(col, paint_yellow.rgb, yellow);
+	// Puddles collect in the gutters and in low patches; one extra sample.
+	float low = texture(asphalt_tex, wuv * 0.23 + vec2(0.61, 0.17)).r;
+	float gutter_pull = len > 0.0 ? smoothstep(hw - 2.2, hw - 0.3, abs(lat)) * 0.35 : 0.0;
+	float puddle = smoothstep(0.76 - wetness * 0.12, 0.8 - wetness * 0.12, (1.0 - low) * 0.75 + gutter_pull + macro2 * 0.2);
+	puddle *= step(0.001, wetness);
+	col = mix(col, col * 0.55, puddle);
 	ALBEDO = col;
-	ROUGHNESS = clamp(mix(0.9, 0.7, max(white, yellow)) + rough_mod, 0.2, 1.0);
-	SPECULAR = 0.35;
-	NORMAL_MAP = texture(asphalt_normal, wuv).rgb;
+	ROUGHNESS = mix(clamp(mix(0.9, 0.7, max(white, yellow)) + rough_mod, 0.2, 1.0), 0.04, puddle);
+	SPECULAR = mix(0.35, 0.7, puddle);
+	NORMAL_MAP = mix(texture(asphalt_normal, wuv).rgb, vec3(0.5, 0.5, 1.0), puddle);
 	NORMAL_MAP_DEPTH = 0.6;
 }
