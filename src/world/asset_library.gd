@@ -7,6 +7,8 @@ const PROP_DIR := "res://assets/models/props/"
 const VEHICLE_DIR := "res://assets/models/vehicles/"
 
 static var _meshes: Dictionary = {}
+static var _names: Dictionary = {}  ## mesh instance id -> PackedStringArray (main-thread computed)
+static var _arrays: Dictionary = {} ## mesh instance id -> Array of surface arrays (main-thread computed)
 
 
 static func building_mesh(id: String) -> ArrayMesh:
@@ -38,11 +40,30 @@ static func mesh_at(path: String) -> ArrayMesh:
 		if mi and mi.mesh is ArrayMesh:
 			mesh = mi.mesh
 			Materials.apply_to_mesh(mesh)
+			var names := PackedStringArray()
+			for i in mesh.get_surface_count():
+				names.append(Materials.material_name_of(mesh.surface_get_material(i)))
+			_names[mesh.get_instance_id()] = names
+			var surfaces: Array = []
+			for i in mesh.get_surface_count():
+				surfaces.append(mesh.surface_get_arrays(i))
+			_arrays[mesh.get_instance_id()] = surfaces
 		else:
 			push_error("AssetLibrary: no mesh in %s" % path)
 		root.free()
 	_meshes[path] = mesh
 	return mesh
+
+
+## Library material names of a cached asset mesh, safe to call from worker
+## threads (computed when the asset was loaded on the main thread).
+static func surface_names(mesh: ArrayMesh) -> PackedStringArray:
+	return _names.get(mesh.get_instance_id(), PackedStringArray())
+
+
+## Decompressed surface arrays of a cached asset mesh (read-only, thread-safe).
+static func surface_arrays(mesh: ArrayMesh) -> Array:
+	return _arrays.get(mesh.get_instance_id(), [])
 
 
 static func _find_mesh_instance(n: Node) -> MeshInstance3D:

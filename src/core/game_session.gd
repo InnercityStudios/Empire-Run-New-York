@@ -15,7 +15,7 @@ const SAVE_PATH := "user://saves/slot_0.json"
 const AUTOSAVE_INTERVAL_MS := 15_000
 
 var world: SimWorld
-var layout: DistrictLayout
+var layout: WorldLayout
 var player_id := ""
 var _dirty := false
 var _last_save_ms := 0
@@ -30,7 +30,7 @@ func now_ms_f() -> float:
 	return Time.get_unix_time_from_system() * 1000.0
 
 
-func start(p_layout: DistrictLayout) -> void:
+func start(p_layout: WorldLayout) -> void:
 	layout = p_layout
 	var content: GameContent = Content.db
 	var roads := SimBootstrap.roads_for(layout)

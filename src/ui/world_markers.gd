@@ -14,7 +14,7 @@ const NAME_DISTANCE_OTHER := 110.0
 const COLLECT_THRESHOLD := 0.1
 
 var camera: Camera3D
-var world_view: CityWorld
+var world_view: WorldStreamer
 var crew_views: Dictionary = {}
 var selected := {}
 var _bubbles: Array = []

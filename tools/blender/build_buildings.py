@@ -17,6 +17,14 @@ from empire.geometry import export_glb, reset_scene  # noqa: E402
 
 OUT = os.path.join(ROOT, "assets", "models", "buildings")
 
+FACADE_TONES = {
+    "M_Brick_Red": "#7e3a2b", "M_Brick_Brown": "#634434", "M_Brick_Tan": "#a2845f", "M_Brick_Dark": "#4d2b23",
+    "M_Brick_Painted": "#cfc6b4", "M_Stone": "#b8ae9b", "M_Siding_White": "#d9d2c2", "M_Siding_Green": "#7d9a84",
+    "M_Siding_Yellow": "#d4bd84", "M_Siding_Blue": "#8da2b4",
+}
+ROOF_TONES = {"M_Roof_Tar": 0.15, "M_Roof_Silver": 0.85, "M_Roof_Gravel": 0.55, "M_Shingle_Gray": 0.35,
+              "M_Shingle_Brown": 0.3, "M_Shingle_Slate": 0.25}
+
 
 def shop(sign, frontage="M_Shopfront_Green", text="M_Sign_Gold", awning=None, variant=0, **kw):
     g = {"type": "shop", "sign": sign, "frontage": frontage, "sign_text": text, "awning": awning,
@@ -183,6 +191,9 @@ def main():
             "height": round(height, 2),
             "triangles": tris,
             "materials": len(obj.data.materials),
+            # Average tones for the distant-city LOD box.
+            "facade": FACADE_TONES.get(spec.get("wall", spec.get("brick", "")), "#7a5a48"),
+            "roof_tone": ROOF_TONES.get(spec.get("roof", ""), 0.5),
         }
         print("BUILT %-26s tris=%6d mats=%2d h=%.1f" % (spec["id"], tris, len(obj.data.materials), height))
     with open(catalog_path, "w") as f:

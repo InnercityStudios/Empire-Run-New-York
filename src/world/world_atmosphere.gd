@@ -19,15 +19,16 @@ func _ready() -> void:
 	sun.rotation_degrees = Vector3(-sun_elevation_deg, sun_azimuth_deg, 0)
 	sun.light_color = sun_color
 	sun.light_energy = sun_energy
-	sun.shadow_enabled = true
+	sun.shadow_enabled = not QualityFlags.off("shadows")
 	sun.shadow_bias = 0.03
 	sun.shadow_normal_bias = 1.0
 	sun.shadow_blur = 1.8
 	# Partial shadow opacity stands in for the bounce light the Mobile
 	# renderer cannot compute, so shaded streets stay readable.
 	sun.shadow_opacity = 0.8
-	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
-	sun.directional_shadow_split_1 = 0.25
+	# One cascade: measured at ~3M of 4.9M primitives with two cascades,
+	# because every loaded detail chunk was re-rendered per cascade.
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	sun.directional_shadow_max_distance = 260.0
 	sun.directional_shadow_fade_start = 0.85
 	add_child(sun)
@@ -91,7 +92,7 @@ func _ready() -> void:
 ## Called by the camera when zoom changes.
 func on_camera_distance(distance: float) -> void:
 	if sun:
-		sun.directional_shadow_max_distance = clampf(distance * 2.4, 140.0, 700.0)
+		sun.directional_shadow_max_distance = clampf(distance * 1.15, 100.0, 260.0)
 	if environment:
 		environment.fog_depth_begin = distance * 1.6 + 120.0
 		environment.fog_depth_end = distance * 4.0 + 500.0

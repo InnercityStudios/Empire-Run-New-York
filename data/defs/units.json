@@ -66,28 +66,28 @@
     },
     "traffic_chapman": {
       "name": "Chapman '73",
-      "model": "res://assets/models/vehicles/licensed/chapman_73.glb",
+      "model": "res://assets/models/vehicles/licensed/chapman_73_lod.glb",
       "speed_mps": 11.0,
       "seats": 5,
       "traffic_only": true
     },
     "traffic_phoenix": {
       "name": "Phoenix 455",
-      "model": "res://assets/models/vehicles/licensed/phoenix_455_71.glb",
+      "model": "res://assets/models/vehicles/licensed/phoenix_455_71_lod.glb",
       "speed_mps": 11.0,
       "seats": 5,
       "traffic_only": true
     },
     "taxi": {
       "name": "Canyon '75 Taxi",
-      "model": "res://assets/models/vehicles/licensed/canyon_75_taxi.glb",
+      "model": "res://assets/models/vehicles/licensed/canyon_75_taxi_lod.glb",
       "speed_mps": 11.0,
       "seats": 4,
       "traffic_only": true
     },
     "police": {
       "name": "Chapman '73 Cruiser",
-      "model": "res://assets/models/vehicles/licensed/chapman_73_police.glb",
+      "model": "res://assets/models/vehicles/licensed/chapman_73_police_lod.glb",
       "speed_mps": 13.0,
       "seats": 4,
       "traffic_only": true

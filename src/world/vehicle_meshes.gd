@@ -8,6 +8,15 @@ static var _instanced: Dictionary = {}
 static var _rim: ShaderMaterial
 
 
+## Expands a weighted [kind, weight] mix into a pick list.
+static func weighted(mix: Array) -> Array:
+	var out := []
+	for entry in mix:
+		for i in int(entry[1]):
+			out.append(entry[0])
+	return out
+
+
 static func is_tintable(kind: String) -> bool:
 	return bool(Content.db.vehicles.get(kind, {}).get("tintable", false))
 

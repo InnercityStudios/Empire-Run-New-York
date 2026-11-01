@@ -17,7 +17,7 @@ const ERROR_TEXT := {
 	"no_idle_crew": "All crews are busy.",
 }
 
-@onready var world: CityWorld = $CityWorld
+@onready var world: WorldStreamer = $World
 @onready var camera: StrategyCamera = $StrategyCamera
 @onready var atmosphere: WorldAtmosphere = $Atmosphere
 
@@ -34,9 +34,12 @@ var _crew_root: Node3D
 
 func _ready() -> void:
 	add_to_group("main")
-	var layout := DistrictLayout.build(Content.db.districts["little_italy"], Content.db.building_catalog)
+	_show_loading()
+	await get_tree().process_frame
+	var layout := WorldLayout.build(Content.db.worlds["greater_new_york"], Content.db)
 	world.build(layout)
-	camera.set_bounds(layout.bounds.grow(-40.0))
+	world.camera = camera
+	camera.set_bounds(layout.playable)
 	camera.distance_changed.connect(atmosphere.on_camera_distance)
 	camera.tapped.connect(_on_tap)
 	camera.follow_cancelled.connect(func(): _set_follow(""))
@@ -51,7 +54,9 @@ func _ready() -> void:
 	traffic.name = "Traffic"
 	add_child(traffic)
 	traffic.obstacle_provider = _crew_car_positions
-	traffic.setup(layout)
+	traffic.camera = camera
+	if not QualityFlags.off("traffic"):
+		traffic.setup(layout)
 	fader = OcclusionFader.new()
 	fader.name = "OcclusionFader"
 	fader.world = world
@@ -74,7 +79,10 @@ func _ready() -> void:
 	Game.command_failed.connect(_on_command_failed)
 	Game.session_started.connect(_on_session_started)
 	Game.start(layout)
+	_add_ambience()
 	_intro()
+	world.initial_detail_ready.connect(_hide_loading, CONNECT_ONE_SHOT)
+	get_tree().create_timer(12.0).timeout.connect(_hide_loading)
 
 
 func _on_session_started() -> void:
@@ -93,10 +101,66 @@ func _on_session_started() -> void:
 
 
 func _street_widths() -> Dictionary:
-	var out := {}
-	for r in world.layout.avenues + world.layout.streets:
-		out[r["id"]] = r["width"]
-	return out
+	return world.layout.street_widths()
+
+
+# --- Loading screen and ambience ----------------------------------------------------
+var _loading: CanvasLayer
+
+
+func _show_loading() -> void:
+	_loading = CanvasLayer.new()
+	_loading.layer = 50
+	add_child(_loading)
+	var bg := ColorRect.new()
+	bg.color = Color(0.04, 0.035, 0.03)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_loading.add_child(bg)
+	var art := TextureRect.new()
+	art.texture = load("res://assets/branding/loading_screen.png")
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_loading.add_child(art)
+	var shade := ColorRect.new()
+	shade.color = Color(0, 0, 0, 0.35)
+	shade.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	shade.offset_top = -86
+	_loading.add_child(shade)
+	var label := UiTheme.label("Loading Greater New York  ·  1977", UiTheme.SIZE_SMALL, UiTheme.CREAM, "body_medium")
+	label.name = "Status"
+	label.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	label.offset_top = -58
+	label.offset_left = -300
+	label.offset_right = 300
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_loading.add_child(label)
+
+
+func _hide_loading() -> void:
+	if _loading == null or not is_instance_valid(_loading):
+		return
+	var layer := _loading
+	_loading = null
+	var tw := create_tween()
+	for c in layer.get_children():
+		tw.parallel().tween_property(c, "modulate:a", 0.0, 0.6)
+	tw.tween_callback(layer.queue_free)
+
+
+var _ambience: AudioStreamPlayer
+
+
+func _add_ambience() -> void:
+	_ambience = AudioStreamPlayer.new()
+	_ambience.name = "CityAmbience"
+	_ambience.stream = load("res://assets/audio/ambience/city_traffic.wav")
+	_ambience.volume_db = -14.0
+	_ambience.autoplay = true
+	add_child(_ambience)
+	camera.distance_changed.connect(func(d: float):
+		# Street noise fades as the camera climbs to the strategic view.
+		_ambience.volume_db = lerpf(-9.0, -26.0, clampf((d - 60.0) / 500.0, 0.0, 1.0)))
 
 
 func _intro() -> void:

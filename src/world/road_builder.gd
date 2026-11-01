@@ -39,9 +39,26 @@ static func _add_segment(st: SurfaceTool, seg: Dictionary) -> void:
 	var style: float = float(seg.get("style", 1)) / 2.0
 	var p := [a - right * hw, a + right * hw, b + right * hw, b - right * hw]
 	var lat := [-hw, hw, hw, -hw]
-	var along := [0.0, 0.0, length, length]
+	# Pieces of a longer road keep continuous markings (crosswalks only at the true ends).
+	var a0: float = seg.get("along0", 0.0)
+	var total: float = seg.get("total", length)
+	var along := [a0, a0, a0 + length, a0 + length]
 	var idx := [0, 1, 2, 0, 2, 3]
-	_emit(st, p, lat, along, idx, Vector2(length, hw), style)
+	_emit(st, p, lat, along, idx, Vector2(total, hw), style)
+
+
+## Road surfaces for a set of segments and intersections (one chunk).
+static func build_chunk_roads(segments: Array, intersections_list: Array) -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for seg in segments:
+		_add_segment(st, seg)
+	for inter in intersections_list:
+		_add_flat_quad(st, inter["rect"], 0.0, 0.0)
+	var mesh := st.commit()
+	if mesh.get_surface_count() > 0:
+		mesh.surface_set_material(0, Materials.get_road_material())
+	return mesh
 
 
 static func _add_flat_quad(st: SurfaceTool, r: Rect2, y: float, style: float) -> void:
@@ -70,12 +87,20 @@ static func _emit(st: SurfaceTool, p: Array, lat: Array, along: Array, idx: Arra
 
 ## Raised sidewalk slab for a block: rounded corners, granite curb lip and face.
 ## Geometry is added to `tools` ({material_name: SurfaceTool}) for chunk merging.
-static func add_sidewalk(tools: Dictionary, rect: Rect2, curb_h: float, radius: float) -> void:
+static func add_sidewalk(tools: Dictionary, rect: Rect2, curb_h: float, radius: float, lawn := false,
+		sidewalk_w := 4.0) -> void:
 	var outer := _rounded_rect(rect, radius)
 	var inner := _rounded_rect(rect.grow(-CURB_LIP), maxf(radius - CURB_LIP, 0.5))
 	var top: SurfaceTool = _tool(tools, "M_Sidewalk")
 	var curb: SurfaceTool = _tool(tools, "M_Curb")
 	var c := rect.get_center()
+	if lawn:
+		# Front lawns and yards: grass inside a pavement ring.
+		var grass := _tool(tools, "M_Grass")
+		var g := rect.grow(-sidewalk_w)
+		var gy := curb_h + 0.01
+		_tri(grass, Vector3(g.position.x, gy, g.position.y), Vector3(g.end.x, gy, g.position.y), Vector3(g.end.x, gy, g.end.y), Vector3.UP, 6.0)
+		_tri(grass, Vector3(g.position.x, gy, g.position.y), Vector3(g.end.x, gy, g.end.y), Vector3(g.position.x, gy, g.end.y), Vector3.UP, 6.0)
 	# Sidewalk top (convex fan)
 	for i in inner.size():
 		var j := (i + 1) % inner.size()

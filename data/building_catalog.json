@@ -8,8 +8,10 @@
       "width": 16.0,
       "depth": 20.0,
       "height": 43.9,
-      "triangles": 10448,
-      "materials": 9
+      "triangles": 10722,
+      "materials": 9,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "apartment_tall_b",
@@ -17,9 +19,11 @@
       "scene": "res://assets/models/buildings/apartment_tall_b.glb",
       "width": 14.0,
       "depth": 20.0,
-      "height": 38.81,
-      "triangles": 8532,
-      "materials": 8
+      "height": 38.97,
+      "triangles": 7536,
+      "materials": 9,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "biz_bar_blue_lantern",
@@ -27,9 +31,11 @@
       "scene": "res://assets/models/buildings/biz_bar_blue_lantern.glb",
       "width": 9.0,
       "depth": 20.0,
-      "height": 20.02,
-      "triangles": 3059,
-      "materials": 9
+      "height": 19.05,
+      "triangles": 3429,
+      "materials": 9,
+      "facade": "#4d2b23",
+      "roof_tone": 0.5
     },
     {
       "id": "biz_garage_bowery",
@@ -37,9 +43,11 @@
       "scene": "res://assets/models/buildings/biz_garage_bowery.glb",
       "width": 14.0,
       "depth": 20.0,
-      "height": 13.76,
-      "triangles": 1764,
-      "materials": 7
+      "height": 13.83,
+      "triangles": 1866,
+      "materials": 7,
+      "facade": "#cfc6b4",
+      "roof_tone": 0.5
     },
     {
       "id": "biz_restaurant_vesuvio",
@@ -48,8 +56,10 @@
       "width": 12.0,
       "depth": 20.0,
       "height": 28.25,
-      "triangles": 6747,
-      "materials": 8
+      "triangles": 7165,
+      "materials": 8,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "biz_trattoria_napoli",
@@ -57,9 +67,11 @@
       "scene": "res://assets/models/buildings/biz_trattoria_napoli.glb",
       "width": 10.5,
       "depth": 20.0,
-      "height": 19.05,
-      "triangles": 4370,
-      "materials": 8
+      "height": 19.33,
+      "triangles": 4114,
+      "materials": 7,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "biz_warehouse_grand",
@@ -68,8 +80,10 @@
       "width": 24.0,
       "depth": 22.0,
       "height": 28.5,
-      "triangles": 6036,
-      "materials": 8
+      "triangles": 5978,
+      "materials": 8,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "corner_left_a",
@@ -77,9 +91,11 @@
       "scene": "res://assets/models/buildings/corner_left_a.glb",
       "width": 12.0,
       "depth": 20.0,
-      "height": 22.36,
-      "triangles": 4113,
-      "materials": 8
+      "height": 23.17,
+      "triangles": 4355,
+      "materials": 7,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "corner_left_b",
@@ -88,8 +104,10 @@
       "width": 12.0,
       "depth": 20.0,
       "height": 31.35,
-      "triangles": 5127,
-      "materials": 7
+      "triangles": 4797,
+      "materials": 7,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "corner_right_a",
@@ -97,9 +115,11 @@
       "scene": "res://assets/models/buildings/corner_right_a.glb",
       "width": 12.0,
       "depth": 20.0,
-      "height": 22.68,
-      "triangles": 3932,
-      "materials": 7
+      "height": 23.3,
+      "triangles": 4386,
+      "materials": 7,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "corner_right_b",
@@ -107,9 +127,11 @@
       "scene": "res://assets/models/buildings/corner_right_b.glb",
       "width": 12.0,
       "depth": 20.0,
-      "height": 19.45,
-      "triangles": 3194,
-      "materials": 8
+      "height": 20.25,
+      "triangles": 3584,
+      "materials": 8,
+      "facade": "#4d2b23",
+      "roof_tone": 0.5
     },
     {
       "id": "estate_a",
@@ -119,7 +141,9 @@
       "depth": 18.0,
       "height": 15.4,
       "triangles": 513,
-      "materials": 5
+      "materials": 5,
+      "facade": "#b8ae9b",
+      "roof_tone": 0.25
     },
     {
       "id": "factory_a",
@@ -129,7 +153,9 @@
       "depth": 36.0,
       "height": 26.2,
       "triangles": 102,
-      "materials": 5
+      "materials": 5,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "house_a",
@@ -139,7 +165,9 @@
       "depth": 10.0,
       "height": 9.6,
       "triangles": 312,
-      "materials": 8
+      "materials": 8,
+      "facade": "#d9d2c2",
+      "roof_tone": 0.35
     },
     {
       "id": "house_b",
@@ -149,7 +177,9 @@
       "depth": 9.5,
       "height": 9.6,
       "triangles": 288,
-      "materials": 8
+      "materials": 8,
+      "facade": "#7d9a84",
+      "roof_tone": 0.3
     },
     {
       "id": "house_c",
@@ -159,7 +189,9 @@
       "depth": 10.5,
       "height": 9.6,
       "triangles": 312,
-      "materials": 7
+      "materials": 7,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.25
     },
     {
       "id": "house_d",
@@ -169,7 +201,9 @@
       "depth": 9.0,
       "height": 9.6,
       "triangles": 300,
-      "materials": 7
+      "materials": 7,
+      "facade": "#d4bd84",
+      "roof_tone": 0.35
     },
     {
       "id": "house_e",
@@ -179,7 +213,9 @@
       "depth": 10.0,
       "height": 9.6,
       "triangles": 312,
-      "materials": 8
+      "materials": 8,
+      "facade": "#8da2b4",
+      "roof_tone": 0.25
     },
     {
       "id": "hq_social_club",
@@ -187,9 +223,11 @@
       "scene": "res://assets/models/buildings/hq_social_club.glb",
       "width": 10.5,
       "depth": 20.0,
-      "height": 16.77,
-      "triangles": 3399,
-      "materials": 9
+      "height": 17.05,
+      "triangles": 3465,
+      "materials": 8,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "loft_a",
@@ -197,9 +235,11 @@
       "scene": "res://assets/models/buildings/loft_a.glb",
       "width": 16.0,
       "depth": 24.0,
-      "height": 29.74,
-      "triangles": 1754,
-      "materials": 8
+      "height": 29.89,
+      "triangles": 1886,
+      "materials": 7,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "pier_shed_a",
@@ -209,7 +249,9 @@
       "depth": 150.0,
       "height": 11.68,
       "triangles": 84,
-      "materials": 3
+      "materials": 3,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
     },
     {
       "id": "rowhouse_a",
@@ -217,9 +259,11 @@
       "scene": "res://assets/models/buildings/rowhouse_a.glb",
       "width": 6.5,
       "depth": 20.0,
-      "height": 17.08,
-      "triangles": 1548,
-      "materials": 6
+      "height": 15.95,
+      "triangles": 1422,
+      "materials": 6,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "rowhouse_b",
@@ -227,9 +271,11 @@
       "scene": "res://assets/models/buildings/rowhouse_b.glb",
       "width": 7.0,
       "depth": 20.0,
-      "height": 19.85,
-      "triangles": 1836,
-      "materials": 6
+      "height": 19.66,
+      "triangles": 1782,
+      "materials": 6,
+      "facade": "#4d2b23",
+      "roof_tone": 0.5
     },
     {
       "id": "rowhouse_c",
@@ -237,9 +283,11 @@
       "scene": "res://assets/models/buildings/rowhouse_c.glb",
       "width": 6.0,
       "depth": 20.0,
-      "height": 15.75,
-      "triangles": 1222,
-      "materials": 6
+      "height": 16.71,
+      "triangles": 1352,
+      "materials": 5,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "rowhouse_d",
@@ -247,9 +295,11 @@
       "scene": "res://assets/models/buildings/rowhouse_d.glb",
       "width": 7.5,
       "depth": 20.0,
-      "height": 19.85,
-      "triangles": 2564,
-      "materials": 5
+      "height": 19.52,
+      "triangles": 2102,
+      "materials": 5,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "taxpayer_a",
@@ -257,9 +307,11 @@
       "scene": "res://assets/models/buildings/taxpayer_a.glb",
       "width": 15.0,
       "depth": 20.0,
-      "height": 7.79,
-      "triangles": 1905,
-      "materials": 8
+      "height": 6.87,
+      "triangles": 1853,
+      "materials": 7,
+      "facade": "#cfc6b4",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_a",
@@ -267,9 +319,11 @@
       "scene": "res://assets/models/buildings/tenement_a.glb",
       "width": 7.5,
       "depth": 20.0,
-      "height": 22.82,
-      "triangles": 2941,
-      "materials": 7
+      "height": 23.14,
+      "triangles": 3199,
+      "materials": 7,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_b",
@@ -277,9 +331,11 @@
       "scene": "res://assets/models/buildings/tenement_b.glb",
       "width": 9.0,
       "depth": 20.0,
-      "height": 19.43,
-      "triangles": 2688,
-      "materials": 8
+      "height": 18.9,
+      "triangles": 2556,
+      "materials": 7,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_c",
@@ -288,8 +344,10 @@
       "width": 7.5,
       "depth": 20.0,
       "height": 31.35,
-      "triangles": 3915,
-      "materials": 7
+      "triangles": 3837,
+      "materials": 7,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_d",
@@ -297,9 +355,11 @@
       "scene": "res://assets/models/buildings/tenement_d.glb",
       "width": 10.5,
       "depth": 20.0,
-      "height": 22.81,
-      "triangles": 3925,
-      "materials": 8
+      "height": 23.31,
+      "triangles": 4057,
+      "materials": 7,
+      "facade": "#4d2b23",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_e",
@@ -307,9 +367,11 @@
       "scene": "res://assets/models/buildings/tenement_e.glb",
       "width": 9.0,
       "depth": 20.0,
-      "height": 21.95,
-      "triangles": 4163,
-      "materials": 8
+      "height": 22.23,
+      "triangles": 3223,
+      "materials": 8,
+      "facade": "#cfc6b4",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_f",
@@ -317,9 +379,11 @@
       "scene": "res://assets/models/buildings/tenement_f.glb",
       "width": 8.0,
       "depth": 20.0,
-      "height": 19.74,
-      "triangles": 3023,
-      "materials": 8
+      "height": 19.75,
+      "triangles": 2983,
+      "materials": 7,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_g",
@@ -328,8 +392,10 @@
       "width": 12.0,
       "depth": 20.0,
       "height": 31.35,
-      "triangles": 4663,
-      "materials": 7
+      "triangles": 5947,
+      "materials": 7,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_h",
@@ -337,9 +403,11 @@
       "scene": "res://assets/models/buildings/tenement_h.glb",
       "width": 7.5,
       "depth": 20.0,
-      "height": 16.72,
-      "triangles": 1272,
-      "materials": 6
+      "height": 16.21,
+      "triangles": 1532,
+      "materials": 5,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_i",
@@ -347,9 +415,11 @@
       "scene": "res://assets/models/buildings/tenement_i.glb",
       "width": 10.5,
       "depth": 20.0,
-      "height": 23.08,
-      "triangles": 3189,
-      "materials": 7
+      "height": 23.1,
+      "triangles": 3575,
+      "materials": 7,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_j",
@@ -358,8 +428,10 @@
       "width": 9.0,
       "depth": 20.0,
       "height": 31.35,
-      "triangles": 4041,
-      "materials": 8
+      "triangles": 4771,
+      "materials": 8,
+      "facade": "#4d2b23",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_k",
@@ -367,9 +439,11 @@
       "scene": "res://assets/models/buildings/tenement_k.glb",
       "width": 8.0,
       "depth": 20.0,
-      "height": 23.2,
-      "triangles": 3505,
-      "materials": 9
+      "height": 23.19,
+      "triangles": 2809,
+      "materials": 9,
+      "facade": "#a2845f",
+      "roof_tone": 0.5
     },
     {
       "id": "tenement_l",
@@ -377,9 +451,11 @@
       "scene": "res://assets/models/buildings/tenement_l.glb",
       "width": 9.0,
       "depth": 20.0,
-      "height": 16.22,
-      "triangles": 1274,
-      "materials": 6
+      "height": 16.92,
+      "triangles": 1358,
+      "materials": 5,
+      "facade": "#cfc6b4",
+      "roof_tone": 0.5
     },
     {
       "id": "warehouse_a",
@@ -387,9 +463,11 @@
       "scene": "res://assets/models/buildings/warehouse_a.glb",
       "width": 24.0,
       "depth": 30.0,
-      "height": 23.51,
-      "triangles": 1886,
-      "materials": 8
+      "height": 22.92,
+      "triangles": 1782,
+      "materials": 7,
+      "facade": "#7e3a2b",
+      "roof_tone": 0.15
     },
     {
       "id": "warehouse_b",
@@ -398,8 +476,10 @@
       "width": 20.0,
       "depth": 26.0,
       "height": 24.7,
-      "triangles": 3647,
-      "materials": 8
+      "triangles": 3517,
+      "materials": 8,
+      "facade": "#634434",
+      "roof_tone": 0.5
     },
     {
       "id": "warehouse_c",
@@ -407,9 +487,11 @@
       "scene": "res://assets/models/buildings/warehouse_c.glb",
       "width": 28.0,
       "depth": 34.0,
-      "height": 15.7,
-      "triangles": 3757,
-      "materials": 8
+      "height": 15.2,
+      "triangles": 3797,
+      "materials": 8,
+      "facade": "#4d2b23",
+      "roof_tone": 0.5
     }
   ]
 }

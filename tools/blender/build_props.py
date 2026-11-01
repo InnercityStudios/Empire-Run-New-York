@@ -26,6 +26,7 @@ ASSETS = [
     ("props/newspaper_box", props.build_newspaper_box),
     ("props/tree_a", lambda: props.build_tree(3, "tree_a")),
     ("props/tree_b", lambda: props.build_tree(11, "tree_b")),
+    ("props/tree_far", props.build_tree_far),
     ("props/subway_entrance", props.build_subway_entrance),
     ("props/bus_stop", props.build_bus_stop),
     ("props/phone_booth", props.build_phone_booth),

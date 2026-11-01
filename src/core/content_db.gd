@@ -1,3 +1,4 @@
+@tool
 extends Node
 ## Autoload "Content": the game's single loaded GameContent instance.
 

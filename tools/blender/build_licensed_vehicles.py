@@ -31,6 +31,10 @@ HIDDEN_RES = 512
 CREDIT = {"author": "Daniel Zhabotinsky", "author_url": "https://sketchfab.com/DanielZhabotinsky",
           "license": "CC-BY-4.0", "license_url": "http://creativecommons.org/licenses/by/4.0/"}
 
+# Ambient traffic and parked cars are many and small on screen: lean variants.
+TRAFFIC_BUDGET = 2600
+TRAFFIC_TEXTURE = 512
+
 SPECS = [
     {"id": "chapman_73_black", "src": "chapman_73.glb", "title": "Chapman '73", "paint": (0.018, 0.018, 0.02),
      "source_url": "https://sketchfab.com/3d-models/chapman-73-low-poly-model-f30b644b59b54e809355009dce463d47"},
@@ -98,7 +102,7 @@ def orient_and_ground(obj, flip):
     me.update()
 
 
-def optimise(obj):
+def optimise(obj, budget=None):
     before = tri_count(obj)
     bm = bmesh.new()
     bm.from_mesh(obj.data)
@@ -116,10 +120,11 @@ def optimise(obj):
     bpy.ops.mesh.quads_convert_to_tris()
     bpy.ops.object.mode_set(mode="OBJECT")
     after_planar = tri_count(obj)
-    if after_planar > TRI_BUDGET:
+    budget = budget or TRI_BUDGET
+    if after_planar > budget:
         mod = obj.modifiers.new("collapse", "DECIMATE")
         mod.decimate_type = "COLLAPSE"
-        mod.ratio = TRI_BUDGET / after_planar
+        mod.ratio = budget / after_planar
         mod.use_collapse_triangulate = True
         mod.use_symmetry = True
         mod.symmetry_axis = "X"
@@ -127,7 +132,7 @@ def optimise(obj):
     return before, after_planar, tri_count(obj)
 
 
-def resize_textures(obj):
+def resize_textures(obj, max_size=None):
     seen = set()
     for m in obj.data.materials:
         if not (m and m.use_nodes):
@@ -137,8 +142,11 @@ def resize_textures(obj):
             if n.type == "TEX_IMAGE" and n.image and n.image.name not in seen:
                 seen.add(n.image.name)
                 w, h = n.image.size
-                if not keep and max(w, h) > HIDDEN_RES:
-                    n.image.scale(HIDDEN_RES, HIDDEN_RES * h // w)
+                limit = HIDDEN_RES if not keep else 1024
+                if max_size:
+                    limit = min(limit, max_size)
+                if max(w, h) > limit:
+                    n.image.scale(limit, limit * h // w)
 
 
 def repaint(obj, rgb):
@@ -160,19 +168,31 @@ def repaint(obj, rgb):
                 bsdf.inputs["Roughness"].default_value = 0.18
 
 
+def _with_traffic_variants(specs):
+    out = list(specs)
+    for sp in specs:
+        if sp["id"] in ("chapman_73", "canyon_75_taxi", "phoenix_455_71", "chapman_73_police"):
+            lean = dict(sp)
+            lean["id"] = sp["id"] + "_lod"
+            lean["budget"] = TRAFFIC_BUDGET
+            lean["max_texture"] = TRAFFIC_TEXTURE
+            out.append(lean)
+    return out
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     credits = []
     only = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    for spec in SPECS:
+    for spec in _with_traffic_variants(SPECS):
         if only and spec["id"] not in only:
             continue
         reset()
         bpy.ops.import_scene.gltf(filepath=os.path.join(SRC, spec["src"]))
         obj = join_all()
         orient_and_ground(obj, spec.get("flip", False))
-        before, planar, after = optimise(obj)
-        resize_textures(obj)
+        before, planar, after = optimise(obj, spec.get("budget"))
+        resize_textures(obj, spec.get("max_texture"))
         if spec.get("paint"):
             repaint(obj, spec["paint"])
         dims = obj.dimensions

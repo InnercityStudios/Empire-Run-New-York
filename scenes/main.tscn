@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/main/main.gd" id="1"]
-[ext_resource type="Script" path="res://src/world/city_world.gd" id="2"]
+[ext_resource type="Script" path="res://src/world/stream/world_streamer.gd" id="2"]
 [ext_resource type="Script" path="res://src/camera/strategy_camera.gd" id="3"]
 [ext_resource type="Script" path="res://src/world/world_atmosphere.gd" id="4"]
 
@@ -11,7 +11,7 @@ script = ExtResource("1")
 [node name="Atmosphere" type="Node3D" parent="."]
 script = ExtResource("4")
 
-[node name="CityWorld" type="Node3D" parent="."]
+[node name="World" type="Node3D" parent="."]
 script = ExtResource("2")
 
 [node name="StrategyCamera" type="Node3D" parent="."]

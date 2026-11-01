@@ -46,6 +46,25 @@ def sources():
         yield from sorted(glob.glob(os.path.join(ROOT, "assets", "models", "vehicles", "licensed", "*." + ext)))
 
 
+def _params(text):
+    """Key/value pairs of the [params] section."""
+    part = text.split("[params]", 1)
+    out = {}
+    for line in (part[1] if len(part) > 1 else "").splitlines():
+        if "=" in line:
+            k, v = line.split("=", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+
+def _configured(old, body):
+    """True when every parameter we manage already has our value (Godot adds
+    its own defaults and remap lines, which we leave untouched)."""
+    want = _params(body)
+    have = _params(old)
+    return all(have.get(k) == v for k, v in want.items())
+
+
 def main():
     for path in sources():
         name = os.path.basename(path)
@@ -56,6 +75,8 @@ def main():
         imp = path + ".import"
         body = TEMPLATE.format(res=res, mode=mode, normal=normal, limit=0)
         old = open(imp).read() if os.path.exists(imp) else ""
+        if old and _configured(old, body):
+            continue  # already configured; keep Godot's remap/uid lines intact
         # Preserve the uid Godot assigned so references stay stable.
         uid = next((l for l in old.splitlines() if l.startswith("uid=")), None)
         if uid:

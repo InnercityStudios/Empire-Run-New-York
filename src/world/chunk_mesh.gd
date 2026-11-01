@@ -25,6 +25,23 @@ static func build(surfaces: Array, with_lods := true) -> ArrayMesh:
 	return im.get_mesh()
 
 
+## Thread-safe variant: returns {mesh, names} without querying the material
+## library after construction. Shared materials must already be created.
+static func build_named(surfaces: Array) -> Dictionary:
+	var mesh := ArrayMesh.new()
+	var names := PackedStringArray()
+	var flags := 0 if QualityFlags.off("compress") else Mesh.ARRAY_FLAG_COMPRESS_ATTRIBUTES
+	for entry in surfaces:
+		var st: SurfaceTool = entry[1]
+		var arrays := st.commit_to_arrays()
+		if arrays.is_empty() or (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).is_empty():
+			continue
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, flags)
+		mesh.surface_set_material(mesh.get_surface_count() - 1, Materials.get_material(entry[0]))
+		names.append(entry[0])
+	return {"mesh": mesh, "names": names}
+
+
 ## Material names of a built chunk mesh, in surface order.
 static func surface_names(mesh: ArrayMesh) -> PackedStringArray:
 	var out := PackedStringArray()

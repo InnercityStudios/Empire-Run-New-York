@@ -386,6 +386,9 @@ def build_all(out_dir):
     write_png(p("wood_albedo.png"), wood(256, 81))
     write_png(p("foliage_albedo.png"), foliage(512, 91))
     write_png(p("grime_noise.png"), grime(512, 101))
+    rngw = _rng(151)
+    waves = fbm(512, 512, 8, 5, rngw) * 0.7 + fbm(512, 512, 24, 3, rngw) * 0.3
+    write_png(p("water_normal.png"), height_to_normal(waves, 9.0))
     write_png(p("grass_albedo.png"), grass(512, 141))
     a, n = siding(512, 121)
     write_png(p("siding_albedo.png"), a)

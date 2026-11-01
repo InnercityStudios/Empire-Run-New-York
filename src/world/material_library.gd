@@ -1,3 +1,4 @@
+@tool
 extends Node
 ## Autoload "Materials": shared runtime materials built from data/materials.json.
 ##
@@ -34,6 +35,10 @@ func _init() -> void:
 		push_error("MaterialLibrary: cannot parse %s" % LIBRARY_PATH)
 		return
 	_defs = parsed.get("materials", {})
+
+
+func all_names() -> Array:
+	return _defs.keys()
 
 
 func has_material(mat_name: String) -> bool:

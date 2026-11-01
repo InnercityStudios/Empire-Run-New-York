@@ -14,9 +14,9 @@ signal distance_changed(distance: float)
 signal follow_cancelled
 
 @export var min_distance := 58.0
-@export var max_distance := 340.0
+@export var max_distance := 720.0
 @export var pitch_near_deg := 42.0
-@export var pitch_far_deg := 58.0
+@export var pitch_far_deg := 60.0
 @export var fov_deg := 30.0
 @export var smoothing := 12.0
 @export var tap_slop_px := 14.0

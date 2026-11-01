@@ -11,10 +11,10 @@ extends Node
 const MAX_TARGETS := 2
 const GLOBALS := ["occl_target_0", "occl_target_1"]
 
-var world: CityWorld
+var world: WorldStreamer
 var camera: Camera3D
 var targets: Array = []   ## Array[Callable] returning Vector3, or null
-var _cut: Dictionary = {} ## chunk index -> true while using cutout materials
+var _cut: Dictionary = {} ## chunk key -> true while using cutout materials
 
 
 func _process(_delta: float) -> void:
@@ -34,7 +34,7 @@ func _process(_delta: float) -> void:
 	var want := {}
 	for t in active:
 		var target: Vector3 = t[0]
-		for ci in world.chunks.size():
+		for ci in world.chunks:
 			var chunk: Dictionary = world.chunks[ci]
 			var inst: MeshInstance3D = chunk["instance"]
 			var aabb: AABB = inst.global_transform * (chunk["aabb"] as AABB)
@@ -49,7 +49,9 @@ func _process(_delta: float) -> void:
 	_cut = want
 
 
-func _set_cutout(ci: int, on: bool) -> void:
+func _set_cutout(ci: String, on: bool) -> void:
+	if not world.chunks.has(ci):
+		return  # chunk was streamed out
 	var chunk: Dictionary = world.chunks[ci]
 	var inst: MeshInstance3D = chunk["instance"]
 	var names: PackedStringArray = chunk["names"]

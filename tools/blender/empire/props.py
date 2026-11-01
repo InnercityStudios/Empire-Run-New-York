@@ -234,3 +234,14 @@ def build_parking_meter():
     mb.add_box((-0.1, -0.08, 1.1), (0.1, 0.08, 1.42), "M_MetalGalv")
     mb.add_box((-0.07, -0.085, 1.22), (0.07, -0.08, 1.36), "M_CarGlass")
     return mb
+
+
+def build_tree_far():
+    """Distant tree for large stands (parks): one canopy blob and a trunk, ~40 tris."""
+    rng = random.Random(7)
+    mb = MeshBuilder("tree_far")
+    mb.add_box((-0.15, -0.15, 0), (0.15, 0.15, 3.2), "M_Bark", skip=("nz",))
+    mb.shade_fn = lambda p, n: 0.5 + 0.5 * max(0.0, min(1.0, (p.z - 2.8) / 4.6))
+    _blob(mb, Vector((0, 0, 5.0)), 2.6, rng, levels=1)
+    mb.shade_fn = None
+    return mb

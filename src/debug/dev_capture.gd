@@ -46,6 +46,14 @@ func _ready() -> void:
 			RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
 			RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME),
 			RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0])
+		var main := get_tree().get_first_node_in_group("main")
+		if main and "world" in main and main.world is WorldStreamer:
+			var w: WorldStreamer = main.world
+			print("DevCapture: streamer ", w.stats, " pending=", w.pending_count(),
+				" camera_distance=%.0f radius=%.0f" % [w.camera.distance, WorldStreamer.detail_radius(w.camera.distance)])
+	var main := get_tree().get_first_node_in_group("main")
+	if main and main.get("world") and main.world.get("stats") != null:
+		print("DevCapture: WorldStreamer stats ", main.world.stats)
 	capture_saved.emit(path)
 	get_tree().quit()
 
