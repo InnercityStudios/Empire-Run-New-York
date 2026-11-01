@@ -7,3 +7,6 @@ tools/blender/build_pbr_textures.py.
 
 - brick_wall_006 (2K): diffuse, OpenGL normal, ARM (AO/roughness/metal), AO, roughness
 - asphalt_02 (2K): same set
+- grass_medium_01 (2K): blade atlas with alpha for 3D grass clumps (not a
+  ground texture). Kept for future close-zoom park/verge clumps; not used yet
+  because alpha-tested cards cost overdraw on mobile GPUs.
