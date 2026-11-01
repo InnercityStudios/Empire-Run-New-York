@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "max_level": 25,
+  "facilities": {
+    "dons_office": {"name": "Don's Office", "description": "Seat of the family. Its level caps every other facility.", "max_level": 25, "unlock_hq_level": 1},
+    "crew_quarters": {"name": "Crew Quarters", "description": "Houses soldiers. Raises total soldier capacity.", "max_level": 25, "unlock_hq_level": 1},
+    "garage": {"name": "Motor Pool", "description": "Keeps the sedans running. Adds crew dispatch slots.", "max_level": 25, "unlock_hq_level": 1},
+    "operations": {"name": "Operations Room", "description": "Maps, phones and lookouts. Improves crew travel speed.", "max_level": 25, "unlock_hq_level": 3},
+    "vault": {"name": "Vault", "description": "Protects a share of your cash from raids.", "max_level": 25, "unlock_hq_level": 2},
+    "security": {"name": "Security", "description": "Guards, dogs and a sawn-off behind the bar. HQ defence.", "max_level": 25, "unlock_hq_level": 2},
+    "administration": {"name": "Business Office", "description": "Bookkeeping. Raises how many businesses you can run.", "max_level": 25, "unlock_hq_level": 4},
+    "research": {"name": "Back Room", "description": "Where new rackets are planned. Unlocks research.", "max_level": 25, "unlock_hq_level": 5}
+  },
+  "levels": [
+    {"business_limit": 4, "crew_slots": 2, "soldier_capacity": 60},
+    {"business_limit": 5, "crew_slots": 2, "soldier_capacity": 90},
+    {"business_limit": 6, "crew_slots": 3, "soldier_capacity": 130}
+  ]
+}

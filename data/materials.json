@@ -1,0 +1,175 @@
+{
+  "materials": {
+    "M_Awning": {
+      "albedo": "res://assets/textures/awning_atlas.png",
+      "color": "#ffffff",
+      "cull": "disabled",
+      "roughness": 0.85
+    },
+    "M_Brick_Brown": {
+      "albedo": "res://assets/textures/brick_brown_albedo.png",
+      "color": "#ffffff",
+      "normal": "res://assets/textures/brick_normal.png",
+      "roughness": 0.92,
+      "uv_m": 2.4
+    },
+    "M_Brick_Dark": {
+      "albedo": "res://assets/textures/brick_dark_albedo.png",
+      "color": "#ffffff",
+      "normal": "res://assets/textures/brick_normal.png",
+      "roughness": 0.93,
+      "uv_m": 2.4
+    },
+    "M_Brick_Painted": {
+      "albedo": "res://assets/textures/brick_painted_albedo.png",
+      "color": "#d9cdb4",
+      "normal": "res://assets/textures/brick_normal.png",
+      "roughness": 0.85,
+      "uv_m": 2.4
+    },
+    "M_Brick_Red": {
+      "albedo": "res://assets/textures/brick_red_albedo.png",
+      "color": "#ffffff",
+      "normal": "res://assets/textures/brick_normal.png",
+      "roughness": 0.92,
+      "uv_m": 2.4
+    },
+    "M_Brick_Tan": {
+      "albedo": "res://assets/textures/brick_tan_albedo.png",
+      "color": "#ffffff",
+      "normal": "res://assets/textures/brick_normal.png",
+      "roughness": 0.9,
+      "uv_m": 2.4
+    },
+    "M_Concrete": {
+      "albedo": "res://assets/textures/stone_albedo.png",
+      "color": "#b9b3a8",
+      "normal": "res://assets/textures/stone_normal.png",
+      "roughness": 0.95,
+      "uv_m": 3.0
+    },
+    "M_Curb": {
+      "albedo": "res://assets/textures/stone_albedo.png",
+      "color": "#c9c3b6",
+      "normal": "res://assets/textures/stone_normal.png",
+      "roughness": 0.8,
+      "uv_m": 2.0
+    },
+    "M_Foliage": {
+      "albedo": "res://assets/textures/foliage_albedo.png",
+      "color": "#ffffff",
+      "roughness": 0.85,
+      "uv_m": 1.5
+    },
+    "M_Palette": {
+      "albedo": "res://assets/textures/palette_albedo.png",
+      "cull": "disabled",
+      "emission": "#ffffff",
+      "emission_energy": 4.0,
+      "emission_tex": "res://assets/textures/palette_emission.png",
+      "orm": "res://assets/textures/palette_orm.png",
+      "palette": true
+    },
+    "M_Roof": {
+      "albedo": "res://assets/textures/roof_albedo.png",
+      "color": "#ffffff",
+      "roughness": 0.95,
+      "uv_m": 4.0
+    },
+    "M_ShopGlass": {
+      "albedo": "res://assets/textures/shop_atlas.png",
+      "color": "#ffffff",
+      "emission": "#ffcf8a",
+      "emission_energy": 0.25,
+      "emission_tex": "res://assets/textures/shop_atlas.png",
+      "roughness": 0.12
+    },
+    "M_Shutter": {
+      "albedo": "res://assets/textures/corrugated_albedo.png",
+      "color": "#8d8b85",
+      "metallic": 0.4,
+      "normal": "res://assets/textures/corrugated_normal.png",
+      "roughness": 0.6,
+      "uv_m": 1.0
+    },
+    "M_Shutter_Green": {
+      "albedo": "res://assets/textures/corrugated_albedo.png",
+      "color": "#4f6b58",
+      "metallic": 0.3,
+      "normal": "res://assets/textures/corrugated_normal.png",
+      "roughness": 0.6,
+      "uv_m": 1.0
+    },
+    "M_Sidewalk": {
+      "albedo": "res://assets/textures/sidewalk_albedo.png",
+      "color": "#ffffff",
+      "normal": "res://assets/textures/sidewalk_normal.png",
+      "roughness": 0.9,
+      "uv_m": 3.0
+    },
+    "M_SignalAmber": {
+      "animated": true,
+      "color": "#3a2a08",
+      "emission": "#ffaa1a",
+      "emission_energy": 0.0,
+      "roughness": 0.2
+    },
+    "M_SignalAmber_EW": {
+      "animated": true,
+      "color": "#3a2a08",
+      "emission": "#ffaa1a",
+      "emission_energy": 0.0,
+      "roughness": 0.2
+    },
+    "M_SignalGreen": {
+      "animated": true,
+      "color": "#0a2a18",
+      "emission": "#30ff8a",
+      "emission_energy": 0.0,
+      "roughness": 0.2
+    },
+    "M_SignalGreen_EW": {
+      "animated": true,
+      "color": "#0a2a18",
+      "emission": "#30ff8a",
+      "emission_energy": 0.0,
+      "roughness": 0.2
+    },
+    "M_SignalRed": {
+      "animated": true,
+      "color": "#3a0b08",
+      "emission": "#ff2a1a",
+      "emission_energy": 0.0,
+      "roughness": 0.2
+    },
+    "M_SignalRed_EW": {
+      "animated": true,
+      "color": "#3a0b08",
+      "emission": "#ff2a1a",
+      "emission_energy": 0.0,
+      "roughness": 0.2
+    },
+    "M_Stone": {
+      "albedo": "res://assets/textures/stone_albedo.png",
+      "color": "#ffffff",
+      "normal": "res://assets/textures/stone_normal.png",
+      "roughness": 0.85,
+      "uv_m": 2.0
+    },
+    "M_Window": {
+      "albedo": "res://assets/textures/window_atlas.png",
+      "color": "#ffffff",
+      "emission": "#ffd9a0",
+      "emission_energy": 0.0,
+      "emission_tex": "res://assets/textures/window_emission.png",
+      "roughness": 0.15
+    },
+    "M_Wood": {
+      "albedo": "res://assets/textures/wood_albedo.png",
+      "color": "#ffffff",
+      "roughness": 0.9,
+      "uv_m": 2.0
+    }
+  },
+  "version": 1
+}

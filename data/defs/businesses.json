@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "business_types": {
+    "restaurant": {
+      "name": "Restaurant",
+      "icon": "restaurant",
+      "description": "A family trattoria that launders cash through a busy dining room.",
+      "acquisition": ["purchase", "mission", "combat"],
+      "purchase_price": 18000,
+      "levels": [
+        {"income_per_hour": 1500, "upkeep_per_hour": 300, "storage_hours": 4, "defence": 120, "upgrade_cost": 4000, "upgrade_seconds": 20},
+        {"income_per_hour": 2400, "upkeep_per_hour": 450, "storage_hours": 5, "defence": 200, "upgrade_cost": 9000, "upgrade_seconds": 60},
+        {"income_per_hour": 3600, "upkeep_per_hour": 650, "storage_hours": 6, "defence": 320, "upgrade_cost": 18000, "upgrade_seconds": 300},
+        {"income_per_hour": 5200, "upkeep_per_hour": 900, "storage_hours": 7, "defence": 480, "upgrade_cost": 36000, "upgrade_seconds": 1800},
+        {"income_per_hour": 7400, "upkeep_per_hour": 1200, "storage_hours": 8, "defence": 700, "upgrade_cost": 0, "upgrade_seconds": 0}
+      ]
+    },
+    "garage": {
+      "name": "Garage",
+      "icon": "garage",
+      "description": "Body shop by day, chop shop by night. Boosts crew vehicles.",
+      "acquisition": ["purchase", "mission", "combat"],
+      "purchase_price": 15000,
+      "levels": [
+        {"income_per_hour": 1100, "upkeep_per_hour": 250, "storage_hours": 4, "defence": 160, "upgrade_cost": 3500, "upgrade_seconds": 20},
+        {"income_per_hour": 1800, "upkeep_per_hour": 380, "storage_hours": 5, "defence": 260, "upgrade_cost": 8000, "upgrade_seconds": 60},
+        {"income_per_hour": 2700, "upkeep_per_hour": 520, "storage_hours": 6, "defence": 400, "upgrade_cost": 16000, "upgrade_seconds": 300},
+        {"income_per_hour": 3900, "upkeep_per_hour": 700, "storage_hours": 7, "defence": 600, "upgrade_cost": 32000, "upgrade_seconds": 1800},
+        {"income_per_hour": 5400, "upkeep_per_hour": 950, "storage_hours": 8, "defence": 850, "upgrade_cost": 0, "upgrade_seconds": 0}
+      ]
+    },
+    "warehouse": {
+      "name": "Warehouse",
+      "icon": "warehouse",
+      "description": "Freight that falls off trucks has to land somewhere.",
+      "acquisition": ["purchase", "mission", "combat"],
+      "purchase_price": 24000,
+      "levels": [
+        {"income_per_hour": 2000, "upkeep_per_hour": 500, "storage_hours": 6, "defence": 220, "upgrade_cost": 6000, "upgrade_seconds": 30},
+        {"income_per_hour": 3100, "upkeep_per_hour": 700, "storage_hours": 7, "defence": 340, "upgrade_cost": 12000, "upgrade_seconds": 90},
+        {"income_per_hour": 4600, "upkeep_per_hour": 950, "storage_hours": 8, "defence": 520, "upgrade_cost": 24000, "upgrade_seconds": 600},
+        {"income_per_hour": 6600, "upkeep_per_hour": 1300, "storage_hours": 9, "defence": 760, "upgrade_cost": 48000, "upgrade_seconds": 3600},
+        {"income_per_hour": 9200, "upkeep_per_hour": 1700, "storage_hours": 10, "defence": 1050, "upgrade_cost": 0, "upgrade_seconds": 0}
+      ]
+    },
+    "bar": {
+      "name": "Bar",
+      "icon": "bar",
+      "description": "Smoke, jukebox and a back room for the numbers game.",
+      "acquisition": ["purchase", "mission", "combat"],
+      "purchase_price": 14000,
+      "levels": [
+        {"income_per_hour": 1300, "upkeep_per_hour": 280, "storage_hours": 4, "defence": 140, "upgrade_cost": 3800, "upgrade_seconds": 20},
+        {"income_per_hour": 2100, "upkeep_per_hour": 420, "storage_hours": 5, "defence": 230, "upgrade_cost": 8500, "upgrade_seconds": 60},
+        {"income_per_hour": 3200, "upkeep_per_hour": 600, "storage_hours": 6, "defence": 360, "upgrade_cost": 17000, "upgrade_seconds": 300},
+        {"income_per_hour": 4600, "upkeep_per_hour": 820, "storage_hours": 7, "defence": 540, "upgrade_cost": 34000, "upgrade_seconds": 1800},
+        {"income_per_hour": 6500, "upkeep_per_hour": 1100, "storage_hours": 8, "defence": 780, "upgrade_cost": 0, "upgrade_seconds": 0}
+      ]
+    }
+  }
+}

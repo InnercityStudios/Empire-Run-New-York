@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "rarities": {
+    "common": {"name": "Common", "color": "#9d9480"},
+    "rare": {"name": "Rare", "color": "#4f7fb8"},
+    "epic": {"name": "Epic", "color": "#8a4fb8"},
+    "legendary": {"name": "Legendary", "color": "#c9a24a"}
+  },
+  "capos": {
+    "capo_sal_russo": {"name": "Salvatore \"Sal\" Russo", "kind": "capo", "rarity": "rare", "leadership_permille": 120, "max_soldiers": 30,
+      "abilities": ["steady_hand"], "bio": "Ran numbers on Mulberry for your uncle. Still loyal. Mostly."},
+    "capo_tony_ferraro": {"name": "Anthony \"Tony Knuckles\" Ferraro", "kind": "capo", "rarity": "common", "leadership_permille": 80, "max_soldiers": 24,
+      "abilities": ["street_brawler"], "bio": "Ex-prizefighter who settles disputes with two arguments: left and right."},
+    "capo_carmine_moretti": {"name": "Carmine Moretti", "kind": "capo", "rarity": "epic", "leadership_permille": 160, "max_soldiers": 40,
+      "abilities": ["iron_grip"], "bio": "The Moretti family's eldest son and the man who sold out your uncle."},
+    "capo_nicky_bruno": {"name": "Nicky \"The Weasel\" Bruno", "kind": "capo", "rarity": "common", "leadership_permille": 70, "max_soldiers": 20,
+      "abilities": ["quick_getaway"], "bio": "Moretti errand boy who never misses a chance to switch sides."},
+    "legend_mickey_callahan": {"name": "Mickey \"The Ghost\" Callahan", "kind": "legend", "rarity": "legendary", "leadership_permille": 220, "max_soldiers": 50,
+      "abilities": ["vanish", "west_side_connections"], "bio": "Hell's Kitchen legend. Nobody has seen him twice."}
+  },
+  "abilities": {
+    "steady_hand": {"name": "Steady Hand", "description": "+8% crew defence while stationed at a business.", "effects": {"defence_permille": 80}},
+    "street_brawler": {"name": "Street Brawler", "description": "+6% attack in street fights.", "effects": {"attack_permille": 60}},
+    "iron_grip": {"name": "Iron Grip", "description": "+10% business defence where stationed.", "effects": {"business_defence_permille": 100}},
+    "quick_getaway": {"name": "Quick Getaway", "description": "+15% vehicle speed when retreating.", "effects": {"retreat_speed_permille": 150}},
+    "vanish": {"name": "Vanish", "description": "Crew cannot be scouted while moving.", "effects": {}},
+    "west_side_connections": {"name": "West Side Connections", "description": "+10% income at docks and warehouses.", "effects": {"warehouse_income_permille": 100}}
+  }
+}

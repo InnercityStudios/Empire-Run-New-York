@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "id": "chapter_1_little_italy",
+  "district": "little_italy",
+  "seed": 19770613,
+  "player_faction": "marino",
+  "factions": [
+    {"id": "marino", "name": "Marino Family", "boss": "Vincent Marino", "color": "#c9a24a", "cash": 25000, "is_player": true, "ai": false},
+    {"id": "moretti", "name": "Moretti Family", "boss": "Don Aldo Moretti", "color": "#b3362b", "cash": 60000, "is_player": false, "ai": true},
+    {"id": "independent", "name": "Independent", "boss": "", "color": "#8f8a7e", "cash": 0, "is_player": false, "ai": false}
+  ],
+  "headquarters": [
+    {"faction": "marino", "landmark": "lm_hq_marino", "name": "Marino Social Club", "level": 1,
+     "facilities": {"dons_office": 1, "crew_quarters": 1, "garage": 1}}
+  ],
+  "businesses": [
+    {"id": "biz_vesuvio", "type": "restaurant", "name": "Ristorante Vesuvio", "landmark": "lm_vesuvio", "owner": "marino", "level": 2, "stored_hours": 1.5},
+    {"id": "biz_bowery_auto", "type": "garage", "name": "Bowery Auto Body", "landmark": "lm_bowery_auto", "owner": "marino", "level": 1, "stored_hours": 0.75},
+    {"id": "biz_grand_freight", "type": "warehouse", "name": "Grand Street Freight", "landmark": "lm_grand_freight", "owner": "independent", "level": 2, "stored_hours": 0},
+    {"id": "biz_napoli", "type": "restaurant", "name": "Trattoria Napoli", "landmark": "lm_trattoria_napoli", "owner": "moretti", "level": 3, "stored_hours": 2},
+    {"id": "biz_blue_lantern", "type": "bar", "name": "The Blue Lantern", "landmark": "lm_blue_lantern", "owner": "moretti", "level": 2, "stored_hours": 1}
+  ],
+  "crews": [
+    {"id": "crew_mulberry", "owner": "marino", "name": "Mulberry Crew", "capo": "capo_sal_russo",
+     "soldiers": {"associate": 10, "soldier": 4}, "vehicle": "sedan_black", "vehicles": 2, "start_landmark": "lm_hq_marino"},
+    {"id": "crew_bowery", "owner": "marino", "name": "Bowery Boys", "capo": "capo_tony_ferraro",
+     "soldiers": {"associate": 8, "soldier": 2}, "vehicle": "sedan_black", "vehicles": 1, "start_landmark": "lm_bowery_auto"},
+    {"id": "crew_moretti_1", "owner": "moretti", "name": "Moretti Muscle", "capo": "capo_carmine_moretti",
+     "soldiers": {"associate": 12, "soldier": 8, "enforcer": 2}, "vehicle": "sedan_black", "vehicles": 2, "start_landmark": "lm_trattoria_napoli"},
+    {"id": "crew_moretti_2", "owner": "moretti", "name": "Bruno's Runners", "capo": "capo_nicky_bruno",
+     "soldiers": {"associate": 9, "soldier": 3}, "vehicle": "sedan_black", "vehicles": 1, "start_landmark": "lm_blue_lantern"}
+  ]
+}
