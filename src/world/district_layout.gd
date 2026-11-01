@@ -37,6 +37,35 @@ var graph_edges: Array = []      ## {a, b, street, width}
 
 var _catalog: Dictionary
 var _midblock_ids: Array = []
+## Fill style (opt-in; Little Italy uses the defaults, which keeps its layout
+## bit-identical). See STYLES.
+var style := "tenement"
+var _style: Dictionary = {}
+var _boundary_streets: Dictionary = {}
+var _lot_counter := 0
+var boundary_width := 20.0
+
+## Neighbourhood fill styles: which building kinds fill block faces, whether
+## street corners get corner buildings, building setback and gaps (metres),
+## street-tree probability and whether blocks get raised sidewalks.
+const STYLES := {
+	"tenement": {"kinds": ["midblock"], "corners": true, "setback": 0.0, "gap": [0.0, 0.0], "tree_chance": 0.62,
+		"sidewalks": true, "props": true},
+	"industrial": {"kinds": ["industrial"], "corners": false, "setback": 0.0, "gap": [2.0, 10.0], "tree_chance": 0.12,
+		"sidewalks": true, "props": true},
+	"rowhouse": {"kinds": ["rowhouse"], "corners": false, "setback": 0.0, "gap": [0.0, 0.0], "tree_chance": 0.85,
+		"sidewalks": true, "props": true, "primary_only": true},
+	"suburban": {"kinds": ["house"], "corners": false, "setback": 7.0, "gap": [5.0, 11.0], "tree_chance": 0.9,
+		"sidewalks": true, "props": true, "lawns": true},
+	"towers": {"kinds": ["midblock_tall"], "corners": false, "setback": 12.0, "gap": [22.0, 40.0], "tree_chance": 0.9,
+		"sidewalks": true, "props": true, "lawns": true},
+	"waterfront": {"kinds": ["industrial"], "corners": false, "setback": 0.0, "gap": [6.0, 18.0], "tree_chance": 0.0,
+		"sidewalks": true, "props": true},
+	"civic": {"kinds": ["midblock_tall", "midblock_low", "midblock"], "corners": false, "setback": 3.0,
+		"gap": [4.0, 16.0], "tree_chance": 0.75, "sidewalks": true, "props": true},
+	"park": {"kinds": [], "corners": false, "setback": 0.0, "gap": [0.0, 0.0], "tree_chance": 0.0,
+		"sidewalks": false, "props": false},
+}
 
 
 static func build(def: Dictionary, catalog: Dictionary) -> DistrictLayout:
@@ -59,11 +88,21 @@ func _build(def: Dictionary, catalog: Dictionary) -> void:
 	streets = def.get("streets", []).duplicate(true)
 	avenues.sort_custom(func(a, b): return a["x"] < b["x"])
 	streets.sort_custom(func(a, b): return a["z"] < b["z"])
-	var margin: float = def.get("edge_margin", 60.0)
-	bounds = Rect2(Vector2(avenues[0]["x"] - margin, streets[0]["z"] - margin), Vector2.ZERO)
-	bounds.end = Vector2(avenues[-1]["x"] + margin, streets[-1]["z"] + margin)
+	if def.has("bounds"):
+		var bb: Array = def["bounds"]
+		bounds = Rect2(Vector2(bb[0], bb[1]), Vector2(bb[2] - bb[0], bb[3] - bb[1]))
+	else:
+		var margin: float = def.get("edge_margin", 60.0)
+		bounds = Rect2(Vector2(avenues[0]["x"] - margin, streets[0]["z"] - margin), Vector2.ZERO)
+		bounds.end = Vector2(avenues[-1]["x"] + margin, streets[-1]["z"] + margin)
+	style = def.get("style", "tenement")
+	_style = STYLES.get(style, STYLES["tenement"]).duplicate()
+	_style.merge(def.get("style_overrides", {}), true)
+	_boundary_streets = def.get("boundary_streets", {})
+	boundary_width = def.get("boundary_width", 20.0)
+	var kinds: Array = _style["kinds"] + def.get("extra_kinds", [])
 	for b in catalog.values():
-		if b.get("kind") == "midblock":
+		if b.get("kind") in kinds:
 			_midblock_ids.append(b["id"])
 	_midblock_ids.sort()
 	_build_roads()
@@ -128,7 +167,8 @@ func _add_node(p: Vector2) -> int:
 
 func _add_chain(chain: Array, road: Dictionary) -> void:
 	for k in chain.size() - 1:
-		graph_edges.append({"a": chain[k], "b": chain[k + 1], "street": road["id"], "width": road["width"]})
+		graph_edges.append({"a": chain[k], "b": chain[k + 1], "street": road["id"], "width": road["width"],
+			"speed": road.get("speed", 1000)})
 
 
 func street_name(street_id: String) -> String:
@@ -152,7 +192,12 @@ func _build_blocks() -> void:
 				"col": col, "row": row,
 				"rect": Rect2(x0, z0, x1 - x0, z1 - z0),
 				"core": col >= 0 and col < n - 1 and row >= 0 and row < m - 1,
-				"faces": {"north": row >= 0, "south": row < m - 1, "west": col >= 0, "east": col < n - 1},
+				"faces": {
+					"north": row >= 0 or bool(_boundary_streets.get("north", false)),
+					"south": row < m - 1 or bool(_boundary_streets.get("south", false)),
+					"west": col >= 0 or bool(_boundary_streets.get("west", false)),
+					"east": col < n - 1 or bool(_boundary_streets.get("east", false)),
+				},
 			})
 
 
@@ -207,16 +252,18 @@ func _place_landmarks_and_lots(landmark_defs: Array) -> void:
 			var u0 := 0.0
 			var u1 := length
 			var bi := blocks.find(block)
-			if primary:
+			if primary and _style["corners"]:
 				if has_left:
 					_add_lot(_pick_corner("corner_left", rng), bi, lot_transform(frame, CORNER_WIDTH * 0.5), "")
 					u0 = CORNER_WIDTH
 				if has_right:
 					_add_lot(_pick_corner("corner_right", rng), bi, lot_transform(frame, length - CORNER_WIDTH * 0.5), "")
 					u1 = length - CORNER_WIDTH
-			else:
+			elif not primary:
 				u0 = lot_depth if has_left else 0.0
 				u1 = length - lot_depth if has_right else length
+			if not primary and _style.get("primary_only", false):
+				u1 = u0  # side streets show rear gardens and blank party walls
 			var runs := [[u0, u1]]
 			var key := "%d,%d,%s" % [block["col"], block["row"], face]
 			for lm in by_face.get(key, []):
@@ -236,21 +283,23 @@ func _place_landmarks_and_lots(landmark_defs: Array) -> void:
 				runs = _split_runs(runs, uc - w * 0.5, uc + w * 0.5)
 			for run in runs:
 				_fill_run(frame, bi, run[0], run[1], rng)
-			_place_props(block, bi, face, frame, rng, by_face.get(key, []))
+			if _style["props"]:
+				_place_props(block, bi, face, frame, rng, by_face.get(key, []))
 
 
 func _street_width_for(block: Dictionary, face: String) -> float:
 	var col: int = block["col"]
 	var row: int = block["row"]
+	# Faces on the district boundary front a road owned by the world (an arterial).
 	match face:
 		"north":
-			return streets[row]["width"]
+			return streets[row]["width"] if row >= 0 else boundary_width
 		"south":
-			return streets[row + 1]["width"]
+			return streets[row + 1]["width"] if row + 1 < streets.size() else boundary_width
 		"west":
-			return avenues[col]["width"]
+			return avenues[col]["width"] if col >= 0 else boundary_width
 		_:
-			return avenues[col + 1]["width"]
+			return avenues[col + 1]["width"] if col + 1 < avenues.size() else boundary_width
 
 
 func _split_runs(runs: Array, a: float, b: float) -> Array:
@@ -279,6 +328,10 @@ func _fill_run(frame: Dictionary, bi: int, u0: float, u1: float, rng: RandomNumb
 	var length := u1 - u0
 	if length < 6.0 or _midblock_ids.is_empty():
 		return
+	var gap: Array = _style["gap"]
+	if float(gap[1]) > 0.0:
+		_fill_run_spaced(frame, bi, u0, u1, rng)
+		return
 	var chosen := []
 	var total := 0.0
 	var last := ""
@@ -303,8 +356,34 @@ func _fill_run(frame: Dictionary, bi: int, u0: float, u1: float, rng: RandomNumb
 		u += w
 
 
+## Detached and industrial styles: buildings with gaps (yards, lawns,
+## driveways), set back from the building line, never stretched.
+func _fill_run_spaced(frame: Dictionary, bi: int, u0: float, u1: float, rng: RandomNumberGenerator) -> void:
+	var gap: Array = _style["gap"]
+	var setback: float = _style["setback"]
+	var u := u0 + rng.randf_range(float(gap[0]), float(gap[1])) * 0.5
+	var last := ""
+	var guard := 0
+	while guard < 64:
+		guard += 1
+		var candidates := _midblock_ids.filter(func(i): return i != last and u + float(_catalog[i]["width"]) <= u1)
+		if candidates.is_empty():
+			break
+		var pick: String = candidates[rng.randi() % candidates.size()]
+		var w: float = _catalog[pick]["width"]
+		var t := lot_transform(frame, u + w * 0.5)
+		var o: Vector2 = frame["out"]
+		t.origin -= Vector3(o.x, 0, o.y) * setback
+		_add_lot(pick, bi, t, "")
+		u += w + rng.randf_range(float(gap[0]), float(gap[1]))
+		last = pick
+
+
 func _add_lot(building: String, bi: int, t: Transform3D, landmark_id: String) -> void:
-	lots.append({"building": building, "block": bi, "transform": t, "landmark": landmark_id})
+	# Stable identity: district id + generation order (deterministic).
+	lots.append({"id": "%s:%d" % [id, _lot_counter], "building": building, "block": bi, "transform": t,
+		"landmark": landmark_id})
+	_lot_counter += 1
 
 
 func _prop_transform(frame: Dictionary, u: float, inset: float, yaw_right := false) -> Transform3D:
@@ -342,7 +421,7 @@ func _place_props(block: Dictionary, bi: int, face: String, frame: Dictionary, r
 	var tree_u := 5.0 + rng.randf() * 4.0
 	while tree_u < length - 5.0:
 		var near := used.any(func(x): return absf(x - tree_u) < 3.5)
-		if not near and rng.randf() < 0.62:
+		if not near and rng.randf() < float(_style["tree_chance"]):
 			var t := _prop_transform(frame, tree_u, 1.1)
 			t.basis = t.basis.rotated(Vector3.UP, rng.randf() * TAU)
 			props.append({"prop": "tree_a" if rng.randf() < 0.5 else "tree_b", "block": bi, "transform": t})

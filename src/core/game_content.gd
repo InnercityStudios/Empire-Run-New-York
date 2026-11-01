@@ -20,6 +20,7 @@ var headquarters: Dictionary = {}
 var building_catalog: Dictionary = {}
 var districts: Dictionary = {}
 var scenarios: Dictionary = {}
+var worlds: Dictionary = {}
 var errors: PackedStringArray = []
 
 
@@ -47,6 +48,7 @@ func load_all(root: String) -> void:
 		building_catalog[b["id"]] = b
 	districts["little_italy"] = _read(root + "districts/little_italy.json")
 	scenarios["new_game"] = _read(root + "scenarios/new_game.json")
+	worlds["greater_new_york"] = _read(root + "world/greater_new_york.json")
 	_validate()
 	for e in errors:
 		push_error("Content: " + e)

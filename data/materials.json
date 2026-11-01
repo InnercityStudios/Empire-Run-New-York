@@ -68,6 +68,20 @@
       "roughness": 0.85,
       "uv_m": 1.5
     },
+    "M_Grass": {
+      "albedo": "res://assets/textures/grass_albedo.png",
+      "color": "#ffffff",
+      "roughness": 0.95,
+      "uv_m": 6.0
+    },
+    "M_Gravel": {
+      "albedo": "res://assets/textures/roof_gravel_albedo.png",
+      "color": "#ffffff",
+      "grime": 0.4,
+      "normal": "res://assets/textures/roof_gravel_normal.png",
+      "roughness": 0.95,
+      "uv_m": 4.0
+    },
     "M_Palette": {
       "albedo": "res://assets/textures/palette_albedo.png",
       "cull": "disabled",
@@ -77,6 +91,14 @@
       "grime": 0.35,
       "orm": "res://assets/textures/palette_orm.png",
       "palette": true
+    },
+    "M_Quay": {
+      "albedo": "res://assets/textures/stone_albedo.png",
+      "color": "#9a958c",
+      "grime": 1.0,
+      "normal": "res://assets/textures/stone_normal.png",
+      "roughness": 0.9,
+      "uv_m": 3.0
     },
     "M_Roof": {
       "albedo": "res://assets/textures/roof_albedo.png",
@@ -109,6 +131,30 @@
       "normal": "res://assets/textures/roof_tar_normal.png",
       "roughness": 0.9,
       "uv_m": 4.0
+    },
+    "M_Shingle_Brown": {
+      "albedo": "res://assets/textures/shingle_albedo.png",
+      "color": "#7a5a44",
+      "grime": 0.5,
+      "normal": "res://assets/textures/shingle_normal.png",
+      "roughness": 0.9,
+      "uv_m": 3.0
+    },
+    "M_Shingle_Gray": {
+      "albedo": "res://assets/textures/shingle_albedo.png",
+      "color": "#6b6a66",
+      "grime": 0.5,
+      "normal": "res://assets/textures/shingle_normal.png",
+      "roughness": 0.9,
+      "uv_m": 3.0
+    },
+    "M_Shingle_Slate": {
+      "albedo": "res://assets/textures/shingle_albedo.png",
+      "color": "#4a5058",
+      "grime": 0.4,
+      "normal": "res://assets/textures/shingle_normal.png",
+      "roughness": 0.8,
+      "uv_m": 3.0
     },
     "M_ShopGlass": {
       "albedo": "res://assets/textures/shop_atlas.png",
@@ -144,6 +190,38 @@
       "normal": "res://assets/textures/sidewalk_normal.png",
       "roughness": 0.9,
       "uv_m": 3.0
+    },
+    "M_Siding_Blue": {
+      "albedo": "res://assets/textures/siding_albedo.png",
+      "color": "#8da2b4",
+      "grime": 0.6,
+      "normal": "res://assets/textures/siding_normal.png",
+      "roughness": 0.75,
+      "uv_m": 2.0
+    },
+    "M_Siding_Green": {
+      "albedo": "res://assets/textures/siding_albedo.png",
+      "color": "#7d9a84",
+      "grime": 0.6,
+      "normal": "res://assets/textures/siding_normal.png",
+      "roughness": 0.75,
+      "uv_m": 2.0
+    },
+    "M_Siding_White": {
+      "albedo": "res://assets/textures/siding_albedo.png",
+      "color": "#e4ddcd",
+      "grime": 0.6,
+      "normal": "res://assets/textures/siding_normal.png",
+      "roughness": 0.75,
+      "uv_m": 2.0
+    },
+    "M_Siding_Yellow": {
+      "albedo": "res://assets/textures/siding_albedo.png",
+      "color": "#d9c38a",
+      "grime": 0.6,
+      "normal": "res://assets/textures/siding_normal.png",
+      "roughness": 0.75,
+      "uv_m": 2.0
     },
     "M_SignalAmber": {
       "animated": true,

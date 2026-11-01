@@ -732,13 +732,15 @@ def build_warehouse(spec):
         f.box(uu - 0.06, uu + 0.06, 1.2, 4.5, 2.6, 2.72, "M_Iron")
     # Name band and cornice
     f.box(0.0, W, g.top - 1.4, g.top - 0.2, 0.0, 0.14, "M_Sign_Black")
-    f.text(spec.get("sign", "WAREHOUSE"), FONT_DISPLAY, W * 0.5, g.top - 0.8, W * 0.8, 0.8, 0.145, "M_Sign_White")
+    if spec.get("sign"):
+        f.text(spec["sign"], FONT_DISPLAY, W * 0.5, g.top - 0.8, W * 0.8, 0.8, 0.145, "M_Sign_White")
     f.box(0.0, W, g.top, Hb, 0.0, 0.35, "M_Stone")
     # Painted side sign (left wall)
     side = Facade(mb, (-W * 0.5, D, 0.0), (0, -1, 0), D, Hb)
     side.quad(0.0, D, 0.0, Hb, 0.0, g.brick)
     side.quad(D * 0.1, D * 0.9, g.top - 7.0, g.top - 1.0, 0.01, "M_Sign_Black")
-    side.text(spec.get("side_sign", ""), FONT_SIGN, D * 0.5, g.top - 4.0, D * 0.72, 4.6, 0.02, "M_Cornice_Cream")
+    if spec.get("side_sign"):
+        side.text(spec["side_sign"], FONT_SIGN, D * 0.5, g.top - 4.0, D * 0.72, 4.6, 0.02, "M_Cornice_Cream")
     g.plain_wall((W * 0.5, 0.0, 0.0), (0, 1, 0), D, Hb)
     g.back_facade()
     g.roof()

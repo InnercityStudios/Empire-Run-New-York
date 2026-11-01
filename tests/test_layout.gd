@@ -85,3 +85,19 @@ func test_layout_is_deterministic() -> void:
 		if layout.lots[i]["building"] != again.lots[i]["building"]:
 			same = false
 	check(same, "same building choices")
+
+
+## Golden fingerprint recorded before the world refactor (tests/tools_fingerprint.gd).
+const LITTLE_ITALY_FINGERPRINT := "381:708f77ce754b9eda"
+
+
+func test_little_italy_layout_preserved() -> void:
+	check_eq(LayoutFingerprint.of(layout), LITTLE_ITALY_FINGERPRINT, "Little Italy lots unchanged")
+
+
+func test_lot_ids_unique_and_stable() -> void:
+	var seen := {}
+	for lot in layout.lots:
+		check(not seen.has(lot["id"]), "unique lot id %s" % lot["id"])
+		seen[lot["id"]] = true
+	check_eq(layout.lots[0]["id"], "little_italy:0", "ids are district-scoped")

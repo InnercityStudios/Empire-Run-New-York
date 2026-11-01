@@ -1,0 +1,808 @@
+{
+  "version": 1,
+  "id": "greater_new_york",
+  "display_name": "Greater New York",
+  "seed": 1977,
+  "chunk_size": 256,
+  "land": [
+    -1700,
+    -1700,
+    1700,
+    1400
+  ],
+  "world": [
+    -2700,
+    -2400,
+    2700,
+    2100
+  ],
+  "playable": [
+    -1650,
+    -1650,
+    1650,
+    1350
+  ],
+  "water_level": -1.6,
+  "defaults": {
+    "sidewalk_width": 4.0,
+    "curb_height": 0.15,
+    "corner_radius": 3.2,
+    "lot_depth": 20.0,
+    "lane_offset": 1.9
+  },
+  "street_sets": {
+    "core_streets": [
+      {
+        "id": "great_jones_st",
+        "name": "Great Jones St",
+        "z": -690,
+        "width": 12
+      },
+      {
+        "id": "bond_st",
+        "name": "Bond St",
+        "z": -598,
+        "width": 12
+      },
+      {
+        "id": "bleecker_st",
+        "name": "Bleecker St",
+        "z": -506,
+        "width": 12
+      },
+      {
+        "id": "prince_st",
+        "name": "Prince St",
+        "z": -414,
+        "width": 12
+      },
+      {
+        "id": "spring_st",
+        "name": "Spring St",
+        "z": -322,
+        "width": 12
+      },
+      {
+        "id": "kenmare_st",
+        "name": "Kenmare St",
+        "z": -230,
+        "width": 12
+      },
+      {
+        "id": "broome_st",
+        "name": "Broome St",
+        "z": -138,
+        "width": 14
+      },
+      {
+        "id": "grand_st",
+        "name": "Grand St",
+        "z": -46,
+        "width": 14
+      },
+      {
+        "id": "hester_st",
+        "name": "Hester St",
+        "z": 46,
+        "width": 12
+      },
+      {
+        "id": "canal_st",
+        "name": "Canal St",
+        "z": 140,
+        "width": 20,
+        "style": 2,
+        "speed": 1200
+      },
+      {
+        "id": "bayard_st",
+        "name": "Bayard St",
+        "z": 232,
+        "width": 12
+      },
+      {
+        "id": "pell_st",
+        "name": "Pell St",
+        "z": 324,
+        "width": 12
+      },
+      {
+        "id": "worth_st",
+        "name": "Worth St",
+        "z": 416,
+        "width": 12
+      },
+      {
+        "id": "leonard_st",
+        "name": "Leonard St",
+        "z": 508,
+        "width": 12
+      },
+      {
+        "id": "franklin_st",
+        "name": "Franklin St",
+        "z": 600,
+        "width": 12
+      },
+      {
+        "id": "white_st",
+        "name": "White St",
+        "z": 692,
+        "width": 12
+      }
+    ],
+    "li_avenues": [
+      {
+        "id": "baxter_st",
+        "name": "Baxter St",
+        "x": -160,
+        "width": 12
+      },
+      {
+        "id": "mulberry_st",
+        "name": "Mulberry St",
+        "x": -80,
+        "width": 12
+      },
+      {
+        "id": "mott_st",
+        "name": "Mott St",
+        "x": 0,
+        "width": 12
+      },
+      {
+        "id": "elizabeth_st",
+        "name": "Elizabeth St",
+        "x": 80,
+        "width": 12
+      },
+      {
+        "id": "bowery",
+        "name": "Bowery",
+        "x": 168,
+        "width": 20,
+        "style": 2,
+        "speed": 1200
+      }
+    ],
+    "west_avenues": [
+      {
+        "id": "centre_st",
+        "name": "Centre St",
+        "x": -320,
+        "width": 12
+      },
+      {
+        "id": "lafayette_st",
+        "name": "Lafayette St",
+        "x": -400,
+        "width": 14
+      },
+      {
+        "id": "crosby_st",
+        "name": "Crosby St",
+        "x": -480,
+        "width": 12
+      },
+      {
+        "id": "mercer_st",
+        "name": "Mercer St",
+        "x": -560,
+        "width": 12
+      },
+      {
+        "id": "greene_st",
+        "name": "Greene St",
+        "x": -640,
+        "width": 12
+      }
+    ],
+    "east_avenues": [
+      {
+        "id": "chrystie_st",
+        "name": "Chrystie St",
+        "x": 328,
+        "width": 12
+      },
+      {
+        "id": "forsyth_st",
+        "name": "Forsyth St",
+        "x": 408,
+        "width": 12
+      },
+      {
+        "id": "eldridge_st",
+        "name": "Eldridge St",
+        "x": 488,
+        "width": 12
+      },
+      {
+        "id": "allen_st",
+        "name": "Allen St",
+        "x": 568,
+        "width": 16
+      },
+      {
+        "id": "orchard_st",
+        "name": "Orchard St",
+        "x": 648,
+        "width": 12
+      },
+      {
+        "id": "ludlow_st",
+        "name": "Ludlow St",
+        "x": 728,
+        "width": 12
+      },
+      {
+        "id": "essex_st",
+        "name": "Essex St",
+        "x": 808,
+        "width": 12
+      }
+    ]
+  },
+  "arterials": [
+    {
+      "id": "cathedral_pkwy",
+      "name": "Cathedral Pkwy",
+      "axis": "x",
+      "at": -1505,
+      "from": -1700,
+      "to": 1700,
+      "width": 18,
+      "speed": 1400
+    },
+    {
+      "id": "houston_st",
+      "name": "Houston St",
+      "axis": "x",
+      "at": -760,
+      "from": -1480,
+      "to": 1500,
+      "width": 20,
+      "speed": 1400
+    },
+    {
+      "id": "chambers_st",
+      "name": "Chambers St",
+      "axis": "x",
+      "at": 760,
+      "from": -1480,
+      "to": 1500,
+      "width": 20,
+      "speed": 1400
+    },
+    {
+      "id": "south_st",
+      "name": "South St",
+      "axis": "x",
+      "at": 1170,
+      "from": -1700,
+      "to": 1700,
+      "width": 18,
+      "speed": 1300
+    },
+    {
+      "id": "west_st",
+      "name": "West St",
+      "axis": "z",
+      "at": -1480,
+      "from": -1505,
+      "to": 1170,
+      "width": 22,
+      "speed": 1600
+    },
+    {
+      "id": "hudson_ave",
+      "name": "Hudson Ave",
+      "axis": "z",
+      "at": -760,
+      "from": -1505,
+      "to": 1170,
+      "width": 20,
+      "speed": 1400
+    },
+    {
+      "id": "first_ave",
+      "name": "First Ave",
+      "axis": "z",
+      "at": 910,
+      "from": -1505,
+      "to": 1170,
+      "width": 20,
+      "speed": 1400
+    },
+    {
+      "id": "east_river_dr",
+      "name": "East River Dr",
+      "axis": "z",
+      "at": 1500,
+      "from": -1505,
+      "to": 1170,
+      "width": 22,
+      "speed": 1600
+    }
+  ],
+  "regions": [
+    {
+      "id": "little_italy",
+      "name": "Little Italy",
+      "district": "little_italy"
+    },
+    {
+      "id": "nolita",
+      "name": "Nolita",
+      "style": "tenement",
+      "rect": [
+        -218,
+        -750,
+        226,
+        -196
+      ],
+      "avenues": "li_avenues",
+      "streets": "core_streets",
+      "boundary_streets": {
+        "north": true
+      }
+    },
+    {
+      "id": "chinatown",
+      "name": "Chinatown",
+      "style": "tenement",
+      "rect": [
+        -218,
+        198,
+        226,
+        750
+      ],
+      "avenues": "li_avenues",
+      "streets": "core_streets",
+      "boundary_streets": {
+        "south": true
+      }
+    },
+    {
+      "id": "soho",
+      "name": "SoHo Cast-Iron District",
+      "style": "industrial",
+      "rect": [
+        -750,
+        -750,
+        -218,
+        750
+      ],
+      "avenues": "west_avenues",
+      "streets": "core_streets",
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true
+      }
+    },
+    {
+      "id": "lower_east_side",
+      "name": "Lower East Side",
+      "style": "tenement",
+      "rect": [
+        226,
+        -750,
+        600,
+        750
+      ],
+      "avenues": "east_avenues",
+      "streets": "core_streets",
+      "boundary_streets": {
+        "north": true,
+        "south": true
+      }
+    },
+    {
+      "id": "seward_park",
+      "name": "Seward Park Houses",
+      "style": "towers",
+      "rect": [
+        600,
+        -750,
+        900,
+        750
+      ],
+      "avenues": "east_avenues",
+      "streets": "core_streets",
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "east": true
+      }
+    },
+    {
+      "id": "civic_center",
+      "name": "Civic Center",
+      "style": "civic",
+      "rect": [
+        -750,
+        770,
+        900,
+        1161
+      ],
+      "grid": {
+        "x_pitch": 160,
+        "x_origin": -680,
+        "z_lines": [
+          870,
+          968,
+          1066
+        ]
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "vanderhook_park",
+      "name": "Vanderhook Park",
+      "style": "park",
+      "rect": [
+        -750,
+        -1496,
+        900,
+        -770
+      ],
+      "grid": {
+        "z_lines": [
+          {
+            "z": -1130,
+            "width": 14,
+            "name": "Park Transverse",
+            "id": "park_transverse",
+            "speed": 1300
+          }
+        ]
+      },
+      "boundary_streets": {},
+      "park": {
+        "lake": [
+          -120,
+          -1380,
+          360,
+          -1220
+        ],
+        "paths": 9
+      }
+    },
+    {
+      "id": "upper_west_side",
+      "name": "Upper West Side",
+      "style": "rowhouse",
+      "rect": [
+        -1469,
+        -1496,
+        -770,
+        -770
+      ],
+      "grid": {
+        "x_pitch": 200,
+        "x_origin": -1330,
+        "z_pitch": 184,
+        "z_origin": -1322
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "meatpacking",
+      "name": "Meatpacking District",
+      "style": "industrial",
+      "rect": [
+        -1469,
+        -750,
+        -770,
+        750
+      ],
+      "grid": {
+        "x_pitch": 175,
+        "x_origin": -1295,
+        "z_lines": [
+          -598,
+          -414,
+          -230,
+          -46,
+          140,
+          324,
+          508,
+          692
+        ]
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "tribeca",
+      "name": "Tribeca Warehouses",
+      "style": "industrial",
+      "rect": [
+        -1469,
+        770,
+        -770,
+        1161
+      ],
+      "grid": {
+        "x_pitch": 175,
+        "x_origin": -1295,
+        "z_lines": [
+          968
+        ]
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "gramercy",
+      "name": "Gramercy",
+      "style": "rowhouse",
+      "rect": [
+        920,
+        -1496,
+        1489,
+        -770
+      ],
+      "grid": {
+        "x_pitch": 200,
+        "x_origin": 1060,
+        "z_pitch": 184,
+        "z_origin": -1322
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "stuyvesant_town",
+      "name": "Stuyvesant Town",
+      "style": "towers",
+      "rect": [
+        920,
+        -750,
+        1489,
+        750
+      ],
+      "grid": {
+        "x_pitch": 190,
+        "x_origin": 1110,
+        "z_lines": [
+          -414,
+          -46,
+          324
+        ]
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "two_bridges",
+      "name": "Two Bridges",
+      "style": "industrial",
+      "rect": [
+        920,
+        770,
+        1489,
+        1161
+      ],
+      "grid": {
+        "x_pitch": 190,
+        "x_origin": 1110,
+        "z_lines": [
+          968
+        ]
+      },
+      "boundary_streets": {
+        "north": true,
+        "south": true,
+        "west": true,
+        "east": true
+      }
+    },
+    {
+      "id": "hudson_piers",
+      "name": "Hudson Piers",
+      "style": "waterfront",
+      "rect": [
+        -1700,
+        -1496,
+        -1491,
+        1161
+      ],
+      "grid": {
+        "z_lines": [
+          -1130,
+          -760,
+          -414,
+          -46,
+          324,
+          760
+        ]
+      },
+      "boundary_streets": {
+        "east": true,
+        "north": true,
+        "south": true
+      },
+      "piers": {
+        "side": "west",
+        "length": 300,
+        "width": 44
+      }
+    },
+    {
+      "id": "east_river_piers",
+      "name": "East River Piers",
+      "style": "waterfront",
+      "rect": [
+        1511,
+        -1496,
+        1700,
+        1161
+      ],
+      "grid": {
+        "z_lines": [
+          -1130,
+          -760,
+          -414,
+          {
+            "z": -230,
+            "name": "Delancey St",
+            "id": "delancey_st",
+            "width": 16,
+            "speed": 1300
+          },
+          324,
+          760
+        ]
+      },
+      "boundary_streets": {
+        "west": true,
+        "north": true,
+        "south": true
+      },
+      "piers": {
+        "side": "east",
+        "length": 260,
+        "width": 44,
+        "skip": [
+          -230
+        ]
+      }
+    },
+    {
+      "id": "spuyten_heights",
+      "name": "Spuyten Heights",
+      "style": "suburban",
+      "rect": [
+        -1700,
+        -1700,
+        1700,
+        -1514
+      ],
+      "grid": {
+        "x_pitch": 170,
+        "x_origin": -1615,
+        "z_lines": [
+          -1610
+        ]
+      },
+      "boundary_streets": {
+        "south": true
+      },
+      "extra_kinds": [
+        "estate"
+      ]
+    },
+    {
+      "id": "south_street_seaport",
+      "name": "South Street Seaport",
+      "style": "waterfront",
+      "rect": [
+        -1700,
+        1179,
+        1700,
+        1400
+      ],
+      "grid": {
+        "x_pitch": 340,
+        "x_origin": -1360
+      },
+      "boundary_streets": {
+        "north": true
+      },
+      "piers": {
+        "side": "south",
+        "length": 240,
+        "width": 40
+      }
+    }
+  ],
+  "bridges": [
+    {
+      "id": "delancey_bridge",
+      "name": "Delancey Bridge",
+      "from": [
+        1700,
+        -230
+      ],
+      "to": [
+        2300,
+        -230
+      ],
+      "width": 24,
+      "towers": [
+        1880,
+        2120
+      ],
+      "leads_to": "Brooklyn (future city)",
+      "speed": 1600
+    }
+  ],
+  "backdrops": [
+    {
+      "id": "new_jersey_shore",
+      "rect": [
+        -2700,
+        -2400,
+        -2300,
+        2100
+      ],
+      "height": [
+        8,
+        26
+      ]
+    },
+    {
+      "id": "brooklyn_shore",
+      "rect": [
+        2300,
+        -2400,
+        2700,
+        2100
+      ],
+      "height": [
+        8,
+        30
+      ]
+    },
+    {
+      "id": "harlem",
+      "rect": [
+        -1700,
+        -2400,
+        1700,
+        -1716
+      ],
+      "height": [
+        12,
+        40
+      ]
+    }
+  ]
+}

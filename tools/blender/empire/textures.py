@@ -386,6 +386,13 @@ def build_all(out_dir):
     write_png(p("wood_albedo.png"), wood(256, 81))
     write_png(p("foliage_albedo.png"), foliage(512, 91))
     write_png(p("grime_noise.png"), grime(512, 101))
+    write_png(p("grass_albedo.png"), grass(512, 141))
+    a, n = siding(512, 121)
+    write_png(p("siding_albedo.png"), a)
+    write_png(p("siding_normal.png"), n)
+    a, n = shingles(512, 131)
+    write_png(p("shingle_albedo.png"), a)
+    write_png(p("shingle_normal.png"), n)
     for i, kind in enumerate(("tar", "silver", "gravel")):
         a, n = roof_variant(512, 110 + i, kind)
         write_png(p("roof_%s_albedo.png" % kind), a)
@@ -427,6 +434,49 @@ def roof_variant(size, seed, kind):
         height = mid * 0.5 + blister * 0.5 + seam * 0.8
     alb = np.where((seam > 0.5)[..., None], alb * 0.7, alb)
     return alb, height_to_normal(height, 3.0)
+
+
+def grass(size, seed):
+    rng = _rng(seed)
+    n1 = fbm(size, size, 6, 5, rng)
+    n2 = fbm(size, size, 48, 3, rng)
+    dry = smoothstep(0.55, 0.8, fbm(size, size, 3, 4, rng))
+    alb = lerp(rgb("#3f5a26")[None, None, :], rgb("#6f8a3a")[None, None, :], (n1 * 0.6 + n2 * 0.4)[..., None])
+    alb = lerp(alb, rgb("#8f8656")[None, None, :], (dry * 0.5)[..., None])
+    blade = rng.random((size, size)) > 0.85
+    return np.where(blade[..., None], alb * 1.15, alb)
+
+
+def siding(size, seed):
+    """Painted clapboard (2 m tile, 10 cm boards): light neutral albedo that the
+    material colour tints, plus a normal map with board shadow lines."""
+    rng = _rng(seed)
+    yy = np.arange(size)[:, None] / size * 20.0
+    f = yy - np.floor(yy)
+    board = np.repeat(f, size, axis=1)
+    shade = 0.78 + 0.22 * board
+    n = fbm(size, size, 8, 4, rng)
+    alb = np.ones((size, size, 3)) * (shade * (0.92 + n * 0.12))[..., None]
+    alb = np.where((board < 0.06)[..., None], alb * 0.6, alb)
+    return alb, height_to_normal(board, 6.0)
+
+
+def shingles(size, seed):
+    rng = _rng(seed)
+    yy, xx = np.mgrid[0:size, 0:size].astype(float)
+    rows = 16
+    rh = size / rows
+    row = np.floor(yy / rh).astype(int)
+    off = (row % 2) * 0.5
+    u = xx / (size / 12) + off
+    col = np.floor(u).astype(int)
+    per = rng.random((rows, 14))
+    tone = per[row, col % 14]
+    fv = (yy % rh) / rh
+    alb = np.ones((size, size, 3)) * (0.55 + tone * 0.35)[..., None] * (0.8 + 0.2 * fv)[..., None]
+    gaps = (np.abs(u - np.round(u)) < 0.03) | (fv > 0.94)
+    alb = np.where(gaps[..., None], alb * 0.45, alb)
+    return alb, height_to_normal(fv * (1 - gaps), 3.0)
 
 
 def grime(size, seed):

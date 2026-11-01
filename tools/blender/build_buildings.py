@@ -11,6 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 
+from empire import buildings_extra  # noqa: E402
 from empire.buildings import BuildingGenerator, build_warehouse  # noqa: E402
 from empire.geometry import export_glb, reset_scene  # noqa: E402
 
@@ -72,6 +73,40 @@ BUILDINGS = [
     {"id": "taxpayer_a", "kind": "midblock_low", "width": 15.0, "floors": 0, "brick": "M_Brick_Painted",
      "cornice": "simple", "frame": "M_Frame_Dark", "ground_h": 4.6,
      "ground": shop("DISCOUNT RECORDS & RADIO", "M_Shopfront_Black", "M_Neon_Red", awning=2, variant=2)},
+    # --- Rowhouses (brownstone residential blocks) ---------------------------------
+    {"id": "rowhouse_a", "kind": "rowhouse", "width": 6.5, "floors": 3, "brick": "M_Brick_Brown", "lintel": "hood",
+     "cornice_mat": "M_Cornice_Dark", "ground": {"type": "residential"}, "ac": 0.05},
+    {"id": "rowhouse_b", "kind": "rowhouse", "width": 7.0, "floors": 4, "brick": "M_Brick_Dark", "lintel": "keystone",
+     "cornice_mat": "M_Cornice_Dark", "ground": {"type": "residential"}, "ac": 0.05},
+    {"id": "rowhouse_c", "kind": "rowhouse", "width": 6.0, "floors": 3, "brick": "M_Brick_Red", "lintel": "flat",
+     "cornice": "simple", "ground": {"type": "residential"}, "ac": 0.08},
+    {"id": "rowhouse_d", "kind": "rowhouse", "width": 7.5, "floors": 4, "brick": "M_Brick_Tan", "lintel": "hood",
+     "cornice_mat": "M_Cornice_Green", "ground": {"type": "residential"}, "ac": 0.05},
+    # --- Industrial: warehouses, lofts, works ---------------------------------------------
+    {"id": "warehouse_a", "kind": "industrial", "builder": "warehouse", "width": 24.0, "depth": 30.0, "floors": 4,
+     "brick": "M_Brick_Red", "sign": "", "side_sign": "", "roof": "M_Roof_Tar"},
+    {"id": "warehouse_b", "kind": "industrial", "builder": "warehouse", "width": 20.0, "depth": 26.0, "floors": 3,
+     "brick": "M_Brick_Brown", "sign": "HUDSON COLD STORAGE", "side_sign": "", "water_tower": True},
+    {"id": "loft_a", "kind": "industrial", "builder": "warehouse", "width": 16.0, "depth": 24.0, "floors": 6,
+     "brick": "M_Brick_Tan", "sign": "", "side_sign": "", "floor_h": 3.6},
+    {"id": "warehouse_c", "kind": "industrial", "builder": "warehouse", "width": 28.0, "depth": 34.0, "floors": 2,
+     "brick": "M_Brick_Dark", "sign": "MERCHANTS TRUCKING", "side_sign": "TRUCKING · CARTAGE"},
+    {"id": "factory_a", "kind": "industrial", "builder": "factory", "width": 30.0, "depth": 36.0, "brick": "M_Brick_Red"},
+    # --- Suburban houses and the family estate ----------------------------------------
+    {"id": "house_a", "kind": "house", "builder": "house", "width": 11.0, "depth": 10.0, "wall": "M_Siding_White",
+     "roof": "M_Shingle_Gray", "seed": 1},
+    {"id": "house_b", "kind": "house", "builder": "house", "width": 10.0, "depth": 9.5, "wall": "M_Siding_Green",
+     "roof": "M_Shingle_Brown", "trim": "M_Frame_White", "seed": 2},
+    {"id": "house_c", "kind": "house", "builder": "house", "width": 12.0, "depth": 10.5, "wall": "M_Brick_Red",
+     "roof": "M_Shingle_Slate", "hip": True, "seed": 3},
+    {"id": "house_d", "kind": "house", "builder": "house", "width": 10.5, "depth": 9.0, "wall": "M_Siding_Yellow",
+     "roof": "M_Shingle_Gray", "seed": 4, "garage": False},
+    {"id": "house_e", "kind": "house", "builder": "house", "width": 11.5, "depth": 10.0, "wall": "M_Siding_Blue",
+     "roof": "M_Shingle_Slate", "hip": True, "seed": 5},
+    {"id": "estate_a", "kind": "estate", "builder": "estate", "width": 26.0, "depth": 18.0, "wall": "M_Stone",
+     "roof": "M_Shingle_Slate", "seed": 6},
+    # --- Waterfront ---------------------------------------------------------------------
+    {"id": "pier_shed_a", "kind": "pier", "builder": "pier_shed", "width": 26.0, "depth": 150.0},
     # --- Corner buildings (side facade wraps the street corner) ---------------------
     {"id": "corner_left_a", "kind": "corner_left", "width": 12.0, "floors": 5, "brick": "M_Brick_Red",
      "cornice_mat": "M_Cornice_Dark", "fire_escape": True,
@@ -128,8 +163,11 @@ def main():
         if only and spec["id"] not in only:
             continue
         reset_scene()
-        if spec.get("builder") == "warehouse":
+        builder = spec.get("builder")
+        if builder == "warehouse":
             mb = build_warehouse(spec)
+        elif builder in ("house", "estate", "factory", "pier_shed"):
+            mb = getattr(buildings_extra, "build_" + builder)(spec)
         else:
             mb = BuildingGenerator(spec).build()
         tris = mb.triangle_count()
