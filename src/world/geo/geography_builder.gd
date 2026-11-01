@@ -147,7 +147,7 @@ func _landmark_towers(def: Dictionary) -> void:
 			w.towers.append({"pos": pos, "size": size, "height": float(dm["height"]), "color": Color(spec[2]), "yaw": yaw,
 				"id": lm["id"], "name": lm["name"], "model": model})
 			var mxf := Transform2D(yaw, pos)
-			var mh: Vector2 = size * 0.5 + Vector2(10, 10)
+			var mh: Vector2 = size * 0.5 + Vector2(4, 4)
 			_tower_polys.append(mxf * PackedVector2Array([-mh, Vector2(mh.x, -mh.y), mh, Vector2(-mh.x, mh.y)]))
 			w.labels.append({"text": lm["name"], "pos": pos, "kind": "landmark"})
 			continue
