@@ -148,19 +148,17 @@ func _hide_loading() -> void:
 	tw.tween_callback(layer.queue_free)
 
 
-var _ambience: AudioStreamPlayer
+var ambience: AmbienceDirector
 
 
 func _add_ambience() -> void:
-	_ambience = AudioStreamPlayer.new()
-	_ambience.name = "CityAmbience"
-	_ambience.stream = load("res://assets/audio/ambience/city_traffic.wav")
-	_ambience.volume_db = -14.0
-	_ambience.autoplay = true
-	add_child(_ambience)
-	camera.distance_changed.connect(func(d: float):
-		# Street noise fades as the camera climbs to the strategic view.
-		_ambience.volume_db = lerpf(-9.0, -26.0, clampf((d - 60.0) / 500.0, 0.0, 1.0)))
+	ambience = AmbienceDirector.new()
+	ambience.name = "Ambience"
+	ambience.camera = camera
+	ambience.traffic = traffic
+	add_child(ambience)
+	camera.distance_changed.connect(ambience.on_camera_distance)
+	ambience.on_camera_distance(camera.distance)
 
 
 func _intro() -> void:

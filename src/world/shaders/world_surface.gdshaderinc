@@ -11,6 +11,9 @@ uniform float normal_scale = 1.0;
 uniform float roughness : hint_range(0.0, 1.0) = 0.8;
 uniform float metallic : hint_range(0.0, 1.0) = 0.0;
 uniform bool use_orm = false;
+uniform bool use_arm = false;
+uniform sampler2D arm_tex : hint_default_white, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform float uv_scale = 1.0;
 uniform sampler2D orm_tex : hint_default_white, filter_linear, repeat_enable;
 uniform sampler2D emission_tex : source_color, hint_default_white, filter_linear_mipmap, repeat_enable;
 uniform vec3 emission_color : source_color = vec3(0.0);
@@ -91,10 +94,18 @@ void fragment() {
 		}
 	}
 #endif
-	vec4 a = texture(albedo_tex, UV) * albedo_color;
+	vec2 uv = UV * uv_scale;
+	vec4 a = texture(albedo_tex, uv) * albedo_color;
 	float r = roughness;
 	float m = metallic;
 	float tint_mask = 0.0;
+	float tex_ao = 1.0;
+	if (use_arm) {
+		vec3 arm = texture(arm_tex, uv).rgb;
+		tex_ao = arm.r;
+		r = arm.g;
+		m = arm.b;
+	}
 	if (use_orm) {
 		vec3 orm = texture(orm_tex, UV).rgb;
 		tint_mask = orm.r;
@@ -117,14 +128,14 @@ void fragment() {
 		albedo = mix(albedo, albedo * vec3(0.55, 0.52, 0.48), g);
 		r = clamp(r + g * 0.12 - streak * 0.08 + (speck - 0.5) * 0.1, 0.04, 1.0);
 	}
-	ALBEDO = albedo * v_ao;
-	AO = v_ao;
+	ALBEDO = albedo * v_ao * mix(1.0, tex_ao, 0.6);
+	AO = v_ao * tex_ao;
 	AO_LIGHT_AFFECT = 0.35;
 	ROUGHNESS = r;
 	METALLIC = m;
 	SPECULAR = specular_amount;
 	if (use_normal_map) {
-		NORMAL_MAP = texture(normal_tex, UV).rgb;
+		NORMAL_MAP = texture(normal_tex, uv).rgb;
 		NORMAL_MAP_DEPTH = normal_scale;
 	}
 	vec3 e = texture(emission_tex, UV).rgb * emission_color * (emission_energy + night_emission * world_night);

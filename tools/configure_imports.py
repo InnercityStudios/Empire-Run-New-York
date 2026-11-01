@@ -41,6 +41,7 @@ detect_3d/compress_to=0
 
 def sources():
     yield from sorted(glob.glob(os.path.join(ROOT, "assets", "textures", "*.png")))
+    yield from sorted(glob.glob(os.path.join(ROOT, "assets", "textures", "pbr", "*.png")))
     # Textures Godot extracts from licensed vehicle GLBs.
     for ext in ("png", "jpg"):
         yield from sorted(glob.glob(os.path.join(ROOT, "assets", "models", "vehicles", "licensed", "*." + ext)))

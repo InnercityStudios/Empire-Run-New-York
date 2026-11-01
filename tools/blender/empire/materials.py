@@ -16,6 +16,8 @@ Fields:
   cull       "back" (default) or "disabled"
   animated   keeps a dedicated material so Godot can animate it (signals)
   tint       albedo is multiplied by a per-instance tint in Godot (car paint)
+  arm        packed ambient occlusion / roughness / metalness texture (PBR sets)
+  uv_scale   runtime UV multiplier (lets a photographic set use its true scale)
 
 Palette: every untextured, non-animated material is packed into one swatch of
 a shared palette atlas (albedo, roughness/metallic/tint-mask, emission). The
@@ -29,7 +31,8 @@ TEX = "res://assets/textures/"
 
 MATERIALS = {
     # --- Masonry -------------------------------------------------------------
-    "M_Brick_Red":    {"grime": 1.0, "color": "#ffffff", "albedo": "brick_red_albedo.png", "normal": "brick_normal.png", "uv_m": 2.4, "roughness": 0.92},
+    # Photographic brick (Poly Haven brick_wall_006, CC0): 2.85 m tile vs 2.4 m UVs.
+    "M_Brick_Red":    {"grime": 1.0, "color": "#d6c2b8", "albedo": "pbr/brick_wall_006_albedo.png", "normal": "pbr/brick_wall_006_normal.png", "arm": "pbr/brick_wall_006_arm.png", "uv_m": 2.4, "uv_scale": 0.84, "roughness": 0.92},
     "M_Brick_Brown":  {"grime": 1.0, "color": "#ffffff", "albedo": "brick_brown_albedo.png", "normal": "brick_normal.png", "uv_m": 2.4, "roughness": 0.92},
     "M_Brick_Tan":    {"grime": 1.0, "color": "#ffffff", "albedo": "brick_tan_albedo.png", "normal": "brick_normal.png", "uv_m": 2.4, "roughness": 0.9},
     "M_Brick_Dark":   {"grime": 0.8, "color": "#ffffff", "albedo": "brick_dark_albedo.png", "normal": "brick_normal.png", "uv_m": 2.4, "roughness": 0.93},
@@ -159,7 +162,7 @@ def export_material_library(path):
         if is_palette(name):
             continue
         entry = dict(m)
-        for key in ("albedo", "normal", "emission_tex"):
+        for key in ("albedo", "normal", "emission_tex", "arm"):
             if key in entry:
                 entry[key] = TEX + entry[key]
         lib[name] = entry

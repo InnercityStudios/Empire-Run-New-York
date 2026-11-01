@@ -70,8 +70,10 @@ func get_road_material() -> ShaderMaterial:
 	if _road == null:
 		_road = ShaderMaterial.new()
 		_road.shader = ROAD_SHADER
-		_road.set_shader_parameter("asphalt_tex", load("res://assets/textures/asphalt_albedo.png"))
-		_road.set_shader_parameter("asphalt_normal", load("res://assets/textures/asphalt_normal.png"))
+		# Photographic asphalt (Poly Haven asphalt_02, CC0); markings stay procedural.
+		_road.set_shader_parameter("asphalt_tex", load("res://assets/textures/pbr/asphalt_02_albedo.png"))
+		_road.set_shader_parameter("asphalt_normal", load("res://assets/textures/pbr/asphalt_02_normal.png"))
+		_road.set_shader_parameter("tile_m", 4.0)
 	return _road
 
 
@@ -143,6 +145,10 @@ func _build(mat_name: String, variant: String) -> Material:
 		m.set_shader_parameter("use_normal_map", true)
 		m.set_shader_parameter("normal_tex", load(d["normal"]))
 		m.set_shader_parameter("normal_scale", d.get("normal_scale", 1.0))
+	if d.has("arm"):
+		m.set_shader_parameter("use_arm", true)
+		m.set_shader_parameter("arm_tex", load(d["arm"]))
+	m.set_shader_parameter("uv_scale", d.get("uv_scale", 1.0))
 	if d.has("orm"):
 		m.set_shader_parameter("use_orm", true)
 		m.set_shader_parameter("orm_tex", load(d["orm"]))

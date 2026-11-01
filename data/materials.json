@@ -31,12 +31,14 @@
       "uv_m": 2.4
     },
     "M_Brick_Red": {
-      "albedo": "res://assets/textures/brick_red_albedo.png",
-      "color": "#ffffff",
+      "albedo": "res://assets/textures/pbr/brick_wall_006_albedo.png",
+      "arm": "res://assets/textures/pbr/brick_wall_006_arm.png",
+      "color": "#d6c2b8",
       "grime": 1.0,
-      "normal": "res://assets/textures/brick_normal.png",
+      "normal": "res://assets/textures/pbr/brick_wall_006_normal.png",
       "roughness": 0.92,
-      "uv_m": 2.4
+      "uv_m": 2.4,
+      "uv_scale": 0.84
     },
     "M_Brick_Tan": {
       "albedo": "res://assets/textures/brick_tan_albedo.png",

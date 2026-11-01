@@ -70,6 +70,17 @@ func setup(p_layout: WorldLayout) -> void:
 		_respawn(car, true)
 
 
+## World position of a random moving car (for spatial sound), or null.
+func random_car_position() -> Variant:
+	if _cars.is_empty():
+		return null
+	var car: Dictionary = _cars[_rng.randi() % _cars.size()]
+	if float(car["speed"]) < 1.0:
+		return null
+	var p: Vector2 = car["pos"]
+	return Vector3(p.x, 1.2, p.y)
+
+
 func signal_state_for(axis: String) -> String:
 	return ns_state if axis == "ns" else ew_state
 

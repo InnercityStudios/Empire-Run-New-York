@@ -22,26 +22,37 @@ void vertex() {
 
 void fragment() {
 	vec3 n = v_world_normal;
-	vec3 col = COLOR.rgb;
+	// Catalogue tones are sRGB; convert for linear lighting.
+	vec3 col = pow(COLOR.rgb, vec3(2.2));
 	float rough = 0.9;
 	vec3 emit = vec3(0.0);
 	if (n.y > 0.5) {
 		float t = texture(noise_tex, v_world.xz * 0.02).r;
-		col = mix(roof_color.rgb * 0.75, roof_color.rgb * 1.35, mix(t, COLOR.a, 0.6));
+		// COLOR.a: roof tone (0 = dark tar, 1 = silver coating); pavements use 0.6.
+		vec3 tar = vec3(0.045, 0.043, 0.04);
+		vec3 silver = vec3(0.3, 0.3, 0.28);
+		// Building-scale variation: tar, coated and gravel roofs side by side.
+		float tone = texture(noise_tex, floor(v_world.xz / 9.0) * 0.173).g;
+		float patchy = texture(noise_tex, v_world.xz * 0.11).b;
+		col = mix(tar, silver, clamp(mix(COLOR.a, tone, 0.75), 0.0, 1.0)) * (0.8 + t * 0.25 + patchy * 0.15);
+		if (v_world.y < 0.5) {
+			col = pow(COLOR.rgb, vec3(2.2)) * 0.55;
+		}
 	} else {
 		float along = abs(n.x) > abs(n.z) ? v_world.z : v_world.x;
 		vec2 cell = vec2(along / window_pitch, (v_world.y - 0.6) / floor_h);
 		vec2 f = fract(cell);
-		float win = step(0.3, f.x) * step(f.x, 0.72) * step(0.32, f.y) * step(f.y, 0.86) * step(4.0, v_world.y);
+		float win = step(0.3, f.x) * step(f.x, 0.72) * step(0.32, f.y) * step(f.y, 0.86) * step(4.4, v_world.y);
 		float lit = step(0.78, texture(noise_tex, floor(cell) * 0.137).r);
-		vec3 glass = mix(vec3(0.07, 0.08, 0.09), vec3(0.42, 0.47, 0.52), 0.25);
-		col = mix(col, glass, win * 0.85);
-		rough = mix(0.9, 0.2, win);
+		vec3 glass = vec3(0.025, 0.03, 0.035);
+		col = mix(col, glass, win * 0.9);
+		// Shopfront band and street-level occlusion.
+		col *= mix(0.45, 1.0, smoothstep(3.6, 4.4, v_world.y));
+		rough = mix(0.9, 0.25, win);
 		emit = vec3(1.0, 0.78, 0.45) * win * lit * world_night * 1.5;
-		col *= 0.75 + 0.25 * smoothstep(0.0, 3.0, v_world.y);
 	}
 	ALBEDO = col;
 	ROUGHNESS = rough;
-	SPECULAR = 0.35;
+	SPECULAR = 0.3;
 	EMISSION = emit;
 }
