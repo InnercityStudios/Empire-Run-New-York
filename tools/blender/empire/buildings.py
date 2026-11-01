@@ -22,7 +22,7 @@ FLOOR_H = 3.1
 WIN_W = 0.95
 WIN_H = 1.65
 WIN_SILL = 0.85
-WIN_DEPTH = 0.18
+WIN_DEPTH = 0.25
 
 # Window atlas weights: plain, lace, blinds, lit, shade, red curtain, plant, grimy
 WINDOW_WEIGHTS = [0.22, 0.15, 0.14, 0.08, 0.13, 0.08, 0.08, 0.12]
@@ -63,13 +63,13 @@ class Facade:
     def nvec(self, nu, nv, no):
         return self.R * nu + self.Z * nv + self.N * no
 
-    def face(self, pts, mat, n, uvs=None):
-        self.mb.add_face([self.P(*p) for p in pts], mat, uvs=uvs, normal=self.nvec(*n))
+    def face(self, pts, mat, n, uvs=None, shade=None):
+        self.mb.add_face([self.P(*p) for p in pts], mat, uvs=uvs, normal=self.nvec(*n), shade=shade)
 
-    def quad(self, u0, u1, v0, v1, o, mat, uvs=None):
-        self.face([(u0, v0, o), (u1, v0, o), (u1, v1, o), (u0, v1, o)], mat, (0, 0, 1), uvs)
+    def quad(self, u0, u1, v0, v1, o, mat, uvs=None, shade=None):
+        self.face([(u0, v0, o), (u1, v0, o), (u1, v1, o), (u0, v1, o)], mat, (0, 0, 1), uvs, shade)
 
-    def box(self, u0, u1, v0, v1, o0, o1, mat, skip_back=True):
+    def box(self, u0, u1, v0, v1, o0, o1, mat, skip_back=True, shade=None, bottom=False):
         pts = [self.P(u, v, o) for u in (u0, u1) for v in (v0, v1) for o in (o0, o1)]
         mn = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
         mx = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
@@ -79,7 +79,13 @@ class Facade:
             back = -self.N
             skip = ({(-1, 0): "nx", (1, 0): "px"}.get((round(back.x), round(back.y))) or
                     {(0, -1): "ny", (0, 1): "py"}.get((round(back.x), round(back.y))),)
+        if not bottom and v0 > 0.05:
+            skip = tuple(s for s in skip if s) + ("nz",)
+        prev = self.mb.shade
+        if shade is not None:
+            self.mb.shade = shade
         self.mb.add_box(mn, mx, mat, skip=skip)
+        self.mb.shade = prev
 
     def text(self, text, font, u, v, w, h, o, mat, facing=None):
         obj = make_text(text, font, w, h, self.P(u, v, o), facing or facing_name(self.N))
@@ -108,10 +114,10 @@ class Facade:
                 self.quad(start, us[-1], v0, v1, 0.0, mat)
         for (u0, u1, v0, v1, d) in openings:
             if v0 > 1e-4:
-                self.face([(u0, v0, 0), (u1, v0, 0), (u1, v0, -d), (u0, v0, -d)], reveal_mat, (0, 1, 0))
-            self.face([(u0, v1, 0), (u1, v1, 0), (u1, v1, -d), (u0, v1, -d)], reveal_mat, (0, -1, 0))
-            self.face([(u0, v0, 0), (u0, v1, 0), (u0, v1, -d), (u0, v0, -d)], reveal_mat, (1, 0, 0))
-            self.face([(u1, v0, 0), (u1, v1, 0), (u1, v1, -d), (u1, v0, -d)], reveal_mat, (-1, 0, 0))
+                self.face([(u0, v0, 0), (u1, v0, 0), (u1, v0, -d), (u0, v0, -d)], reveal_mat, (0, 1, 0), shade=0.8)
+            self.face([(u0, v1, 0), (u1, v1, 0), (u1, v1, -d), (u0, v1, -d)], reveal_mat, (0, -1, 0), shade=0.45)
+            self.face([(u0, v0, 0), (u0, v1, 0), (u0, v1, -d), (u0, v0, -d)], reveal_mat, (1, 0, 0), shade=0.62)
+            self.face([(u1, v0, 0), (u1, v1, 0), (u1, v1, -d), (u1, v0, -d)], reveal_mat, (-1, 0, 0), shade=0.62)
 
 
 class BuildingGenerator:
@@ -130,6 +136,24 @@ class BuildingGenerator:
         self.Hb = self.top + self.crown
         self.brick = spec["brick"]
         self.frame = spec.get("frame", "M_Frame_White")
+        self.z0 = spec.get("z0", 0.0)
+        # Architectural style (deterministic per building id)
+        self.lintel = spec.get("lintel", self.rng.choice(["flat", "keystone", "keystone", "hood", "soldier"]))
+        self.quoins = spec.get("quoins", self.rng.random() < 0.35)
+        self.belt = spec.get("belt", self.rng.random() < 0.6)
+        self.mb.shade_fn = self._occlusion
+
+    def _occlusion(self, p, n):
+        """Cheap baked AO: grime and bounce-light loss near the pavement, soot
+        under the cornice, darker undersides."""
+        k = 1.0
+        if abs(n.z) < 0.5:
+            k *= 0.68 + 0.32 * min(1.0, max(0.0, (p.z + self.z0) / 2.4))
+            if self.top - 1.2 < p.z < self.top:
+                k *= 0.86
+        elif n.z < -0.5:
+            k *= 0.7
+        return k
 
     # -- helpers -----------------------------------------------------------------
     def window_variant(self):
@@ -159,35 +183,70 @@ class BuildingGenerator:
     def dress_windows(self, f, ops, ac_chance=0.1, grimy=False):
         for (u0, u1, v0, v1, d) in ops:
             var = 7 if grimy else self.window_variant()
-            f.quad(u0, u1, v0, v1, -d, "M_Window", atlas_uv(var, WINDOW_ATLAS_COLS, WINDOW_ATLAS_ROWS))
-            fw = 0.06
-            o = -d + 0.012
-            f.quad(u0, u1, v0, v0 + fw, o, self.frame)
-            f.quad(u0, u1, v1 - fw, v1, o, self.frame)
-            f.quad(u0, u0 + fw, v0 + fw, v1 - fw, o, self.frame)
-            f.quad(u1 - fw, u1, v0 + fw, v1 - fw, o, self.frame)
-            f.box(u0 - 0.07, u1 + 0.07, v0 - 0.09, v0, -0.02, 0.07, "M_Stone")
-            f.box(u0 - 0.1, u1 + 0.1, v1, v1 + 0.2, -0.02, 0.03, "M_Stone")
+            glass_o = -d + 0.04
+            f.quad(u0, u1, v0, v1, glass_o, "M_Window", atlas_uv(var, WINDOW_ATLAS_COLS, WINDOW_ATLAS_ROWS),
+                   shade=0.92)
+            # Frame and meeting rail: flat faces over the textured sash (detail
+            # lives in the texture, not in triangles).
+            fw = 0.07
+            fr = self.frame
+            o = glass_o + 0.015
+            f.quad(u0, u1, v0, v0 + fw, o, fr, shade=0.85)
+            f.quad(u0, u1, v1 - fw, v1, o, fr, shade=0.7)
+            f.quad(u0, u0 + fw, v0 + fw, v1 - fw, o, fr, shade=0.8)
+            f.quad(u1 - fw, u1, v0 + fw, v1 - fw, o, fr, shade=0.8)
+            mid = (v0 + v1) * 0.5
+            f.quad(u0 + fw, u1 - fw, mid - 0.03, mid + 0.03, o + 0.01, fr)
+            f.box(u0 - 0.08, u1 + 0.08, v0 - 0.08, v0, -0.03, 0.09, "M_Stone")
+            self._lintel(f, u0, u1, v1)
             if self.rng.random() < ac_chance:
                 c = (u0 + u1) * 0.5
-                f.box(c - 0.31, c + 0.31, v0 + 0.02, v0 + 0.42, -0.12, 0.34, "M_AC_Unit")
+                f.box(c - 0.31, c + 0.31, v0 + 0.02, v0 + 0.42, -0.14, 0.34, "M_AC_Unit")
+                f.box(c - 0.26, c + 0.26, v0 + 0.08, v0 + 0.36, 0.34, 0.345, "M_Grille")
+
+    def _lintel(self, f, u0, u1, v1):
+        style = self.lintel
+        if style == "keystone":
+            f.box(u0 - 0.1, u1 + 0.1, v1, v1 + 0.2, -0.02, 0.04, "M_Stone")
+            c = (u0 + u1) * 0.5
+            f.box(c - 0.1, c + 0.1, v1 - 0.03, v1 + 0.3, -0.02, 0.07, "M_Stone")
+        elif style == "hood":
+            f.box(u0 - 0.16, u1 + 0.16, v1 + 0.05, v1 + 0.24, -0.02, 0.06, "M_Stone")
+            f.box(u0 - 0.2, u1 + 0.2, v1 + 0.24, v1 + 0.32, -0.02, 0.16, "M_Stone")
+            for uu in (u0 - 0.14, u1 + 0.06):
+                f.box(uu, uu + 0.08, v1 - 0.2, v1 + 0.24, -0.02, 0.1, "M_Stone", shade=0.85)
+        elif style == "soldier":
+            # Soldier-course brick lintel, slightly proud of the wall.
+            f.box(u0 - 0.06, u1 + 0.06, v1, v1 + 0.26, -0.02, 0.025, self.brick)
+        else:
+            f.box(u0 - 0.1, u1 + 0.1, v1, v1 + 0.2, -0.02, 0.03, "M_Stone")
 
     def cornice_on(self, f, start_u=0.0, end_u=None):
         end_u = f.width if end_u is None else end_u
         mat = self.s.get("cornice_mat", "M_Cornice_Dark")
         if self.cornice == "bracket":
-            f.box(start_u, end_u, self.top - 0.7, self.top, 0.0, 0.1, mat)
-            f.box(start_u, end_u, self.top, self.top + self.crown, 0.0, 0.62, mat)
+            f.box(start_u, end_u, self.top - 0.75, self.top - 0.05, 0.0, 0.1, mat)
+            f.box(start_u, end_u, self.top - 0.05, self.top + 0.12, 0.0, 0.34, mat, shade=0.8)
+            f.box(start_u, end_u, self.top + 0.12, self.top + 0.3, 0.0, 0.5, mat)
+            f.box(start_u, end_u, self.top + 0.3, self.top + self.crown, 0.0, 0.66, mat)
             n = max(2, int((end_u - start_u) / 1.3))
             for i in range(n + 1):
                 u = start_u + 0.15 + (end_u - start_u - 0.3) * i / n
-                f.box(u - 0.09, u + 0.09, self.top - 0.62, self.top, 0.1, 0.52, mat)
+                f.box(u - 0.09, u + 0.09, self.top - 0.66, self.top - 0.05, 0.1, 0.45, mat, shade=0.82)
+            # Dentil course under the crown
+            u = start_u + 0.12
+            while u < end_u - 0.2:
+                f.box(u, u + 0.1, self.top - 0.2, self.top - 0.05, 0.1, 0.2, mat, shade=0.75)
+                u += 0.32
         else:
             f.box(start_u, end_u, self.top - 0.25, self.top - 0.05, 0.0, 0.08, "M_Stone")
             f.box(start_u, end_u, self.top + self.crown - 0.12, self.top + self.crown, 0.0, 0.1, "M_Stone")
 
     def sign(self, f, u0, u1, v0, v1, text, board_mat, text_mat, font):
         f.box(u0, u1, v0, v1, 0.0, 0.12, board_mat)
+        trim = "M_Gold_Trim" if text_mat == "M_Sign_Gold" else "M_Frame_Dark"
+        f.box(u0, u1, v1 - 0.05, v1, 0.12, 0.15, trim)
+        f.box(u0, u1, v0, v0 + 0.05, 0.12, 0.15, trim, shade=0.8)
         if text:
             f.text(text, font, (u0 + u1) * 0.5, (v0 + v1) * 0.5, (u1 - u0) * 0.84, (v1 - v0) * 0.62, 0.125, text_mat)
 
@@ -244,8 +303,13 @@ class BuildingGenerator:
                 else:
                     us, ue = u1 - 0.3, u1 - 0.3 - run
                 oa, ob = 0.2, 0.8
-                f.face([(us, z, oa), (ue, zn, oa), (ue, zn, ob), (us, z, ob)], iron, (0, 1, 0))
-                f.face([(us, z, oa), (ue, zn, oa), (ue, zn, ob), (us, z, ob)], iron, (0, -1, 0))
+                steps = int(abs(ue - us) / 0.24)
+                for i in range(steps):
+                    t0 = (i + 0.1) / steps
+                    t1 = (i + 0.7) / steps
+                    ua, ub = us + (ue - us) * t0, us + (ue - us) * t1
+                    va = z + (zn - z) * (i + 1) / steps
+                    f.face([(ua, va, oa), (ub, va, oa), (ub, va, ob), (ua, va, ob)], iron, (0, 1, 0))
                 for o in (oa, ob):
                     f.face([(us, z - 0.18, o), (ue, zn - 0.18, o), (ue, zn, o), (us, z, o)], iron, (0, 0, 1))
                 f.face([(us, z + 0.9, ob), (ue, zn + 0.9, ob), (ue, zn + 0.95, ob), (us, z + 0.95, ob)], iron, (0, 0, 1))
@@ -297,26 +361,47 @@ class BuildingGenerator:
             else:
                 door = (a + 0.15, a + 0.15 + door_w)
                 disp = (door[1] + 0.08, b)
-            # Bulkhead, display glass, transom header
+            variant = g.get("shop_variant", 0)
+            transom = open_h - 0.75
+            # Panelled bulkhead
             f.box(disp[0], disp[1], 0.0, 0.55, -depth, -depth + 0.1, front)
-            f.quad(disp[0], disp[1], 0.55, open_h - 0.4, -depth + 0.02, "M_ShopGlass",
-                   atlas_uv(g.get("shop_variant", 0), SHOP_ATLAS_COLS, SHOP_ATLAS_ROWS))
-            f.quad(a, b, open_h - 0.4, open_h, -depth + 0.02, front)
+            npan = max(1, int((disp[1] - disp[0]) / 1.2))
+            for i in range(npan):
+                pu0 = disp[0] + (disp[1] - disp[0]) * i / npan + 0.1
+                pu1 = disp[0] + (disp[1] - disp[0]) * (i + 1) / npan - 0.1
+                f.box(pu0, pu1, 0.1, 0.45, -depth + 0.1, -depth + 0.13, front, shade=0.82)
+            # Display glass, transom lights and header
+            f.quad(disp[0], disp[1], 0.6, transom, -depth + 0.02, "M_ShopGlass",
+                   atlas_uv(variant, SHOP_ATLAS_COLS, SHOP_ATLAS_ROWS))
+            f.quad(a, b, transom + 0.06, open_h - 0.12, -depth + 0.02, "M_Window",
+                   atlas_uv(0, WINDOW_ATLAS_COLS, WINDOW_ATLAS_ROWS), shade=0.85)
+            f.box(a, b, transom, transom + 0.06, -depth, -depth + 0.08, front)
+            f.box(a, b, open_h - 0.12, open_h, -depth, -depth + 0.1, front, shade=0.7)
+            nt = max(2, int((b - a) / 0.6))
+            for i in range(1, nt):
+                uu = a + (b - a) * i / nt
+                f.box(uu - 0.02, uu + 0.02, transom + 0.06, open_h - 0.12, -depth, -depth + 0.06, front)
             nm = max(1, int((disp[1] - disp[0]) / 1.7))
             for i in range(nm + 1):
                 uu = disp[0] + (disp[1] - disp[0]) * i / nm
-                f.box(uu - 0.045, uu + 0.045, 0.55, open_h - 0.4, -depth, -depth + 0.07, front)
-            f.box(disp[0], disp[1], 0.55, 0.6, -depth, -depth + 0.12, front)
-            # Door with glazed upper panel and flanking posts
-            f.quad(door[0], door[1], 0.0, 2.45, -depth - 0.25, "M_Door")
-            f.quad(door[0] + 0.15, door[1] - 0.15, 1.15, 2.2, -depth - 0.24, "M_ShopGlass",
-                   atlas_uv(3, SHOP_ATLAS_COLS, SHOP_ATLAS_ROWS))
-            f.face([(door[0], 0, -depth), (door[0], 2.45, -depth), (door[0], 2.45, -depth - 0.25),
-                    (door[0], 0, -depth - 0.25)], front, (1, 0, 0))
-            f.face([(door[1], 0, -depth), (door[1], 2.45, -depth), (door[1], 2.45, -depth - 0.25),
-                    (door[1], 0, -depth - 0.25)], front, (-1, 0, 0))
-            f.face([(door[0], 2.45, -depth), (door[1], 2.45, -depth), (door[1], 2.45, -depth - 0.25),
-                    (door[0], 2.45, -depth - 0.25)], front, (0, -1, 0))
+                f.box(uu - 0.045, uu + 0.045, 0.55, transom, -depth, -depth + 0.07, front)
+            f.box(disp[0], disp[1], 0.55, 0.62, -depth, -depth + 0.14, front)
+            # Roll-down security gate housing; closed shops have the gate half down.
+            f.box(a - 0.05, b + 0.05, open_h - 0.02, open_h + 0.28, -0.02, 0.18, "M_Iron", shade=0.85)
+            if variant == 3:
+                f.quad(disp[0], disp[1], transom - 1.1, open_h, -0.02 + 0.1, "M_Shutter")
+            # Recessed entry: tiled floor, glazed side returns, door at the back.
+            rec = depth + 0.75
+            f.quad(door[0], door[1], 0.0, 2.45, -rec, "M_Door", shade=0.75)
+            f.quad(door[0] + 0.15, door[1] - 0.15, 1.15, 2.2, -rec + 0.01, "M_ShopGlass",
+                   atlas_uv(3, SHOP_ATLAS_COLS, SHOP_ATLAS_ROWS), shade=0.8)
+            f.face([(door[0], 0.01, -depth), (door[1], 0.01, -depth), (door[1], 0.01, -rec), (door[0], 0.01, -rec)],
+                   "M_Tile", (0, 1, 0), shade=0.8)
+            for uu, sgn in ((door[0], 1), (door[1], -1)):
+                f.face([(uu, 0, -depth), (uu, 2.45, -depth), (uu, 2.45, -rec), (uu, 0, -rec)], "M_ShopGlass",
+                       (sgn, 0, 0), uvs=atlas_uv(variant, SHOP_ATLAS_COLS, SHOP_ATLAS_ROWS), shade=0.7)
+            f.face([(door[0], 2.45, -depth), (door[1], 2.45, -depth), (door[1], 2.45, -rec), (door[0], 2.45, -rec)],
+                   front, (0, -1, 0), shade=0.5)
             f.quad(door[0], door[1], 2.45, open_h - 0.4, -depth + 0.02, "M_ShopGlass",
                    atlas_uv(g.get("shop_variant", 0), SHOP_ATLAS_COLS, SHOP_ATLAS_ROWS))
             # Sign band and ledge
@@ -394,7 +479,9 @@ class BuildingGenerator:
         cols = self.window_columns(width)
         ops = self.upper_window_openings(f, cols)
         gtype = ground.get("type", "shop")
-        if gtype == "residential":
+        if gtype == "none":
+            gops, dress = [], (lambda: None)
+        elif gtype == "residential":
             gops, dress = self.ground_residential(f, width)
         elif gtype == "garage":
             gops, dress = self.ground_garage(f, ground, width)
@@ -406,6 +493,17 @@ class BuildingGenerator:
         if gtype != "residential":
             pass
         self.cornice_on(f)
+        if self.belt and gtype != "none":
+            f.box(0.0, width, self.gfh + WIN_SILL - 0.18, self.gfh + WIN_SILL - 0.06, -0.02, 0.06, "M_Stone")
+        if self.quoins:
+            v = self.gfh
+            k = 0
+            while v < self.top - 0.8:
+                long = 0.62 if k % 2 == 0 else 0.4
+                for uu in (0.0, width - long):
+                    f.box(uu, uu + long, v, v + 0.38, -0.02, 0.035, "M_Stone")
+                v += 0.42
+                k += 1
         if fire_escape and len(cols) >= 2:
             k = min(len(cols) - 2, self.s.get("fe_col", max(0, len(cols) // 2 - 1)))
             u0 = cols[k] - WIN_W * 0.5 - 0.35
@@ -436,7 +534,8 @@ class BuildingGenerator:
         t = 0.3
         hr = Hb - 0.6
         mb = self.mb
-        mb.add_face([(x0 + t, t, hr), (x1 - t, t, hr), (x1 - t, D - t, hr), (x0 + t, D - t, hr)], "M_Roof",
+        roof_mat = self.s.get("roof", self.rng.choice(["M_Roof_Tar", "M_Roof_Silver", "M_Roof_Silver", "M_Roof_Gravel"]))
+        mb.add_face([(x0 + t, t, hr), (x1 - t, t, hr), (x1 - t, D - t, hr), (x0 + t, D - t, hr)], roof_mat,
                     normal=(0, 0, 1))
         # Parapet inner faces and coping
         inner = [(x0 + t, t), (x1 - t, t), (x1 - t, D - t), (x0 + t, D - t)]
@@ -468,7 +567,55 @@ class BuildingGenerator:
             vx = x0 + 1.0 + rng.random() * (W - 2.0)
             vy = 2.0 + rng.random() * (D - 4.0)
             mb.add_cylinder((vx, vy, hr), 0.18, 0.7, 8, "M_MetalGalv", cap_top=True)
-        if self.s.get("water_tower"):
+        # Plank walkway from the bulkhead and rooftop condensers
+        if rng.random() < 0.5:
+            wx = bx + 0.9
+            mb.add_face([(wx, 0.8, hr + 0.04), (wx + 0.6, 0.8, hr + 0.04), (wx + 0.6, by, hr + 0.04),
+                         (wx, by, hr + 0.04)], "M_Wood", normal=(0, 0, 1))
+        for _ in range(rng.randint(0, 2)):
+            hx = x0 + 0.8 + rng.random() * max(0.1, W - 2.8)
+            hy = 1.2 + rng.random() * (D - 3.0)
+            mb.add_box((hx, hy, hr), (hx + 1.2, hy + 0.9, hr + 0.85), "M_AC_Unit", skip=("nz",))
+            mb.add_cylinder((hx + 0.6, hy + 0.45, hr + 0.85), 0.32, 0.03, 10, "M_Grille")
+        # Mushroom-capped vent stacks
+        for _ in range(rng.randint(1, 2)):
+            vx = x0 + 1.0 + rng.random() * (W - 2.0)
+            vy = 2.0 + rng.random() * (D - 4.0)
+            mb.add_cylinder((vx, vy, hr), 0.08, 1.1, 6, "M_MetalGalv", cap_top=False)
+            mb.add_cylinder((vx, vy, hr + 1.1), 0.22, 0.12, 8, "M_MetalGalv", radius_top=0.05)
+        # Tar patches break up the roof surface
+        for _ in range(rng.randint(1, 3)):
+            px = x0 + 0.6 + rng.random() * (W - 3.0)
+            py = 0.8 + rng.random() * (D - 4.0)
+            pw, pd = 1.0 + rng.random() * 2.0, 1.0 + rng.random() * 2.5
+            mb.add_face([(px, py, hr + 0.01), (px + pw, py, hr + 0.01), (px + pw, py + pd, hr + 0.01),
+                         (px, py + pd, hr + 0.01)], "M_Tarpaper", normal=(0, 0, 1))
+        # Skylight over the stairwell
+        if rng.random() < 0.55:
+            sx = x0 + 1.0 + rng.random() * max(0.1, W - 3.4)
+            sy = D * 0.25
+            mb.add_box((sx, sy, hr), (sx + 1.4, sy + 1.0, hr + 0.35), "M_Frame_Dark", skip=("nz",),
+                       mats={"pz": "M_CarGlass"})
+        # 1970s TV aerials
+        for _ in range(rng.randint(1, 3)):
+            ax = x0 + 0.8 + rng.random() * (W - 1.6)
+            ay = 1.0 + rng.random() * (D - 2.0)
+            mast = 2.2 + rng.random() * 1.6
+            mb.add_cylinder((ax, ay, hr), 0.03, mast, 4, "M_MetalGalv", cap_top=False, smooth=False)
+            for i in range(4):
+                bz = hr + mast - 0.15 - i * 0.28
+                half = 0.7 - i * 0.12
+                mb.add_box((ax - half, ay - 0.015, bz), (ax + half, ay + 0.015, bz + 0.03), "M_MetalGalv")
+        # Rooftop pigeon coop
+        if rng.random() < 0.2 and W >= 9:
+            cx = x0 + 1.0
+            cy = D - 4.5
+            mb.add_box((cx, cy, hr), (cx + 2.6, cy + 1.8, hr + 1.6), "M_Wood", skip=("nz",))
+            mb.add_face([(cx - 0.1, cy - 0.1, hr + 1.6), (cx + 2.7, cy - 0.1, hr + 1.6), (cx + 2.7, cy + 1.9, hr + 1.75),
+                         (cx - 0.1, cy + 1.9, hr + 1.75)], "M_Tarpaper", normal=(0, 0, 1))
+            mb.add_face([(cx + 0.2, cy - 0.01, hr + 0.4), (cx + 2.4, cy - 0.01, hr + 0.4), (cx + 2.4, cy - 0.01, hr + 1.4),
+                         (cx + 0.2, cy - 0.01, hr + 1.4)], "M_TrashWire", normal=(0, -1, 0))
+        if self.s.get("water_tower") and not self.s.get("setback"):
             self.water_tower(x0 + W * (0.3 + rng.random() * 0.4), D * 0.62, hr)
 
     def water_tower(self, cx, cy, z):
@@ -513,7 +660,21 @@ class BuildingGenerator:
             self.plain_wall((W * 0.5, 0.0, 0.0), (0, 1, 0), D, Hb)
         self.back_facade()
         self.roof()
+        if s.get("setback"):
+            self._setback(s["setback"])
         return self.mb
+
+    def _setback(self, sb):
+        """Stack a narrower upper volume (elevator-building silhouette)."""
+        inset = sb.get("inset", 2.5)
+        up = dict(self.s)
+        up.update({"id": self.s["id"] + "_upper", "width": self.W - 2 * inset, "depth": self.D - inset - 2.0,
+                   "floors": sb.get("floors", 2), "ground": {"type": "none"}, "ground_h": 0.3, "corner": None,
+                   "fire_escape": False, "setback": None, "quoins": False, "belt": False,
+                   "z0": self.Hb - 0.6, "seed": self.rng.randint(0, 99999)})
+        upper = BuildingGenerator(up)
+        upper.build()
+        self.mb.merge(upper.mb, (0.0, inset, self.Hb - 0.6))
 
 
 def build_warehouse(spec):

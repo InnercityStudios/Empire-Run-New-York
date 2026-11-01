@@ -22,9 +22,18 @@ func _ready() -> void:
 		set_process(false)
 		return
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Measurements must be like-for-like: never inherit a maximised window.
+	var size := Vector2i(1600, 900)
+	if _args.has("size"):
+		var wh := (_args["size"] as String).split("x")
+		size = Vector2i(int(wh[0]), int(wh[1]))
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(size)
 	await get_tree().create_timer(0.2).timeout
 	_apply_setup()
 	await get_tree().create_timer(float(_args.get("capture-delay", "3"))).timeout
+	if _args.has("benchmark"):
+		await _benchmark(float(_args["benchmark"]))
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	var path: String = _args["capture"]
@@ -39,6 +48,42 @@ func _ready() -> void:
 			RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0])
 	capture_saved.emit(path)
 	get_tree().quit()
+
+
+## Uncapped frame-time sampling (vsync off) for comparable performance numbers.
+func _benchmark(seconds: float) -> void:
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	Engine.max_fps = 0
+	for i in 30:
+		await get_tree().process_frame
+	var vp_rid := get_viewport().get_viewport_rid()
+	RenderingServer.viewport_set_measure_render_time(vp_rid, true)
+	var gpu_total := 0.0
+	var cpu_total := 0.0
+	var times: Array[float] = []
+	var draw_calls := 0
+	var prims := 0
+	var start := Time.get_ticks_usec()
+	var last := start
+	while Time.get_ticks_usec() - start < seconds * 1_000_000.0:
+		await get_tree().process_frame
+		var now := Time.get_ticks_usec()
+		times.append((now - last) / 1000.0)
+		last = now
+		gpu_total += RenderingServer.viewport_get_measured_render_time_gpu(vp_rid)
+		cpu_total += RenderingServer.viewport_get_measured_render_time_cpu(vp_rid)
+		draw_calls = maxi(draw_calls, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME))
+		prims = maxi(prims, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))
+	times.sort()
+	var avg := 0.0
+	for t in times:
+		avg += t
+	avg /= maxf(times.size(), 1)
+	print("DevCapture: GPU avg_gpu_ms=%.2f avg_render_cpu_ms=%.2f" % [gpu_total / maxf(times.size(), 1), cpu_total / maxf(times.size(), 1)])
+	print("DevCapture: BENCH frames=%d avg_ms=%.2f p50_ms=%.2f p95_ms=%.2f p99_ms=%.2f max_draw_calls=%d max_primitives=%d vram_mb=%.1f static_mem_mb=%.1f" % [
+		times.size(), avg, times[times.size() / 2], times[int(times.size() * 0.95)], times[int(times.size() * 0.99)],
+		draw_calls, prims, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0,
+		OS.get_static_memory_usage() / 1048576.0])
 
 
 func _apply_setup() -> void:

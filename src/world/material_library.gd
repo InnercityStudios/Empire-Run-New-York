@@ -21,6 +21,7 @@ var _materials: Dictionary = {}
 var _cutout: Dictionary = {}
 var _instanced: Dictionary = {}
 var _road: ShaderMaterial
+var _grime: Texture2D
 var _fallback: StandardMaterial3D
 
 
@@ -101,6 +102,12 @@ func set_signal_state(ns_state: String, ew_state: String) -> void:
 				m.set_shader_parameter("emission_energy", 3.0 if lit else 0.0)
 
 
+func _grime_texture() -> Texture2D:
+	if _grime == null:
+		_grime = load("res://assets/textures/grime_noise.png")
+	return _grime
+
+
 func _material_for(mat_name: String, variant: String) -> Material:
 	match variant:
 		"cutout":
@@ -135,6 +142,10 @@ func _build(mat_name: String, variant: String) -> Material:
 		m.set_shader_parameter("use_orm", true)
 		m.set_shader_parameter("orm_tex", load(d["orm"]))
 	m.set_shader_parameter("roughness", d.get("roughness", 0.8))
+	m.set_shader_parameter("grime_amount", d.get("grime", 0.0))
+	m.set_shader_parameter("specular_amount", d.get("specular", 0.4))
+	if d.get("grime", 0.0) > 0.0:
+		m.set_shader_parameter("grime_tex", _grime_texture())
 	m.set_shader_parameter("metallic", d.get("metallic", 0.0))
 	if d.has("emission"):
 		m.set_shader_parameter("emission_color", Color.html(d["emission"]))

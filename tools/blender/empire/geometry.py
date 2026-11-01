@@ -61,7 +61,12 @@ class MeshBuilder:
         self.face_uvs = []
         self.face_mats = []
         self.face_smooth = []
+        self.face_shades = []
         self.mat_names = []
+        # Baked ambient occlusion: per-vertex value = face shade x shade_fn(p, n).
+        # Stored as the colour attribute (Godot reads COLOR.r as occlusion).
+        self.shade = 1.0
+        self.shade_fn = None
 
     # -- internals -------------------------------------------------------------
     def _mat_index(self, mat):
@@ -80,8 +85,9 @@ class MeshBuilder:
             u, v = p.x * (-1 if n.y > 0 else 1), p.z
         return ((u + offset[0]) / uv_m, (v + offset[1]) / uv_m)
 
-    def add_face(self, pts, mat, uvs=None, normal=None, smooth=False, uv_offset=(0.0, 0.0)):
-        """Add a polygon. If `normal` is given, winding is fixed to face it."""
+    def add_face(self, pts, mat, uvs=None, normal=None, smooth=False, uv_offset=(0.0, 0.0), shade=None):
+        """Add a polygon. If `normal` is given, winding is fixed to face it.
+        `shade` darkens the face (baked occlusion); defaults to self.shade."""
         pts = [Vector(p) for p in pts]
         if len(pts) < 3:
             return
@@ -108,6 +114,8 @@ class MeshBuilder:
         self.face_uvs.append(list(uvs))
         self.face_mats.append(self._mat_index(mat))
         self.face_smooth.append(smooth)
+        k = self.shade if shade is None else shade
+        self.face_shades.append([k * (self.shade_fn(p, n) if self.shade_fn else 1.0) for p in pts])
 
     def add_box(self, mn, mx, mat, skip=(), matrix=None, mats=None):
         """Axis-aligned box from min to max corner. `skip` drops faces by name
@@ -194,17 +202,35 @@ class MeshBuilder:
             self.add_face(pts, mat)
         ev.to_mesh_clear()
 
+    def merge(self, other, offset=(0.0, 0.0, 0.0)):
+        """Append another builder's faces, translated by `offset`."""
+        off = Vector(offset)
+        base = len(self.verts)
+        self.verts.extend(v + off for v in other.verts)
+        for f, uvs, mi, sm, sh in zip(other.faces, other.face_uvs, other.face_mats, other.face_smooth,
+                                      other.face_shades):
+            self.faces.append(tuple(i + base for i in f))
+            self.face_uvs.append(uvs)
+            self.face_mats.append(self._mat_index(other.mat_names[mi]))
+            self.face_smooth.append(sm)
+            self.face_shades.append(sh)
+
     # -- output ----------------------------------------------------------------
     def build(self, weld=True):
         mesh = bpy.data.meshes.new(self.name)
         mesh.from_pydata([tuple(v) for v in self.verts], [], self.faces)
         mesh.validate(clean_customdata=False)
         uv_layer = mesh.uv_layers.new(name="UVMap")
-        for poly, uvs, mi, sm in zip(mesh.polygons, self.face_uvs, self.face_mats, self.face_smooth):
+        col = mesh.color_attributes.new(name="Col", type="BYTE_COLOR", domain="CORNER")
+        mesh.color_attributes.active_color = col
+        for poly, uvs, mi, sm, sh in zip(mesh.polygons, self.face_uvs, self.face_mats, self.face_smooth,
+                                         self.face_shades):
             poly.material_index = mi
             poly.use_smooth = sm
             for k, li in enumerate(poly.loop_indices):
                 uv_layer.data[li].uv = uvs[k]
+                a = max(0.0, min(1.0, sh[k]))
+                col.data[li].color = (a, a, a, 1.0)
         for name in self.mat_names:
             mesh.materials.append(get_material(name))
         obj = bpy.data.objects.new(self.name, mesh)
@@ -281,6 +307,8 @@ def export_glb(obj, path):
         export_normals=True,
         export_materials="EXPORT",
         export_image_format="NONE",
+        export_vertex_color="ACTIVE",
+        export_all_vertex_colors=False,
         export_cameras=False,
         export_lights=False,
         export_animations=False,

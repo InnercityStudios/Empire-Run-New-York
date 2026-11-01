@@ -366,6 +366,7 @@ func _place_props(block: Dictionary, bi: int, face: String, frame: Dictionary, r
 	if block["faces"][frame["left"]]:
 		var t := _prop_transform(frame, -sidewalk + 1.4, 1.4)
 		props.append({"prop": "traffic_signal", "block": bi, "transform": t})
+	_place_furniture(block, bi, face, frame, is_clear, used)
 	# Kerbside parking, kept clear of landmark frontages and hydrants.
 	var pu := 9.0
 	while pu < length - 9.0:
@@ -379,3 +380,48 @@ func _place_props(block: Dictionary, bi: int, face: String, frame: Dictionary, r
 			var basis := Basis(fwd.cross(Vector3.UP), Vector3.UP, -fwd)
 			parking.append({"transform": Transform3D(basis, Vector3(p.x, 0.0, p.y))})
 		pu += 6.4 + rng.randf() * 1.5
+
+
+## Second-generation street furniture. Uses its own RNG stream so adding
+## furniture never changes the deterministic lot and prop sequence above.
+func _place_furniture(block: Dictionary, bi: int, face: String, frame: Dictionary, is_clear: Callable,
+		used: Array) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([seed_value, block["col"], block["row"], face, "furniture"])
+	var length: float = frame["length"]
+	var avenue_face := face == "east" or face == "west"
+	var free := func(u: float, gap: float) -> bool:
+		return is_clear.call(u) and not used.any(func(x): return absf(x - u) < gap)
+	var put := func(prop: String, u: float, inset: float, rotate := false) -> void:
+		props.append({"prop": prop, "block": bi, "transform": _prop_transform(frame, u, inset, rotate)})
+		used.append(u)
+	# Subway entrance on some avenue corners (stairs run along the kerb).
+	if avenue_face and block["core"] and rng.randf() < 0.3:
+		var u := 9.0 if rng.randf() < 0.5 else length - 9.0
+		if free.call(u, 4.0):
+			put.call("subway_entrance", u, 2.2, true)
+	# Bus stop on wide streets.
+	if _street_width_for(block, face) >= 14.0 and rng.randf() < 0.5:
+		var u := length * (0.3 + rng.randf() * 0.4)
+		if free.call(u, 3.5):
+			put.call("bus_stop", u, 1.2)
+	if rng.randf() < 0.35:
+		var u := 4.5 if rng.randf() < 0.5 else length - 4.5
+		if free.call(u, 1.5):
+			put.call("phone_booth", u, 0.7)
+	if block["core"] and rng.randf() < 0.18:
+		var u := 6.0 + rng.randf() * (length - 12.0)
+		if free.call(u, 3.5):
+			put.call("newsstand", u, 1.6)
+	# Garbage piled at the building line (the 1970s sanitation crisis).
+	var piles := rng.randi_range(0, 2)
+	for i in piles:
+		var u := 3.0 + rng.randf() * (length - 6.0)
+		if free.call(u, 1.5):
+			props.append({"prop": "trash_pile", "block": bi, "transform": _prop_transform(frame, u, sidewalk - 0.6)})
+	# Parking meters along the kerb.
+	var mu := 6.0
+	while mu < length - 6.0:
+		if free.call(mu, 1.0) and rng.randf() < 0.7:
+			props.append({"prop": "parking_meter", "block": bi, "transform": _prop_transform(frame, mu, 0.45)})
+		mu += 6.5

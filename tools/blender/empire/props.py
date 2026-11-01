@@ -89,21 +89,37 @@ def build_newspaper_box():
 
 
 def build_tree(seed=3, name="tree"):
+    """Street tree (London plane): branching trunk and a canopy of many small
+    leaf clusters, shaded darker toward the inside and underside."""
     rng = random.Random(seed)
     mb = MeshBuilder(name)
-    mb.add_cylinder((0, 0, 0), 0.16, 2.6, 7, "M_Bark", radius_top=0.11, cap_top=False)
-    for i in range(3):
-        a = i * 2.1 + rng.random()
-        d = Vector((math.cos(a) * 0.6, math.sin(a) * 0.6, 1.0)).normalized()
+    mb.add_cylinder((0, 0, 0), 0.15, 3.0, 7, "M_Bark", radius_top=0.1, cap_top=False)
+    centre = Vector((0, 0, 5.2))
+    for i in range(4):
+        a = i * 1.57 + rng.random() * 0.6
+        d = Vector((math.cos(a) * 0.7, math.sin(a) * 0.7, 1.0)).normalized()
         rot = d.to_track_quat("Z", "Y").to_matrix().to_4x4()
-        mb.add_cylinder((0, 0, 0), 0.07, 1.6, 6, "M_Bark", radius_top=0.035, cap_top=False,
-                        matrix=Matrix.Translation((0, 0, 2.4)) @ rot)
-    # Canopy: displaced low-poly blobs
-    for i in range(5):
-        a = i * 1.3 + rng.random()
-        c = Vector((math.cos(a) * 1.0, math.sin(a) * 1.0, 4.1 + rng.random() * 0.9)) if i else Vector((0, 0, 4.9))
-        r = 1.5 + rng.random() * 0.5
-        _blob(mb, c, r, rng)
+        mb.add_cylinder((0, 0, 0), 0.06, 2.2, 5, "M_Bark", radius_top=0.025, cap_top=False,
+                        matrix=Matrix.Translation((0, 0, 2.8)) @ rot)
+    canopy_r = 2.3 + rng.random() * 0.4
+
+    def leaf_shade(p, n):
+        rel = p - centre
+        up = max(0.0, min(1.0, (rel.z + canopy_r) / (2 * canopy_r)))
+        outward = max(0.0, n.dot(rel.normalized())) if rel.length > 0.01 else 0.5
+        return 0.45 + 0.35 * up + 0.2 * outward
+
+    mb.shade_fn = leaf_shade
+    golden = math.pi * (3 - math.sqrt(5))
+    count = 13
+    for i in range(count):
+        y = 1 - (i + 0.5) / count * 1.6
+        rad = math.sqrt(max(0.0, 1 - y * y))
+        th = golden * i + rng.random() * 0.4
+        c = centre + Vector((math.cos(th) * rad, math.sin(th) * rad, y * 0.75)) * canopy_r * 0.72
+        _blob(mb, c, 0.95 + rng.random() * 0.45, rng, levels=1)
+    _blob(mb, centre, canopy_r * 0.7, rng, levels=1)
+    mb.shade_fn = None
     # Tree pit guard
     for (x0, y0, x1, y1) in ((-0.75, -0.75, 0.75, -0.7), (-0.75, 0.7, 0.75, 0.75), (-0.75, -0.75, -0.7, 0.75),
                              (0.7, -0.75, 0.75, 0.75)):
@@ -111,11 +127,11 @@ def build_tree(seed=3, name="tree"):
     return mb
 
 
-def _blob(mb, c, r, rng):
+def _blob(mb, c, r, rng, levels=2, mat="M_Foliage"):
     """Icosphere-like blob (subdivided octahedron) with noise displacement."""
     verts = [Vector(v) for v in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))]
     faces = [(0, 2, 4), (2, 1, 4), (1, 3, 4), (3, 0, 4), (2, 0, 5), (1, 2, 5), (3, 1, 5), (0, 3, 5)]
-    for _ in range(2):
+    for _ in range(levels):
         cache = {}
         new_faces = []
 
@@ -134,4 +150,87 @@ def _blob(mb, c, r, rng):
     for f in faces:
         p = [pts[i] for i in f]
         n = sum(((pts[i] - c) for i in f), Vector())
-        mb.add_face(p, "M_Foliage", normal=n, smooth=True)
+        mb.add_face(p, mat, normal=n, smooth=True)
+
+
+def build_subway_entrance():
+    """IRT-style stair entrance: iron railing enclosure, lamp globes, sign."""
+    mb = MeshBuilder("subway_entrance")
+    L, Wd = 4.6, 1.9
+    mb.add_face([(-Wd / 2, -L / 2, 0.02), (Wd / 2, -L / 2, 0.02), (Wd / 2, L / 2 - 0.4, 0.02),
+                 (-Wd / 2, L / 2 - 0.4, 0.02)], "M_Tarpaper", normal=(0, 0, 1), shade=0.25)
+    for x in (-Wd / 2, Wd / 2):
+        mb.add_box((x - 0.04, -L / 2, 0), (x + 0.04, L / 2, 0.1), "M_PoleGreen")
+        mb.add_box((x - 0.04, -L / 2, 1.0), (x + 0.04, L / 2, 1.06), "M_PoleGreen")
+        n = 14
+        for i in range(n + 1):
+            y = -L / 2 + L * i / n
+            mb.add_face([(x, y - 0.015, 0.1), (x, y + 0.015, 0.1), (x, y + 0.015, 1.0), (x, y - 0.015, 1.0)],
+                        "M_PoleGreen", normal=(1 if x > 0 else -1, 0, 0))
+    mb.add_box((-Wd / 2, L / 2 - 0.05, 0), (Wd / 2, L / 2 + 0.03, 1.06), "M_PoleGreen")
+    for x in (-Wd / 2, Wd / 2):
+        mb.add_cylinder((x, -L / 2, 0), 0.06, 2.4, 6, "M_PoleGreen", cap_top=False)
+        mb.add_cylinder((x, -L / 2, 2.4), 0.2, 0.32, 8, "M_SubwayGlobe", radius_top=0.12)
+    mb.add_box((-0.55, -L / 2 - 0.03, 1.15), (0.55, -L / 2 + 0.01, 1.5), "M_Sign_Black")
+    return mb
+
+
+def build_bus_stop():
+    mb = MeshBuilder("bus_stop")
+    for x in (-1.6, 1.6):
+        mb.add_box((x - 0.04, 0.6, 0), (x + 0.04, 0.68, 2.4), "M_MetalGalv")
+    mb.add_box((-1.7, -0.3, 2.4), (1.7, 0.75, 2.5), "M_MetalGalv")
+    mb.add_face([(-1.6, 0.66, 0.3), (1.6, 0.66, 0.3), (1.6, 0.66, 2.3), (-1.6, 0.66, 2.3)], "M_CarGlass",
+                normal=(0, -1, 0))
+    mb.add_box((-1.2, 0.35, 0.45), (1.2, 0.62, 0.5), "M_Wood")
+    mb.add_cylinder((2.2, 0.0, 0), 0.04, 2.8, 6, "M_MetalGalv", cap_top=False)
+    mb.add_box((2.0, -0.03, 2.3), (2.4, 0.03, 2.75), "M_MailBlue")
+    return mb
+
+
+def build_phone_booth():
+    mb = MeshBuilder("phone_booth")
+    mb.add_box((-0.06, -0.06, 0), (0.06, 0.06, 1.2), "M_MetalGalv")
+    mb.add_box((-0.38, -0.32, 1.2), (0.38, 0.12, 2.15), "M_MetalGalv", mats={"ny": "M_Grille"})
+    mb.add_box((-0.42, -0.36, 2.15), (0.42, 0.16, 2.3), "M_MailBlue")
+    mb.add_box((-0.18, -0.33, 1.45), (0.18, -0.3, 1.9), "M_Iron")
+    return mb
+
+
+def build_newsstand():
+    mb = MeshBuilder("newsstand")
+    mb.add_box((-1.4, -0.9, 0), (1.4, 0.9, 2.3), "M_Shopfront_Green", skip=("nz",))
+    mb.add_face([(-1.6, -1.4, 2.4), (1.6, -1.4, 2.4), (1.6, 1.0, 2.55), (-1.6, 1.0, 2.55)], "M_Shopfront_Green",
+                normal=(0, 0, 1))
+    mb.add_face([(-1.3, -0.91, 0.9), (1.3, -0.91, 0.9), (1.3, -0.91, 2.0), (-1.3, -0.91, 2.0)], "M_ShopGlass",
+                normal=(0, -1, 0), uvs=[(0.02, 0.02), (0.48, 0.02), (0.48, 0.48), (0.02, 0.48)])
+    cols = ["M_PaperBox", "M_Sign_White", "M_MailBlue", "M_Neon_Gold", "M_Sign_White", "M_PaperBox"]
+    for i, c in enumerate(cols):
+        x = -1.25 + i * 0.42
+        mb.add_box((x, -1.15, 0.7), (x + 0.36, -0.92, 0.85), c)
+    return mb
+
+
+def build_trash_pile(seed=5):
+    """1970s kerbside garbage: black bags and a dented can."""
+    rng = random.Random(seed)
+    mb = MeshBuilder("trash_pile")
+    for i in range(6):
+        c = Vector((rng.uniform(-0.8, 0.8), rng.uniform(-0.35, 0.35), 0.3))
+        _blob_bag(mb, c, 0.32 + rng.random() * 0.12, rng)
+    mb.add_cylinder((0.9, 0.2, 0), 0.27, 0.75, 10, "M_MetalGalv", cap_top=True)
+    return mb
+
+
+def _blob_bag(mb, c, r, rng):
+    mb.shade_fn = lambda p, n: 0.55 + 0.45 * max(0.0, min(1.0, (p.z - c.z + r) / (2 * r)))
+    _blob(mb, c, r, rng, levels=1, mat="M_TrashBag")
+    mb.shade_fn = None
+
+
+def build_parking_meter():
+    mb = MeshBuilder("parking_meter")
+    mb.add_cylinder((0, 0, 0), 0.04, 1.1, 6, "M_MetalGalv", cap_top=False)
+    mb.add_box((-0.1, -0.08, 1.1), (0.1, 0.08, 1.42), "M_MetalGalv")
+    mb.add_box((-0.07, -0.085, 1.22), (0.07, -0.08, 1.36), "M_CarGlass")
+    return mb

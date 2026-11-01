@@ -60,6 +60,18 @@ BUILDINGS = [
      "ground": shop("TAILOR", "M_Shopfront_Black", awning=2, variant=3, res_door=False)},
     {"id": "tenement_l", "kind": "midblock", "width": 9.0, "floors": 3, "brick": "M_Brick_Painted", "cornice": "simple",
      "frame": "M_Frame_Dark", "ground": {"type": "residential"}},
+    # --- Taller elevator apartments and low commercial strips (new silhouettes) -----
+    {"id": "apartment_tall_a", "kind": "midblock_tall", "width": 16.0, "floors": 8, "brick": "M_Brick_Tan",
+     "cornice_mat": "M_Cornice_Cream", "fire_escape": True, "water_tower": True, "lintel": "hood", "quoins": True,
+     "setback": {"floors": 2, "inset": 2.5},
+     "ground": shop("GRAND LUNCHEONETTE", "M_Shopfront_Cream", "M_Shopfront_Red", awning=1, variant=1)},
+    {"id": "apartment_tall_b", "kind": "midblock_tall", "width": 14.0, "floors": 9, "brick": "M_Brick_Brown",
+     "cornice_mat": "M_Cornice_Dark", "fire_escape": True, "lintel": "keystone",
+     "setback": {"floors": 1, "inset": 2.0},
+     "ground": shop("MERCATO", "M_Shopfront_Green", awning=0, variant=0, res_side="right")},
+    {"id": "taxpayer_a", "kind": "midblock_low", "width": 15.0, "floors": 0, "brick": "M_Brick_Painted",
+     "cornice": "simple", "frame": "M_Frame_Dark", "ground_h": 4.6,
+     "ground": shop("DISCOUNT RECORDS & RADIO", "M_Shopfront_Black", "M_Neon_Red", awning=2, variant=2)},
     # --- Corner buildings (side facade wraps the street corner) ---------------------
     {"id": "corner_left_a", "kind": "corner_left", "width": 12.0, "floors": 5, "brick": "M_Brick_Red",
      "cornice_mat": "M_Cornice_Dark", "fire_escape": True,

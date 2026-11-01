@@ -26,6 +26,12 @@ ASSETS = [
     ("props/newspaper_box", props.build_newspaper_box),
     ("props/tree_a", lambda: props.build_tree(3, "tree_a")),
     ("props/tree_b", lambda: props.build_tree(11, "tree_b")),
+    ("props/subway_entrance", props.build_subway_entrance),
+    ("props/bus_stop", props.build_bus_stop),
+    ("props/phone_booth", props.build_phone_booth),
+    ("props/newsstand", props.build_newsstand),
+    ("props/trash_pile", props.build_trash_pile),
+    ("props/parking_meter", props.build_parking_meter),
 ]
 
 t0 = time.time()

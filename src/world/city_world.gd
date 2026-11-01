@@ -12,6 +12,9 @@ var layout: DistrictLayout
 var landmarks: Dictionary = {}  ## landmark id -> LandmarkView
 var chunks: Array = []          ## {instance: MeshInstance3D, names: PackedStringArray, aabb: AABB}
 var stats := {"buildings": 0, "props": 0, "parked": 0, "chunks": 0, "build_ms": 0}
+## Chunk LODs were measured to cost VRAM without reducing nearby detail
+## (Godot picks LOD from the whole chunk's bounds); off by default.
+@export var generate_lods := false
 
 
 func build(p_layout: DistrictLayout) -> void:
@@ -26,8 +29,8 @@ func build(p_layout: DistrictLayout) -> void:
 	_build_landmarks()
 	_build_parked_cars()
 	stats["build_ms"] = Time.get_ticks_msec() - t0
-	print("CityWorld: %d buildings, %d props, %d parked cars in %d chunks (%d ms)" % [
-		stats["buildings"], stats["props"], stats["parked"], stats["chunks"], stats["build_ms"]])
+	print("CityWorld: %d buildings, %d props, %d parked cars in %d chunks (%d ms, of which LOD/compress %d ms)" % [
+		stats["buildings"], stats["props"], stats["parked"], stats["chunks"], stats["build_ms"], stats.get("lod_ms", 0)])
 	built.emit()
 
 
@@ -54,18 +57,17 @@ func _build_chunks() -> void:
 		for p in props_by_block.get(bi, []):
 			_append_mesh(merged, AssetLibrary.prop_mesh(p["prop"]), p["transform"])
 			stats["props"] += 1
-		var mesh := ArrayMesh.new()
-		var names := PackedStringArray()
+		var surfaces: Array = []
 		for mat_name in merged:
-			(merged[mat_name] as SurfaceTool).commit(mesh)
-			names.append(mat_name)
+			surfaces.append([mat_name, merged[mat_name]])
 		for mat_name in tools:
 			var st: SurfaceTool = tools[mat_name]
 			st.generate_tangents()
-			st.commit(mesh)
-			names.append(mat_name)
-		for i in names.size():
-			mesh.surface_set_material(i, Materials.get_material(names[i]))
+			surfaces.append([mat_name, st])
+		var t_lod := Time.get_ticks_usec()
+		var mesh := ChunkMesh.build(surfaces, generate_lods)
+		stats["lod_ms"] = stats.get("lod_ms", 0) + (Time.get_ticks_usec() - t_lod) / 1000
+		var names := ChunkMesh.surface_names(mesh)
 		var mi := MeshInstance3D.new()
 		mi.name = "Block_%d_%d" % [block["col"], block["row"]]
 		mi.mesh = mesh

@@ -70,6 +70,34 @@ void fragment() {
 			}
 		}
 	}
+	float rough_mod = 0.0;
+	if (len > 0.0) {
+		float alat = abs(lat);
+		// Gutter grime and debris along the kerbs.
+		float gutter = 1.0 - smoothstep(0.0, 0.9, hw - alat);
+		base *= mix(1.0, 0.62, gutter);
+		// Polished tyre tracks in each travel lane.
+		float lane_c = mod(alat, 3.7);
+		float tracks = band(abs(lane_c - 1.85), 0.45, 1.1, 0.25) * step(alat, hw - 2.2);
+		base *= mix(1.0, 0.86, tracks * 0.8);
+		rough_mod -= tracks * 0.12;
+		// Oil drip line down the middle of each lane.
+		base *= mix(1.0, 0.8, band(abs(lane_c - 1.85), 0.0, 0.18, 0.12) * step(alat, hw - 2.2) * 0.7);
+		// Utility trench patches running along the street.
+		float patch_line = band(lat, -hw * 0.35, -hw * 0.35 + 0.9, 0.05) * step(0.5, fract(along / 37.0 + 0.2));
+		base *= mix(1.0, 0.82, patch_line);
+		// Manhole covers every ~24 m, alternating sides.
+		float cell = floor(along / 24.0);
+		float mz = cell * 24.0 + 12.0;
+		float mx = (mod(cell, 2.0) < 1.0 ? -1.0 : 1.0) * hw * 0.42;
+		float d = length(vec2(lat - mx, along - mz));
+		float cover = 1.0 - smoothstep(0.34, 0.37, d);
+		float rim = band(d, 0.33, 0.38, 0.015);
+		float grid = step(0.5, fract((lat + along) * 6.0)) * 0.15;
+		base = mix(base, vec3(0.13, 0.125, 0.12) * (0.9 + grid), cover * step(crosswalk_end + 2.0, min(along, len - along)));
+		base = mix(base, vec3(0.32, 0.31, 0.29), rim * 0.6 * step(crosswalk_end + 2.0, min(along, len - along)));
+		rough_mod -= cover * 0.35;
+	}
 	// Worn paint: break up markings with the asphalt texture.
 	float wear = smoothstep(0.25, 0.6, texture(asphalt_tex, wuv * 3.7).r * 1.6 + macro * 0.4);
 	white *= mix(0.45, 0.95, wear);
@@ -77,7 +105,7 @@ void fragment() {
 	vec3 col = mix(base, paint_white.rgb, white);
 	col = mix(col, paint_yellow.rgb, yellow);
 	ALBEDO = col;
-	ROUGHNESS = mix(0.9, 0.7, max(white, yellow));
+	ROUGHNESS = clamp(mix(0.9, 0.7, max(white, yellow)) + rough_mod, 0.2, 1.0);
 	SPECULAR = 0.35;
 	NORMAL_MAP = texture(asphalt_normal, wuv).rgb;
 	NORMAL_MAP_DEPTH = 0.6;

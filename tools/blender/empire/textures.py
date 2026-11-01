@@ -189,16 +189,27 @@ def wood(size, seed):
 
 
 def foliage(size, seed):
+    """Leaf canopy: overlapping leaf clusters with sunlit tips and dark gaps."""
     rng = _rng(seed)
-    n1 = fbm(size, size, 16, 4, rng)
-    n2 = fbm(size, size, 48, 2, rng)
-    dark = rgb("#2c3f1c")
-    light = rgb("#7d9a3f")
-    t = smoothstep(0.3, 0.75, n1 * 0.6 + n2 * 0.4)
-    alb = lerp(dark[None, None, :], light[None, None, :], t[..., None])
-    spots = rng.random((size, size)) > 0.97
-    alb = np.where(spots[..., None], alb * 1.25, alb)
-    return alb
+    yy, xx = np.mgrid[0:size, 0:size].astype(float)
+    alb = np.ones((size, size, 3)) * rgb("#1f2d14")[None, None, :]
+    palette = [rgb(c) for c in ("#3f5a22", "#56722c", "#6c8a35", "#4a6826", "#7f9c42")]
+    for _ in range(2600):
+        cx, cy = rng.random(2) * size
+        r = 3 + rng.random() * 7
+        col = palette[rng.integers(0, len(palette))] * (0.85 + rng.random() * 0.3)
+        x0, x1 = int(cx - r), int(cx + r) + 1
+        y0, y1 = int(cy - r), int(cy + r) + 1
+        ys = np.arange(y0, y1) % size
+        xs = np.arange(x0, x1) % size
+        dy = (np.arange(y0, y1) - cy)[:, None]
+        dx = (np.arange(x0, x1) - cx)[None, :]
+        # Leaf: ellipse lit from the top-left
+        m = (dx * dx / (r * r) + dy * dy / (r * r * 0.45)) < 1.0
+        shade = (1.15 - (dx + dy) / (3 * r))[..., None]
+        patch = alb[np.ix_(ys, xs)]
+        alb[np.ix_(ys, xs)] = np.where(m[..., None], col[None, None, :] * shade, patch)
+    return np.clip(alb, 0, 1)
 
 
 # ---------------------------------------------------------------------------
@@ -374,7 +385,59 @@ def build_all(out_dir):
     write_png(p("corrugated_normal.png"), n)
     write_png(p("wood_albedo.png"), wood(256, 81))
     write_png(p("foliage_albedo.png"), foliage(512, 91))
+    write_png(p("grime_noise.png"), grime(512, 101))
+    for i, kind in enumerate(("tar", "silver", "gravel")):
+        a, n = roof_variant(512, 110 + i, kind)
+        write_png(p("roof_%s_albedo.png" % kind), a)
+        write_png(p("roof_%s_normal.png" % kind), n)
     palette_textures(out_dir)
+
+
+def roof_variant(size, seed, kind):
+    """Roof membranes (4 m tile): 'tar' dark rolled asphalt, 'silver'
+    aluminium-coated (1970s 'tar beach'), 'gravel' ballasted. Returns albedo
+    and a normal map with seams, blisters and ponding."""
+    rng = _rng(seed)
+    yy = np.arange(size)[:, None] / size * 4.0
+    seam = (np.abs(yy - np.round(yy)) < 0.01).astype(float) * np.ones((1, size))
+    big = fbm(size, size, 3, 5, rng)
+    mid = fbm(size, size, 16, 4, rng)
+    fine = rng.random((size, size))
+    pond = smoothstep(0.6, 0.78, fbm(size, size, 2, 4, rng))
+    if kind == "silver":
+        base = rgb("#908f88")
+        alb = base[None, None, :] * (0.8 + big[..., None] * 0.28) * (0.93 + mid[..., None] * 0.12)
+        alb = lerp(alb, rgb("#6a6359")[None, None, :], (pond * 0.6)[..., None])
+        flake = smoothstep(0.7, 0.86, fbm(size, size, 6, 4, rng))
+        alb = lerp(alb, rgb("#4a4741")[None, None, :], (flake * 0.35)[..., None])
+        height = mid * 0.4 + seam * 0.6 + flake * -0.3
+    elif kind == "gravel":
+        base = rgb("#8f8a80")
+        grit = (fine > 0.5).astype(float) * 0.12 + (fine > 0.92) * 0.25 - (fine < 0.08) * 0.25
+        alb = base[None, None, :] * (0.8 + big[..., None] * 0.25 + grit[..., None])
+        alb = lerp(alb, rgb("#55524b")[None, None, :], (pond * 0.45)[..., None])
+        height = fine * 0.7 + mid * 0.3
+        seam = seam * 0.0
+    else:
+        base = rgb("#3e3c39")
+        alb = base[None, None, :] * (0.72 + big[..., None] * 0.45) * (0.9 + mid[..., None] * 0.2)
+        alb = np.where((fine > 0.94)[..., None], alb * 1.45, alb)
+        alb = lerp(alb, rgb("#77705f")[None, None, :], (pond * 0.35)[..., None])
+        blister = smoothstep(0.7, 0.8, fbm(size, size, 24, 2, rng))
+        height = mid * 0.5 + blister * 0.5 + seam * 0.8
+    alb = np.where((seam > 0.5)[..., None], alb * 0.7, alb)
+    return alb, height_to_normal(height, 3.0)
+
+
+def grime(size, seed):
+    """World-space weathering mask (tileable): R blotches, G vertical rain
+    streaks, B fine speckle. Sampled by the world shader at several scales."""
+    rng = _rng(seed)
+    blot = smoothstep(0.35, 0.75, fbm(size, size, 4, 5, rng))
+    streak = value_noise(size, size, 6, 48, rng) * 0.6 + value_noise(size, size, 12, 96, rng) * 0.4
+    streak = smoothstep(0.45, 0.85, streak)
+    speck = fbm(size, size, 64, 3, rng)
+    return np.dstack([blot, streak, speck])
 
 
 def palette_textures(out_dir):

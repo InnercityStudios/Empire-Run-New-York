@@ -17,6 +17,12 @@ uniform vec3 emission_color : source_color = vec3(0.0);
 uniform float emission_energy = 0.0;
 uniform float night_emission = 0.0;
 uniform vec3 highlight_color : source_color = vec3(0.89, 0.72, 0.36);
+// Weathering: world-space grime (R blotches, G rain streaks, B speckle) scaled
+// per material, plus baked vertex occlusion in COLOR.r from the asset pipeline.
+uniform sampler2D grime_tex : hint_default_black, filter_linear_mipmap, repeat_enable;
+uniform float grime_amount = 0.0;
+uniform float ao_strength = 1.0;
+uniform float specular_amount = 0.4;
 
 instance uniform float highlight = 0.0;
 #ifndef TINT_FROM_CUSTOM
@@ -30,10 +36,14 @@ global uniform vec4 occl_target_1;
 #endif
 
 varying vec3 v_world;
+varying vec3 v_world_normal;
 varying vec4 v_tint;
+varying float v_ao;
 
 void vertex() {
 	v_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	v_world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
+	v_ao = mix(1.0, COLOR.r, ao_strength);
 #ifdef TINT_FROM_CUSTOM
 	v_tint = INSTANCE_CUSTOM;
 #else
@@ -91,10 +101,28 @@ void fragment() {
 		r = orm.g;
 		m = orm.b;
 	}
-	ALBEDO = a.rgb * mix(vec3(1.0), v_tint.rgb, tint_mask);
+	vec3 albedo = a.rgb * mix(vec3(1.0), v_tint.rgb, tint_mask);
+	if (grime_amount > 0.0) {
+		vec3 n = normalize(v_world_normal);
+		float wall = 1.0 - abs(n.y);
+		vec2 puv = abs(n.y) > 0.6 ? v_world.xz : (abs(n.x) > abs(n.z) ? v_world.zy : v_world.xy);
+		float blot = texture(grime_tex, puv * 0.043).r;
+		float streak = texture(grime_tex, vec2(puv.x * 0.31, puv.y * 0.022)).g * wall;
+		float speck = texture(grime_tex, puv * 0.57).b;
+		float tone = texture(grime_tex, puv * 0.0105 + vec2(0.31, 0.77)).r;
+		float ground = (1.0 - smoothstep(0.15, 2.2, v_world.y)) * wall;
+		float g = clamp(grime_amount * (blot * 0.32 + streak * 0.3 + ground * 0.4), 0.0, 1.0);
+		// Large-scale tone shifts make neighbouring buildings read differently.
+		albedo *= mix(0.9, 1.08, tone) * mix(0.93, 1.05, speck);
+		albedo = mix(albedo, albedo * vec3(0.55, 0.52, 0.48), g);
+		r = clamp(r + g * 0.12 - streak * 0.08 + (speck - 0.5) * 0.1, 0.04, 1.0);
+	}
+	ALBEDO = albedo * v_ao;
+	AO = v_ao;
+	AO_LIGHT_AFFECT = 0.35;
 	ROUGHNESS = r;
 	METALLIC = m;
-	SPECULAR = 0.4;
+	SPECULAR = specular_amount;
 	if (use_normal_map) {
 		NORMAL_MAP = texture(normal_tex, UV).rgb;
 		NORMAL_MAP_DEPTH = normal_scale;
