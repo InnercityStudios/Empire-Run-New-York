@@ -87,6 +87,7 @@ func _run(world: WorldLayout, def: Dictionary, content: GameContent) -> void:
 	for g in _district_groups(bounds):
 		_district_grid(g["members"], g["area"])
 	stats["grids_ms"] = Time.get_ticks_msec() - t0
+	_seat_towers()
 	_stitch()
 	_emit_graph()
 	_connect_islands()
@@ -121,6 +122,9 @@ static func _rect_poly(r: Rect2) -> PackedVector2Array:
 
 
 # --- Landmark silhouettes ------------------------------------------------------------------
+## Landmarks wider than this replace blocks (stations, stadiums); smaller ones
+## take a parcel inside the block they stand in.
+const BIG_LANDMARK := 60.0
 const TOWERS := {
 	"empire_state": [Vector2(46, 46), 205.0, "#8f8a80"], "chrysler": [Vector2(36, 36), 175.0, "#9a968c"],
 	"world_trade_center": [Vector2(44, 44), 235.0, "#8a8d90"], "grand_central": [Vector2(90, 55), 32.0, "#9a8a70"],
@@ -146,9 +150,10 @@ func _landmark_towers(def: Dictionary) -> void:
 			size = Vector2(float(dm["width"]), float(dm["depth"]))
 			w.towers.append({"pos": pos, "size": size, "height": float(dm["height"]), "color": Color(spec[2]), "yaw": yaw,
 				"id": lm["id"], "name": lm["name"], "model": model})
-			var mxf := Transform2D(yaw, pos)
-			var mh: Vector2 = size * 0.5 + Vector2(4, 4)
-			_tower_polys.append(mxf * PackedVector2Array([-mh, Vector2(mh.x, -mh.y), mh, Vector2(-mh.x, mh.y)]))
+			if maxf(size.x, size.y) > BIG_LANDMARK:
+				var mxf := Transform2D(yaw, pos)
+				var mh: Vector2 = size * 0.5 + Vector2(4, 4)
+				_tower_polys.append(mxf * PackedVector2Array([-mh, Vector2(mh.x, -mh.y), mh, Vector2(-mh.x, mh.y)]))
 			w.labels.append({"text": lm["name"], "pos": pos, "kind": "landmark"})
 			continue
 		var parts: Array = [[pos, size, float(spec[1])]]
@@ -158,10 +163,49 @@ func _landmark_towers(def: Dictionary) -> void:
 		for part in parts:
 			w.towers.append({"pos": part[0], "size": part[1], "height": part[2], "color": Color(spec[2]), "yaw": yaw,
 				"id": lm["id"], "name": lm["name"]})
-			var xf := Transform2D(yaw, part[0])
-			var half: Vector2 = (part[1] as Vector2) * 0.5 + Vector2(10, 10)
-			_tower_polys.append(xf * PackedVector2Array([-half, Vector2(half.x, -half.y), half, Vector2(-half.x, half.y)]))
+			if maxf(part[1].x, part[1].y) > BIG_LANDMARK:
+				var xf := Transform2D(yaw, part[0])
+				var half: Vector2 = (part[1] as Vector2) * 0.5 + Vector2(4, 4)
+				_tower_polys.append(xf * PackedVector2Array([-half, Vector2(half.x, -half.y), half, Vector2(-half.x, half.y)]))
 		w.labels.append({"text": lm["name"], "pos": pos, "kind": "landmark"})
+
+
+## Puts each landmark tower on a parcel: inside the block it stands in (or the
+## nearest block within 150 m), turned to that block's grid; the block's own
+## buildings leave its footprint free.
+func _seat_towers() -> void:
+	for t in w.towers:
+		var size: Vector2 = t["size"]
+		if maxf(size.x, size.y) > BIG_LANDMARK:
+			continue
+		var pos: Vector2 = t["pos"]
+		var best := -1
+		var best_d := 150.0
+		for bi in w.blocks.size():
+			var b: Dictionary = w.blocks[bi]
+			if not b.get("gen", false):
+				continue
+			var inner: Rect2 = (b["rect"] as Rect2).grow(-w.sidewalk)
+			if inner.size.x < size.x + 2.0 or inner.size.y < size.y + 2.0:
+				continue
+			var local: Vector2 = (b["xform"] as Transform2D).affine_inverse() * pos
+			var clamped := local.clamp(inner.position + size * 0.5, inner.end - size * 0.5)
+			var d := local.distance_to(clamped)
+			if d < best_d:
+				best_d = d
+				best = bi
+		if best < 0:
+			continue
+		var blk: Dictionary = w.blocks[best]
+		var xf: Transform2D = blk["xform"]
+		var inner: Rect2 = (blk["rect"] as Rect2).grow(-w.sidewalk)
+		var local: Vector2 = (xf.affine_inverse() * pos).clamp(inner.position + size * 0.5, inner.end - size * 0.5)
+		t["pos"] = xf * local
+		t["yaw"] = xf.get_rotation()
+		var half := size * 0.5 + Vector2(3, 3)
+		var ex: Array = blk.get("exclude", [])
+		ex.append(xf * PackedVector2Array([local - half, local + Vector2(half.x, -half.y), local + half, local + Vector2(-half.x, half.y)]))
+		blk["exclude"] = ex
 
 
 # --- Polyline roads ------------------------------------------------------------------------
@@ -349,7 +393,7 @@ func _district_groups(bounds: Dictionary) -> Array:
 		if not bounds.has(di) or not d.has("grid") or d.has("polygon") or d["style"] in ["park", "airport"]:
 			continue
 		var g: Dictionary = d["grid"]
-		var key := "%s|%s|%s|%s" % [d["borough"], g["angle"], g["pitch"], g.get("irregular", false)]
+		var key := "%s|%s|%s|%s|%s" % [d["borough"], g["angle"], g["pitch"], g.get("irregular", false), g.get("anchor", "")]
 		if not groups.has(key):
 			groups[key] = {"members": [], "area": bounds[di]}
 			order.append(key)
@@ -358,10 +402,15 @@ func _district_groups(bounds: Dictionary) -> Array:
 	var out: Array = []
 	for k in order:
 		out.append(groups[k])
+	# Larger grids claim land first; smaller ones build up to them.
+	out.sort_custom(func(a, b): return a["members"].size() > b["members"].size() \
+		or (a["members"].size() == b["members"].size() and a["members"][0] < b["members"][0]))
 	return out
 
 
 func _district_grid(members: Array, area: Rect2) -> void:
+	var first_block := w.blocks.size()
+	var group_lines_from := _lines.size()
 	var lead: Dictionary = geo.districts[members[0]]
 	var in_group := {}
 	for di in members:
@@ -369,6 +418,8 @@ func _district_grid(members: Array, area: Rect2) -> void:
 	var grid: Dictionary = lead["grid"]
 	var angle := deg_to_rad(float(grid["angle"]))
 	var seed_p := Vector2(lead["seed"][0], lead["seed"][1])
+	if grid.has("anchor"):
+		seed_p = Vector2(grid["anchor"][0], grid["anchor"][1])  # continue an existing street grid
 	var xf := Transform2D(angle, seed_p)
 	var inv := xf.affine_inverse()
 	var local := Rect2(inv * area.position, Vector2.ZERO)
@@ -381,8 +432,9 @@ func _district_grid(members: Array, area: Rect2) -> void:
 	rng.seed = hash([w.seed_value, lead["id"], "grid"])
 	var wa := 16.0 if pitch_a >= 180.0 else 12.0
 	var ws := 12.0
-	var xs := _lines_across(local.position.x, local.end.x, pitch_a, rng, irregular)
-	var zs := _lines_across(local.position.y, local.end.y, pitch_s, rng, irregular)
+	var jitter := float(grid.get("jitter", 0.24 if irregular else 0.07))
+	var xs := _lines_across(local.position.x, local.end.x, pitch_a, rng, irregular, jitter)
+	var zs := _lines_across(local.position.y, local.end.y, pitch_s, rng, irregular, jitter)
 	var kept := {}
 	var counts := {}
 	for i in xs.size() - 1:
@@ -393,6 +445,7 @@ func _district_grid(members: Array, area: Rect2) -> void:
 	if kept.is_empty():
 		return
 	_lattice_streets(lead, xf, xs, zs, wa, ws, kept, in_group)
+	_claim(first_block, group_lines_from)
 	for di in counts:
 		stats["blocks_" + geo.districts[di]["id"]] = counts[di]
 
@@ -444,7 +497,8 @@ func _lattice_streets(lead: Dictionary, xf: Transform2D, xs: Array, zs: Array, w
 				var dir_p := (pb - pa).normalized()
 				var width_p := wa if vertical else ws
 				if pa.distance_to(pb) > trim_a + trim_b + 2.0:
-					w.add_segment(street_p, pa + dir_p * trim_a, pb - dir_p * trim_b, width_p, 2 if width_p >= 16.0 else 1)
+					w.add_segment(street_p, pa + dir_p * trim_a, pb - dir_p * trim_b, width_p, 2 if width_p >= 16.0 else 1,
+						Vector2(0.0 if trim_a > 0.0 else 1.0, 0.0 if trim_b > 0.0 else 1.0))
 				_new_line(street_p, PackedVector2Array([pa, pb]), width_p, 1000, 1, group, "lattice")
 				for end in [[pa, a, e[0]], [pb, b, e[1]]]:
 					if (end[0] as Vector2).distance_to(end[1]) < 0.5:
@@ -490,10 +544,10 @@ static func _ordinal(n: int) -> String:
 
 ## Grid line positions: regular pitch with gentle variation; the Village gets
 ## strong jitter and merged blocks.
-func _lines_across(lo: float, hi: float, pitch: float, rng: RandomNumberGenerator, irregular: bool) -> Array:
+func _lines_across(lo: float, hi: float, pitch: float, rng: RandomNumberGenerator, irregular: bool,
+		jitter: float) -> Array:
 	var out: Array = []
 	var x := floorf(lo / pitch) * pitch - pitch
-	var jitter := 0.24 if irregular else 0.07
 	while x <= hi + pitch:
 		var v := x + rng.randf_range(-jitter, jitter) * pitch
 		if irregular and not out.is_empty() and rng.randf() < 0.2:
@@ -516,7 +570,7 @@ func _fit_block(r: Rect2, xf: Transform2D, in_group: Dictionary) -> Rect2:
 		var any_bad := false
 		for k in 4:
 			var p: Vector2 = xf * (corners[k] as Vector2)
-			if not geo.is_land(p) or not in_group.has(geo.district_at(p)) or _point_blocked(p):
+			if not geo.is_land(p) or _point_blocked(p):
 				bad[k] = true
 				any_bad = true
 		if not any_bad:
@@ -533,6 +587,55 @@ func _fit_block(r: Rect2, xf: Transform2D, in_group: Dictionary) -> Rect2:
 		var z1 := r.end.y - (SHRINK_STEP if bad[2] or bad[3] else 0.0)
 		r = Rect2(x0, z0, x1 - x0, z1 - z0)
 	return Rect2()
+
+
+## Land taken by an earlier grid: its blocks (plus half a street, so the seam
+## becomes a street) and its streets. Later grids build up to it.
+const OCC_MARGIN := 6.0
+var _occ: Array = []          ## PackedVector2Array polygons
+var _occ_cells: Dictionary = {}
+
+
+func _claim(first_block: int, lines_from: int) -> void:
+	for bi in range(first_block, w.blocks.size()):
+		var b: Dictionary = w.blocks[bi]
+		var r: Rect2 = (b["rect"] as Rect2).grow(OCC_MARGIN)
+		var poly: PackedVector2Array = (b["xform"] as Transform2D) * _rect_poly(r)
+		_occ.append(poly)
+		var idx := _occ.size() - 1
+		var bb := GeoMap.poly_bounds(poly)
+		for cx in range(floori(bb.position.x / SEG_CELL), floori(bb.end.x / SEG_CELL) + 1):
+			for cz in range(floori(bb.position.y / SEG_CELL), floori(bb.end.y / SEG_CELL) + 1):
+				var k := Vector2i(cx, cz)
+				var cell: PackedInt32Array = _occ_cells.get(k, PackedInt32Array())
+				cell.append(idx)
+				_occ_cells[k] = cell
+	for li in range(lines_from, _lines.size()):
+		var line: Dictionary = _lines[li]
+		if line["kind"] != "lattice":
+			continue
+		var pts: PackedVector2Array = line["pts"]
+		_add_corridor(pts[0], pts[1], float(line["width"]) * 0.5)
+
+
+func _in_occupied(p: Vector2) -> bool:
+	for idx in _occ_cells.get(Vector2i((p / SEG_CELL).floor()), PackedInt32Array()):
+		if Geometry2D.is_point_in_polygon(p, _occ[idx]):
+			return true
+	return false
+
+
+func _overlaps_occupied(poly: PackedVector2Array, bb: Rect2) -> bool:
+	var seen := {}
+	for cx in range(floori(bb.position.x / SEG_CELL), floori(bb.end.x / SEG_CELL) + 1):
+		for cz in range(floori(bb.position.y / SEG_CELL), floori(bb.end.y / SEG_CELL) + 1):
+			for idx in _occ_cells.get(Vector2i(cx, cz), PackedInt32Array()):
+				if seen.has(idx):
+					continue
+				seen[idx] = true
+				if not Geometry2D.intersect_polygons(poly, _occ[idx]).is_empty():
+					return true
+	return false
 
 
 ## A block cut by an arterial becomes the blocks either side of it.
@@ -611,7 +714,7 @@ func _edge_pieces(a: Vector2, b: Vector2, in_group: Dictionary) -> Array:
 
 
 func _sample_clear(p: Vector2, in_group: Dictionary) -> bool:
-	if not geo.is_land(p) or not in_group.has(geo.district_at(p)) or _li_rect.grow(8.0).has_point(p) or geo.park_at(p) >= 0:
+	if not geo.is_land(p) or _li_rect.grow(8.0).has_point(p) or geo.park_at(p) >= 0 or _in_occupied(p):
 		return false
 	for idx in _corridor_cells.get(Vector2i((p / SEG_CELL).floor()), PackedInt32Array()):
 		var s: Array = _corridor_segs[idx]
@@ -621,7 +724,7 @@ func _sample_clear(p: Vector2, in_group: Dictionary) -> bool:
 
 
 func _point_blocked(p: Vector2) -> bool:
-	if Geometry2D.is_point_in_polygon(p, _li_poly):
+	if Geometry2D.is_point_in_polygon(p, _li_poly) or _in_occupied(p):
 		return true
 	for tp in _tower_polys:
 		if Geometry2D.is_point_in_polygon(p, tp):
@@ -644,6 +747,8 @@ func _blocked(poly: PackedVector2Array) -> bool:
 	var bb := Rect2(poly[0], Vector2.ZERO)
 	for q in poly:
 		bb = bb.expand(q)
+	if _overlaps_occupied(poly, bb):
+		return true
 	for pk in geo.parks:
 		if (pk["bounds"] as Rect2).intersects(bb) and not Geometry2D.intersect_polygons(poly, pk["polygon"]).is_empty():
 			return true
@@ -671,13 +776,8 @@ static func _band(a: Vector2, b: Vector2, half: float) -> PackedVector2Array:
 
 func _edge_clear(a: Vector2, b: Vector2, in_group: Dictionary) -> bool:
 	for k in 5:
-		var p := a.lerp(b, k / 4.0)
-		if not geo.is_land(p) or not in_group.has(geo.district_at(p)) or _li_rect.grow(8.0).has_point(p) or geo.park_at(p) >= 0:
+		if not _sample_clear(a.lerp(b, k / 4.0), in_group):
 			return false
-		for idx in _corridor_cells.get(Vector2i((p / SEG_CELL).floor()), PackedInt32Array()):
-			var s: Array = _corridor_segs[idx]
-			if p.distance_to(Geometry2D.get_closest_point_to_segment(p, s[0], s[1])) < float(s[2]) + 2.0:
-				return false
 	return true
 
 
@@ -724,7 +824,7 @@ func _stitch() -> void:
 		var start_trim := 6.0 if group.begins_with("d:") else float(c[3])
 		var end_trim := float(target["width"]) * 0.5
 		if best_d > start_trim + end_trim + 1.0:
-			w.add_segment(street, p + dir * start_trim, q - dir * end_trim, 12.0, 1)
+			w.add_segment(street, p + dir * start_trim, q - dir * end_trim, 12.0, 1, Vector2(1, 1))
 		connectors += 1
 	stats["connectors"] = connectors
 
@@ -886,7 +986,7 @@ func _connect_islands() -> void:
 			var street := "link_island_%d" % linked
 			w.streets[street] = {"name": "Service Rd", "width": 12.0}
 			w.edge(best[0], best[1], street, 12.0, 1000)
-			w.add_segment(street, w.graph_nodes[best[0]], w.graph_nodes[best[1]], 12.0, 1)
+			w.add_segment(street, w.graph_nodes[best[0]], w.graph_nodes[best[1]], 12.0, 1, Vector2(1, 1))
 			linked += 1
 			for i in n:
 				if comp[i] == cid:

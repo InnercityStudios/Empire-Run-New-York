@@ -3390,7 +3390,12 @@
     "pitch": [
      80,
      92
-    ]
+    ],
+    "anchor": [
+     0,
+     -46
+    ],
+    "jitter": 0.0
    },
    "territory": "neutral",
    "seed": [
@@ -3426,8 +3431,8 @@
    "grid": {
     "angle": -8,
     "pitch": [
-     160,
-     120
+     110,
+     80
     ]
    },
    "territory": "rival",
@@ -3447,7 +3452,12 @@
     "pitch": [
      80,
      92
-    ]
+    ],
+    "anchor": [
+     0,
+     -46
+    ],
+    "jitter": 0.0
    },
    "territory": "neutral",
    "seed": [
@@ -3466,7 +3476,12 @@
     "pitch": [
      80,
      92
-    ]
+    ],
+    "anchor": [
+     0,
+     -46
+    ],
+    "jitter": 0.0
    },
    "territory": "neutral",
    "seed": [
@@ -3485,7 +3500,12 @@
     "pitch": [
      80,
      92
-    ]
+    ],
+    "anchor": [
+     0,
+     -46
+    ],
+    "jitter": 0.0
    },
    "territory": "neutral",
    "seed": [

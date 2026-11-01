@@ -44,7 +44,8 @@ static func _add_segment(st: SurfaceTool, seg: Dictionary) -> void:
 	var total: float = seg.get("total", length)
 	var along := [a0, a0, a0 + length, a0 + length]
 	var idx := [0, 1, 2, 0, 2, 3]
-	_emit(st, p, lat, along, idx, Vector2(total, hw), style)
+	var no_cross: Vector2 = seg.get("no_crossing", Vector2.ZERO)
+	_emit(st, p, lat, along, idx, Vector2(total, hw), style, 0.0, no_cross)
 
 
 ## Road surfaces for a set of segments and intersections (one chunk).
@@ -82,7 +83,7 @@ static func _add_flat_quad(st: SurfaceTool, r: Rect2, y: float, style: float) ->
 
 
 static func _emit(st: SurfaceTool, p: Array, lat: Array, along: Array, idx: Array, info: Vector2, style: float,
-		y := 0.0) -> void:
+		y := 0.0, no_cross := Vector2.ZERO) -> void:
 	var tris := []
 	for k in range(0, idx.size(), 3):
 		tris.append([idx[k], idx[k + 1], idx[k + 2]])
@@ -94,7 +95,7 @@ static func _emit(st: SurfaceTool, p: Array, lat: Array, along: Array, idx: Arra
 		for i in order:
 			st.set_normal(Vector3.UP)
 			st.set_tangent(Plane(1, 0, 0, 1))
-			st.set_color(Color(style, 0, 0, 1))
+			st.set_color(Color(style, no_cross.x, no_cross.y, 1))
 			st.set_uv(Vector2(lat[i], along[i]))
 			st.set_uv2(info)
 			st.add_vertex(Vector3(p[i].x, y, p[i].y))

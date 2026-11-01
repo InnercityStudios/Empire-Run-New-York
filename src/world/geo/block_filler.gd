@@ -172,8 +172,22 @@ static func _xf(block: Dictionary, frame: Dictionary, u: float, scale_x: float, 
 
 static func _lot(block: Dictionary, out: Dictionary, counter: Array, building: String, frame: Dictionary, u: float,
 		scale_x: float, setback: float, curb_h: float) -> void:
+	var t := _xf(block, frame, u, scale_x, setback, curb_h)
+	if block.has("exclude"):
+		# Keep landmark parcels free: test the footprint centre and front corners.
+		var depth: float = (block["kit"]["dims"][building] as Vector3).z if block["kit"]["dims"].has(building) else 20.0
+		var half_w := (block["kit"]["dims"][building] as Vector3).x * scale_x * 0.5 if block["kit"]["dims"].has(building) else 5.0
+		var fwd := Vector2(t.basis.z.x, t.basis.z.z).normalized()
+		var right := Vector2(t.basis.x.x, t.basis.x.z).normalized()
+		var o := Vector2(t.origin.x, t.origin.z)
+		for poly in block["exclude"]:
+			for p in [o - fwd * depth * 0.5, o - fwd * 1.0 + right * (half_w - 1.0), o - fwd * 1.0 - right * (half_w - 1.0),
+					o - fwd * (depth - 1.0)]:
+				if Geometry2D.is_point_in_polygon(p, poly):
+					counter[0] += 1  # keep later lot ids stable
+					return
 	out["lots"].append({"id": "%s:%d:%d" % [block["district"], block["index"], counter[0]], "building": building,
-		"transform": _xf(block, frame, u, scale_x, setback, curb_h)})
+		"transform": t})
 	counter[0] += 1
 
 

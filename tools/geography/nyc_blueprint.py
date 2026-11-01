@@ -33,6 +33,9 @@ AXIS_SLOPE = 0.42  # Manhattan's long axis leans east going north (~23 degrees)
 GRID_ANGLE = math.degrees(math.atan(AXIS_SLOPE))
 # One Commissioners' grid for Manhattan above Houston/14th (shared lattice).
 MANHATTAN_PITCH = (220, 72)
+# Below Houston the streets continue Little Italy's own lines (avenues every
+# 80 m from Mott at x = 0, streets every 92 m from Grand at z = -46).
+LI_GRID = {"angle": 0, "pitch": (80, 92), "anchor": (0, -46), "jitter": 0.0}
 
 
 # ---------------------------------------------------------------------------
@@ -251,17 +254,17 @@ DISTRICTS = [
     {"id": "financial_district", "name": "Financial District", "borough": "manhattan", "seed": (50, 1350),
      "style": "highrise_old", "grid": {"angle": -12, "pitch": (85, 70)}, "territory": "neutral"},
     {"id": "chinatown", "name": "Chinatown", "borough": "manhattan", "seed": (150, 650), "style": "tenement",
-     "grid": {"angle": 0, "pitch": (80, 92)}, "territory": "neutral"},
+     "grid": LI_GRID, "territory": "neutral"},
     {"id": "tribeca", "name": "Tribeca", "borough": "manhattan", "seed": (-750, 550), "style": "loft_industrial",
      "grid": {"angle": -8, "pitch": (110, 80)}, "territory": "rival"},
     {"id": "the_docks", "name": "The Docks", "borough": "manhattan", "seed": (-1150, 1050), "style": "waterfront",
-     "grid": {"angle": -8, "pitch": (160, 120)}, "territory": "rival"},
+     "grid": {"angle": -8, "pitch": (110, 80)}, "territory": "rival"},
     {"id": "soho", "name": "SoHo", "borough": "manhattan", "seed": (-560, -120), "style": "cast_iron",
-     "grid": {"angle": 0, "pitch": (80, 92)}, "territory": "neutral"},
+     "grid": LI_GRID, "territory": "neutral"},
     {"id": "lower_east_side", "name": "Lower East Side", "borough": "manhattan", "seed": (640, 60),
-     "style": "tenement", "grid": {"angle": 0, "pitch": (80, 92)}, "territory": "neutral"},
+     "style": "tenement", "grid": LI_GRID, "territory": "neutral"},
     {"id": "nolita", "name": "Nolita", "borough": "manhattan", "seed": (10, -470), "style": "tenement",
-     "grid": {"angle": 0, "pitch": (80, 92)}, "territory": "neutral"},
+     "grid": LI_GRID, "territory": "neutral"},
     {"id": "greenwich_village", "name": "Greenwich Village", "borough": "manhattan", "seed": (-440, -860),
      "style": "village_irregular", "grid": {"angle": -38, "pitch": (70, 60), "irregular": True},
      "territory": "neutral"},

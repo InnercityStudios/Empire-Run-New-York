@@ -247,8 +247,15 @@ func edge(a: int, b: int, street: String, width: float, speed := 1000) -> void:
 	_edge(a, b, street, width, speed)
 
 
-func add_segment(street: String, from: Vector2, to: Vector2, width: float, style: int) -> void:
+## `no_crossing`: (start, end) = 1 where the road does not meet a junction
+## (dead ends, link roads), so no crosswalk or stop line is painted there.
+func add_segment(street: String, from: Vector2, to: Vector2, width: float, style: int,
+		no_crossing := Vector2.ZERO) -> void:
+	var first := road_segments.size()
 	_add_segment(street, from, to, width, style)
+	if no_crossing != Vector2.ZERO:
+		for i in range(first, road_segments.size()):
+			road_segments[i]["no_crossing"] = no_crossing
 
 
 func _node(p: Vector2) -> int:

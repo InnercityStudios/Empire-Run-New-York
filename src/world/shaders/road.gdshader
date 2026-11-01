@@ -8,6 +8,7 @@ render_mode cull_back, depth_draw_opaque, diffuse_burley, specular_schlick_ggx;
 //   UV2.x segment length in metres (0 = no markings, e.g. intersections)
 //   UV2.y half width of the carriageway in metres
 //   COLOR.r marking style / 2: 0 none, 1 two-way (double yellow), 2 avenue (+ lane dashes)
+//   COLOR.g / COLOR.b  1 = no crosswalk or stop line at the start / end (dead ends, link roads)
 
 uniform sampler2D asphalt_tex : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D asphalt_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
@@ -22,11 +23,13 @@ uniform float wetness = 0.35;
 varying vec3 v_world;
 varying vec2 v_info;
 varying float v_style;
+varying vec2 v_no_crossing;
 
 void vertex() {
 	v_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	v_info = UV2;
 	v_style = COLOR.r * 2.0;
+	v_no_crossing = COLOR.gb;
 }
 
 float band(float x, float a, float b, float aa) {
@@ -51,16 +54,18 @@ void fragment() {
 	float yellow = 0.0;
 	if (len > 0.0) {
 		float de = min(along, len - along);
+		// Crossings only where the street meets a junction.
+		float crossing_ok = 1.0 - step(0.5, along < len * 0.5 ? v_no_crossing.x : v_no_crossing.y);
 		// Continental crosswalk bars
 		if (de > crosswalk_start && de < crosswalk_end) {
 			float bars = band(fract((lat + hw) / 1.1), 0.12, 0.62, aa / 1.1);
 			float edge = band(de, crosswalk_start, crosswalk_end, aav);
-			white = max(white, bars * edge * step(abs(lat), hw - 0.4));
+			white = max(white, bars * edge * step(abs(lat), hw - 0.4) * crossing_ok);
 		}
 		// Stop lines on the approaching half of the carriageway
 		float approaching_end = step(0.0, lat) * band(len - along, crosswalk_end + 0.6, crosswalk_end + 1.0, aav);
 		float approaching_start = step(lat, 0.0) * band(along, crosswalk_end + 0.6, crosswalk_end + 1.0, aav);
-		white = max(white, (approaching_end + approaching_start) * step(abs(lat), hw - 0.3));
+		white = max(white, (approaching_end + approaching_start) * step(abs(lat), hw - 0.3) * crossing_ok);
 		if (de > crosswalk_end + 1.2) {
 			if (v_style > 0.5) {
 				float alat = abs(lat);
