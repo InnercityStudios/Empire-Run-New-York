@@ -72,4 +72,4 @@ func set_highlighted(on: bool) -> void:
 func _apply_highlight(v: float) -> void:
 	_highlight = v
 	if mesh_instance:
-		mesh_instance.set_instance_shader_parameter("highlight", v * 0.6)
+		mesh_instance.set_instance_shader_parameter("highlight", v * 0.3)

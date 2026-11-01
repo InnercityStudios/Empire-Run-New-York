@@ -101,5 +101,5 @@ void fragment() {
 	}
 	vec3 e = texture(emission_tex, UV).rgb * emission_color * (emission_energy + night_emission * world_night);
 	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 2.0);
-	EMISSION = e + highlight_color * highlight * (0.25 + rim * 0.9);
+	EMISSION = e + highlight_color * highlight * (0.06 + rim * 1.1);
 }
