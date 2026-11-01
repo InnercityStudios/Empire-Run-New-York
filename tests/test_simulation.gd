@@ -160,3 +160,48 @@ func test_offline_catch_up_is_bounded() -> void:
 	check(Time.get_ticks_msec() - t < 2000, "48h offline catch-up is fast")
 	check_eq(w.businesses["biz_vesuvio"].stored(w.now_ms, content), w.businesses["biz_vesuvio"].capacity(content),
 		"offline income accrued to cap")
+
+
+func test_location_keys_round_trip() -> void:
+	var w := _world()
+	for c in w.crews.values():
+		var k := w.roads.location_to_key(c.location)
+		check_eq(w.roads.location_from_key(k), c.location, "location key round trip for %s" % c.id)
+
+
+func test_routes_prefer_faster_roads() -> void:
+	var g := RoadGraph.new()
+	# Square: slow direct street a-b vs. fast detour a-c-d-b of similar length.
+	var a := g.add_node(Vector2i(0, 0))
+	var b := g.add_node(Vector2i(100_00, 0))
+	var c := g.add_node(Vector2i(0, 10_00))
+	var d := g.add_node(Vector2i(100_00, 10_00))
+	g.add_edge(a, b, "slow", 500)
+	g.add_edge(a, c, "fast", 2000)
+	g.add_edge(c, d, "fast", 2000)
+	g.add_edge(d, b, "fast", 2000)
+	var r := g.route({"edge": 0, "offset": 0}, {"edge": 0, "offset": 100_00})
+	check_eq(r["cost"], 100_00 * 1000 / 500, "same-edge route stays on its edge")
+	var from := {"edge": 1, "offset": 0}
+	var to := {"edge": 3, "offset": 10_00}
+	var r2 := g.route(from, to)
+	check(r2["points"].size() >= 3, "detour via the fast road")
+
+
+func test_v1_save_migrates() -> void:
+	var w := _world()
+	w.execute({"type": "move_crew", "faction": "marino", "crew": "crew_mulberry", "landmark": "lm_vesuvio"})
+	w.advance_to(T0 + 3_600_000)
+	var d := w.to_dict()
+	# Rewrite as a v1 save: locations as edge indices of the Little Italy graph.
+	var legacy := SimBootstrap.legacy_roads(content)
+	d["version"] = 1
+	for cd in d["crews"]:
+		var loc := w.roads.location_from_key(cd["location"])
+		cd["location"] = legacy.locate(w.roads.location_point(loc))
+	var restored := SimWorld.from_dict(d, content, w.roads, w.landmark_locations, legacy)
+	check(restored != null, "v1 save loads")
+	for id in w.crews:
+		var p0 := w.roads.location_point(w.crews[id].location)
+		var p1 := restored.roads.location_point(restored.crews[id].location)
+		check(Vector2(p0).distance_to(Vector2(p1)) < 50.0, "crew %s keeps its position" % id)

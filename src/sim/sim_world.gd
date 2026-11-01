@@ -11,7 +11,9 @@ extends RefCounted
 ##   in timestamp order, so results never depend on frame rate.
 ## - Changes are reported as event dictionaries collected via `drain_events()`.
 
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
+## v1 stored road locations as edge indices of the Little Italy-only graph.
+const LEGACY_SAVE_VERSION := 1
 const NEUTRAL_FACTION := "independent"
 const AI_INTERVAL_MS := 12_000
 const PURCHASE_LEVEL_STEP_PERMILLE := 500
@@ -333,9 +335,11 @@ func _start_route(c: CrewState, dest: Dictionary, dest_landmark: String) -> Dict
 	var speed_cms := maxi(1, roundi(float(content.vehicles.get(c.vehicle_id, {}).get("speed_mps", 10.0)) * 100.0))
 	c.status = "moving"
 	c.route_points = r["points"]
+	c.route_costs = r.get("costs", [])
+	c.route_cost = int(r.get("cost", r["length"]))
 	c.route_length = r["length"]
 	c.depart_ms = now_ms
-	c.arrive_ms = now_ms + int(r["length"]) * 1000 / speed_cms
+	c.arrive_ms = now_ms + c.route_cost * 1000 / speed_cms
 	c.dest_landmark = dest_landmark
 	c.location = dest.duplicate()
 	c.at_landmark = ""
@@ -351,6 +355,7 @@ func _arrive(c: CrewState) -> void:
 	c.at_landmark = c.dest_landmark
 	c.dest_landmark = ""
 	c.route_points = []
+	c.route_costs = []
 	_station_if_possible(c)
 	_emit("crew_arrived", {"crew": c.id, "landmark": c.at_landmark})
 
@@ -422,14 +427,20 @@ func to_dict() -> Dictionary:
 	for k in _sorted(businesses):
 		d["businesses"].append(businesses[k].to_dict())
 	for k in _sorted(crews):
-		d["crews"].append(crews[k].to_dict())
+		var cd: Dictionary = crews[k].to_dict()
+		cd["location"] = roads.location_to_key(crews[k].location)
+		d["crews"].append(cd)
 	for k in _sorted(headquarters):
 		d["headquarters"].append(headquarters[k].to_dict())
 	return d
 
 
-static func from_dict(d: Dictionary, p_content: GameContent, p_roads: RoadGraph, locations: Dictionary) -> SimWorld:
-	if int(d.get("version", 0)) != SAVE_VERSION:
+## `legacy_roads` is the graph v1 saves were written against (Little Italy
+## only); v1 crew locations are converted to points and re-located.
+static func from_dict(d: Dictionary, p_content: GameContent, p_roads: RoadGraph, locations: Dictionary,
+		legacy_roads: RoadGraph = null) -> SimWorld:
+	var version := int(d.get("version", 0))
+	if version != SAVE_VERSION and not (version == LEGACY_SAVE_VERSION and legacy_roads != null):
 		return null
 	var w := SimWorld.new()
 	w.content = p_content
@@ -448,6 +459,17 @@ static func from_dict(d: Dictionary, p_content: GameContent, p_roads: RoadGraph,
 		w.businesses[bs.id] = bs
 	for c in d.get("crews", []):
 		var cs := CrewState.from_dict(c)
+		var loc: Dictionary = c.get("location", {})
+		if version == LEGACY_SAVE_VERSION:
+			var legacy := {"edge": clampi(int(loc.get("edge", 0)), 0, legacy_roads.edges.size() - 1),
+				"offset": int(loc.get("offset", 0))}
+			cs.location = p_roads.locate(legacy_roads.location_point(legacy))
+		else:
+			cs.location = p_roads.location_from_key(loc)
+			if cs.location.is_empty():
+				cs.location = p_roads.locate(Vector2i(0, 0))
+		if cs.at_landmark != "" and locations.has(cs.at_landmark) and not cs.is_moving():
+			cs.location = locations[cs.at_landmark].duplicate()
 		w.crews[cs.id] = cs
 	for h in d.get("headquarters", []):
 		var hs := HeadquartersState.from_dict(h)

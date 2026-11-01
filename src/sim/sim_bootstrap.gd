@@ -19,3 +19,9 @@ static func landmark_locations(layout: DistrictLayout, roads: RoadGraph) -> Dict
 static func new_world(content: GameContent, layout: DistrictLayout, scenario_id: String, start_ms: int) -> SimWorld:
 	var roads := roads_for(layout)
 	return SimWorld.create_new(content, roads, landmark_locations(layout, roads), content.scenarios[scenario_id], start_ms)
+
+
+## The Little Italy-only graph that v1 saves were written against.
+static func legacy_roads(content: GameContent) -> RoadGraph:
+	var l := DistrictLayout.build(content.districts["little_italy"], content.building_catalog)
+	return roads_for(l)

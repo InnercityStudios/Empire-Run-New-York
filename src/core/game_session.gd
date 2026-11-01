@@ -126,10 +126,10 @@ func _load(content: GameContent, roads: RoadGraph, locations: Dictionary) -> Sim
 	if not FileAccess.file_exists(SAVE_PATH):
 		return null
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
-	if not parsed is Dictionary or parsed.get("district") != layout.id or not parsed.has("world"):
+	if not parsed is Dictionary or not parsed.has("world"):
 		push_warning("Game: ignoring incompatible save")
 		return null
-	var w := SimWorld.from_dict(parsed["world"], content, roads, locations)
+	var w := SimWorld.from_dict(parsed["world"], content, roads, locations, SimBootstrap.legacy_roads(content))
 	if w == null:
 		push_warning("Game: save version mismatch, starting a new game")
 	return w
