@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: Condition "ret != noErr" is true. Returning: ""
+   at: get_system_ca_certificates (platform/macos/os_macos.mm:1035)
+TerrainField: reservations { "target": 2017, "validated": 2034, "shortfall": 0, "tiers": { "prime": 109, "outer": 920, "suburban": 1005 }, "rejected": { "boundary_water": 1289, "road": 6009, "spacing": 3892, "access": 223, "slope": 1 }, "plot_m": 140.0, "spacing_m": 230.0, "exclusion_radius_m": 115.0 }
+WorldStreamer: 0 chunks, 385 road meshes, shell + far city in 1265 ms
+STREAM_VIEW (-80.0, 0.0, 110.0) terrain={ "coarse_tiles": 662, "detail_tiles": 16, "max_tasks": 2, "vegetation_instances": 248 } terrain_pending=0 city_pending=0
+STREAM_VIEW (-5200.0, -6800.0, 1100.0) terrain={ "coarse_tiles": 662, "detail_tiles": 14, "max_tasks": 2, "vegetation_instances": 1149 } terrain_pending=0 city_pending=2
+STREAM_VIEW (-2650.0, 5720.0, 800.0) terrain={ "coarse_tiles": 662, "detail_tiles": 15, "max_tasks": 2, "vegetation_instances": 1443 } terrain_pending=0 city_pending=0
+STREAM_VIEW (12500.0, -11500.0, 1100.0) terrain={ "coarse_tiles": 662, "detail_tiles": 15, "max_tasks": 2, "vegetation_instances": 1294 } terrain_pending=0 city_pending=2
+STREAM_VIEW (400.0, -1700.0, 3200.0) terrain={ "coarse_tiles": 662, "detail_tiles": 0, "max_tasks": 2, "vegetation_instances": 0 } terrain_pending=0 city_pending=1
+STREAMING_SMOKE: PASS

@@ -1,0 +1,19 @@
+config_version=5
+
+[application]
+config/name="Empire · World Rendering Proof"
+run/main_scene="res://proof.tscn"
+config/features=PackedStringArray("4.7", "Mobile")
+
+[display]
+window/size/viewport_width=1600
+window/size/viewport_height=1000
+window/size/window_width_override=1440
+window/size/window_height_override=900
+window/stretch/mode="canvas_items"
+
+[rendering]
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=2048

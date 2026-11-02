@@ -245,3 +245,157 @@ def build_tree_far():
     _blob(mb, Vector((0, 0, 5.0)), 2.6, rng, levels=1)
     mb.shade_fn = None
     return mb
+
+
+# ---------------------------------------------------------------------------
+# Countryside vegetation (estate regions): species with distinct silhouettes,
+# 150-650 triangles each; per-instance tint in Godot adds colour variety.
+# ---------------------------------------------------------------------------
+def _canopy(mb, rng, centre, radii, count, blob_r, mat="M_Foliage"):
+    def shade(p, n):
+        rel = p - centre
+        up = max(0.0, min(1.0, (rel.z + radii[2]) / (2 * radii[2])))
+        out = max(0.0, n.dot(rel.normalized())) if rel.length > 0.01 else 0.5
+        return 0.42 + 0.38 * up + 0.2 * out
+    mb.shade_fn = shade
+    golden = math.pi * (3 - math.sqrt(5))
+    for i in range(count):
+        y = 1 - (i + 0.5) / count * 2
+        rad = math.sqrt(max(0.0, 1 - y * y))
+        th = golden * i + rng.random() * 0.5
+        c = centre + Vector((math.cos(th) * rad * radii[0], math.sin(th) * rad * radii[1], y * radii[2])) * 0.78
+        _blob(mb, c, blob_r * (0.85 + rng.random() * 0.4), rng, levels=1, mat=mat)
+    mb.shade_fn = None
+
+
+def _trunk(mb, rng, height, r0, branches, bark="M_Bark"):
+    mb.add_cylinder((0, 0, 0), r0, height, 7, bark, radius_top=r0 * 0.6, cap_top=False)
+    for i in range(branches):
+        a = i * math.tau / branches + rng.random() * 0.5
+        d = Vector((math.cos(a) * 0.8, math.sin(a) * 0.8, 1.0)).normalized()
+        rot = d.to_track_quat("Z", "Y").to_matrix().to_4x4()
+        mb.add_cylinder((0, 0, 0), r0 * 0.45, height * 0.55, 5, bark, radius_top=r0 * 0.15, cap_top=False,
+                        matrix=Matrix.Translation((0, 0, height * (0.6 + rng.random() * 0.25))) @ rot)
+
+
+def build_oak(seed=21, name="tree_oak"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    _trunk(mb, rng, 4.2, 0.38, 5)
+    _canopy(mb, rng, Vector((0, 0, 7.4)), (4.6, 4.3, 2.9), 15, 1.9)
+    return mb
+
+
+def build_maple(seed=22, name="tree_maple"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    _trunk(mb, rng, 3.6, 0.28, 4)
+    _canopy(mb, rng, Vector((0, 0, 6.6)), (3.4, 3.4, 3.2), 13, 1.6)
+    return mb
+
+
+def build_birch(seed=23, name="tree_birch"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    for k, (ox, oy, lean) in enumerate(((0, 0, 0.0), (0.5, 0.2, 0.12))):
+        rot = Matrix.Rotation(lean, 4, "X")
+        mb.add_cylinder((0, 0, 0), 0.13, 8.5 - k * 1.5, 6, "M_Bark_Birch", radius_top=0.07, cap_top=False,
+                        matrix=Matrix.Translation((ox, oy, 0)) @ rot)
+    _canopy(mb, rng, Vector((0.2, 0.1, 7.6)), (1.8, 1.8, 3.0), 11, 1.05)
+    return mb
+
+
+def build_pine(seed=24, name="tree_pine"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    mb.add_cylinder((0, 0, 0), 0.22, 11.0, 6, "M_Bark", radius_top=0.08, cap_top=False)
+    mb.shade_fn = lambda p, n: 0.45 + 0.55 * max(0.0, min(1.0, p.z / 12.0)) * (0.7 + 0.3 * max(0.0, n.z))
+    for k in range(5):
+        z = 2.6 + k * 1.75
+        r = 3.0 * (1.0 - k / 5.5) + rng.random() * 0.3
+        mb.add_cylinder((0, 0, z), r, 3.0, 9, "M_Foliage_Pine", radius_top=0.05, cap_top=False, cap_bottom=True,
+                        smooth=False)
+    mb.shade_fn = None
+    return mb
+
+
+def build_poplar(seed=25, name="tree_poplar"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    _trunk(mb, rng, 3.0, 0.22, 2)
+    _canopy(mb, rng, Vector((0, 0, 7.5)), (1.6, 1.6, 4.8), 12, 1.25)
+    return mb
+
+
+def build_pine_far():
+    mb = MeshBuilder("tree_pine_far")
+    mb.add_box((-0.15, -0.15, 0), (0.15, 0.15, 3.0), "M_Bark", skip=("nz",))
+    mb.shade_fn = lambda p, n: 0.5 + 0.5 * max(0.0, min(1.0, p.z / 12.0))
+    mb.add_cylinder((0, 0, 2.4), 2.6, 9.0, 6, "M_Foliage_Pine", radius_top=0.05, cap_top=False, cap_bottom=True,
+                    smooth=False)
+    mb.shade_fn = None
+    return mb
+
+
+def build_bush(seed=31, name="bush"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    c = Vector((0, 0, 0.7))
+    mb.shade_fn = lambda p, n: 0.45 + 0.4 * max(0.0, min(1.0, p.z / 1.6)) + 0.15 * max(0.0, n.z)
+    for i in range(4 + seed % 3):
+        a = rng.random() * math.tau
+        d = rng.random() * 0.8
+        _blob(mb, Vector((math.cos(a) * d, math.sin(a) * d, 0.55 + rng.random() * 0.35)), 0.55 + rng.random() * 0.4,
+              rng, levels=1)
+    mb.shade_fn = None
+    return mb
+
+
+def build_rock(seed=41, name="rock", size=(2.4, 1.8, 1.2)):
+    """Weathered boulder: displaced sphere, flattened base, sunk into the ground."""
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    verts = [Vector(v) for v in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))]
+    faces = [(0, 2, 4), (2, 1, 4), (1, 3, 4), (3, 0, 4), (2, 0, 5), (1, 2, 5), (3, 1, 5), (0, 3, 5)]
+    for _ in range(2):
+        cache = {}
+        nf = []
+
+        def mid(a, b):
+            key = (min(a, b), max(a, b))
+            if key not in cache:
+                verts.append(((verts[a] + verts[b]) * 0.5).normalized())
+                cache[key] = len(verts) - 1
+            return cache[key]
+        for a, b, c in faces:
+            ab, bc, ca = mid(a, b), mid(b, c), mid(c, a)
+            nf += [(a, ab, ca), (b, bc, ab), (c, ca, bc), (ab, bc, ca)]
+        faces = nf
+    pts = []
+    for v in verts:
+        d = 1.0 + (rng.random() - 0.5) * 0.45 + 0.18 * math.sin(v.x * 3 + v.y * 2 + seed)
+        p = Vector((v.x * size[0], v.y * size[1], v.z * size[2])) * d
+        p.z = max(p.z, -0.35 * size[2])  # flat, buried base
+        pts.append(p)
+    mb.shade_fn = lambda p, n: 0.55 + 0.45 * max(0.0, n.z)
+    for f in faces:
+        n = sum((pts[i] for i in f), Vector())
+        mb.add_face([pts[i] for i in f], "M_Rock", normal=n)
+    mb.shade_fn = None
+    return mb
+
+
+def build_reeds(seed=51, name="reeds"):
+    rng = random.Random(seed)
+    mb = MeshBuilder(name)
+    for i in range(26):
+        a = rng.random() * math.tau
+        d = rng.random() * 1.4
+        base = Vector((math.cos(a) * d, math.sin(a) * d, 0))
+        h = 1.2 + rng.random() * 1.0
+        lean = Vector(((rng.random() - 0.5) * 0.5, (rng.random() - 0.5) * 0.5, h))
+        side = Vector((math.cos(a + 1.57), math.sin(a + 1.57), 0)) * 0.05
+        mb.add_face([base - side, base + side, base + lean], "M_Reed", normal=Vector((math.cos(a), math.sin(a), 0.2)))
+        if i % 4 == 0:
+            mb.add_cylinder(base + lean * 0.78, 0.05, 0.3, 5, "M_Cattail", cap_top=True)
+    return mb

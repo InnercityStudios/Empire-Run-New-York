@@ -1,0 +1,7 @@
+{
+  "status": "blocked",
+  "exit_code": -6,
+  "requested": "Native Godot Mobile viewport captures",
+  "screenshots_created": false,
+  "log": "results/capture.log"
+}

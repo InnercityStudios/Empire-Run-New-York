@@ -1,0 +1,138 @@
+{
+  "land_polygon_diagnostics": [
+    {
+      "source": "city",
+      "id": "manhattan",
+      "vertices": 180,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "long_island",
+      "vertices": 144,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "bronx",
+      "vertices": 72,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "roosevelt_island",
+      "vertices": 16,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "randalls_island",
+      "vertices": 20,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "governors_island",
+      "vertices": 20,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "liberty_island",
+      "vertices": 16,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "new_jersey",
+      "vertices": 72,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "city",
+      "id": "staten_island",
+      "vertices": 20,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "outer",
+      "id": "staten_fields",
+      "vertices": 24,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "outer",
+      "id": "new_jersey_fields",
+      "vertices": 24,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "outer",
+      "id": "north_fields",
+      "vertices": 20,
+      "proper_self_intersections": []
+    },
+    {
+      "source": "outer",
+      "id": "east_fields",
+      "vertices": 36,
+      "proper_self_intersections": []
+    }
+  ],
+  "rectangular_authored_park_lakes": [
+    {
+      "park": "central_park",
+      "lake_index": 0,
+      "coordinates": [
+        [
+          1869.2,
+          -4010.6
+        ],
+        [
+          1657.1,
+          -4099.7
+        ],
+        [
+          1510.0,
+          -3749.4
+        ],
+        [
+          1722.1,
+          -3660.3
+        ]
+      ]
+    },
+    {
+      "park": "central_park",
+      "lake_index": 1,
+      "coordinates": [
+        [
+          1347.6,
+          -3235.0
+        ],
+        [
+          1258.3,
+          -3223.7
+        ],
+        [
+          1278.4,
+          -3065.0
+        ],
+        [
+          1367.7,
+          -3076.3
+        ]
+      ]
+    }
+  ],
+  "terrain_sampling_m": [
+    16,
+    128
+  ],
+  "detail_radius_formula": "clamp(260 - distance * .6, 0, 220), cutoff 60",
+  "building_detail_disappears_camera_distance_m": 333.333333,
+  "natural_waterway_example_width_m": 7,
+  "coarse_sample_to_stream_width_ratio": 18.285714285714285,
+  "coast_height_jump_on_road_centre_m": 1.87,
+  "scope": "Read-only source diagnostics; screenshot attribution remains pending latest screenshot paths."
+}

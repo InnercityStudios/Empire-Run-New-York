@@ -1,0 +1,159 @@
+{
+  "M_Palette": {
+    "albedo": "res://assets/textures/palette_albedo.png",
+    "cull": "disabled",
+    "emission": "#ffffff",
+    "emission_energy": 4.0,
+    "emission_tex": "res://assets/textures/palette_emission.png",
+    "grime": 0.35,
+    "orm": "res://assets/textures/palette_orm.png",
+    "palette": true
+  },
+  "M_Concrete": {
+    "albedo": "res://assets/textures/stone_albedo.png",
+    "color": "#b9b3a8",
+    "grime": 1.0,
+    "normal": "res://assets/textures/stone_normal.png",
+    "roughness": 0.95,
+    "uv_m": 3.0
+  },
+  "M_Siding_Green": {
+    "albedo": "res://assets/textures/siding_albedo.png",
+    "color": "#7d9a84",
+    "grime": 0.6,
+    "normal": "res://assets/textures/siding_normal.png",
+    "roughness": 0.75,
+    "uv_m": 2.0
+  },
+  "M_Window": {
+    "albedo": "res://assets/textures/window_atlas.png",
+    "color": "#ffffff",
+    "emission": "#ffd9a0",
+    "emission_energy": 0.0,
+    "emission_tex": "res://assets/textures/window_emission.png",
+    "roughness": 0.15,
+    "specular": 0.6
+  },
+  "M_Wood": {
+    "albedo": "res://assets/textures/wood_albedo.png",
+    "color": "#ffffff",
+    "grime": 0.5,
+    "roughness": 0.9,
+    "uv_m": 2.0
+  },
+  "M_Shingle_Brown": {
+    "albedo": "res://assets/textures/shingle_albedo.png",
+    "color": "#7a5a44",
+    "grime": 0.5,
+    "normal": "res://assets/textures/shingle_normal.png",
+    "roughness": 0.9,
+    "uv_m": 3.0
+  },
+  "M_Brick_Red": {
+    "albedo": "res://assets/textures/pbr/brick_wall_006_albedo.png",
+    "arm": "res://assets/textures/pbr/brick_wall_006_arm.png",
+    "color": "#d6c2b8",
+    "grime": 1.0,
+    "normal": "res://assets/textures/pbr/brick_wall_006_normal.png",
+    "roughness": 0.92,
+    "uv_m": 2.4,
+    "uv_scale": 0.84
+  },
+  "M_Shutter": {
+    "albedo": "res://assets/textures/corrugated_albedo.png",
+    "color": "#8d8b85",
+    "grime": 0.6,
+    "metallic": 0.4,
+    "normal": "res://assets/textures/corrugated_normal.png",
+    "roughness": 0.6,
+    "uv_m": 1.0
+  },
+  "M_Siding_Yellow": {
+    "albedo": "res://assets/textures/siding_albedo.png",
+    "color": "#d9c38a",
+    "grime": 0.6,
+    "normal": "res://assets/textures/siding_normal.png",
+    "roughness": 0.75,
+    "uv_m": 2.0
+  },
+  "M_Shingle_Gray": {
+    "albedo": "res://assets/textures/shingle_albedo.png",
+    "color": "#6b6a66",
+    "grime": 0.5,
+    "normal": "res://assets/textures/shingle_normal.png",
+    "roughness": 0.9,
+    "uv_m": 3.0
+  },
+  "M_Brick_Tan": {
+    "albedo": "res://assets/textures/brick_tan_albedo.png",
+    "color": "#ffffff",
+    "grime": 1.0,
+    "normal": "res://assets/textures/brick_normal.png",
+    "roughness": 0.9,
+    "uv_m": 2.4
+  },
+  "M_Stone": {
+    "albedo": "res://assets/textures/stone_albedo.png",
+    "color": "#ffffff",
+    "grime": 0.8,
+    "normal": "res://assets/textures/stone_normal.png",
+    "roughness": 0.85,
+    "uv_m": 2.0
+  },
+  "M_Roof_Silver": {
+    "albedo": "res://assets/textures/roof_silver_albedo.png",
+    "color": "#ffffff",
+    "grime": 0.6,
+    "metallic": 0.25,
+    "normal": "res://assets/textures/roof_silver_normal.png",
+    "roughness": 0.55,
+    "uv_m": 4.0
+  },
+  "M_Rock": {
+    "albedo": "res://assets/textures/terrain_rock_albedo.png",
+    "color": "#ffffff",
+    "grime": 0.4,
+    "normal": "res://assets/textures/terrain_rock_normal.png",
+    "roughness": 0.9,
+    "uv_m": 3.0
+  },
+  "M_Brick_Brown": {
+    "albedo": "res://assets/textures/brick_brown_albedo.png",
+    "color": "#ffffff",
+    "grime": 1.0,
+    "normal": "res://assets/textures/brick_normal.png",
+    "roughness": 0.92,
+    "uv_m": 2.4
+  },
+  "M_Roof_Gravel": {
+    "albedo": "res://assets/textures/roof_gravel_albedo.png",
+    "color": "#ffffff",
+    "grime": 0.5,
+    "normal": "res://assets/textures/roof_gravel_normal.png",
+    "roughness": 0.95,
+    "uv_m": 4.0
+  },
+  "M_ShopGlass": {
+    "albedo": "res://assets/textures/shop_atlas.png",
+    "color": "#ffffff",
+    "emission": "#ffcf8a",
+    "emission_energy": 0.25,
+    "emission_tex": "res://assets/textures/shop_atlas.png",
+    "roughness": 0.12,
+    "specular": 0.6
+  },
+  "M_Foliage": {
+    "albedo": "res://assets/textures/foliage_albedo.png",
+    "color": "#ffffff",
+    "roughness": 0.85,
+    "uv_m": 1.5
+  },
+  "M_Roof_Tar": {
+    "albedo": "res://assets/textures/roof_tar_albedo.png",
+    "color": "#ffffff",
+    "grime": 0.5,
+    "normal": "res://assets/textures/roof_tar_normal.png",
+    "roughness": 0.9,
+    "uv_m": 4.0
+  }
+}

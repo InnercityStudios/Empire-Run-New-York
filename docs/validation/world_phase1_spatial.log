@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: Condition "ret != noErr" is true. Returning: ""
+   at: get_system_ca_certificates (platform/macos/os_macos.mm:1035)
+TerrainField: reservations { "target": 2017, "validated": 2034, "shortfall": 0, "tiers": { "prime": 109, "outer": 920, "suburban": 1005 }, "rejected": { "boundary_water": 1289, "road": 6009, "spacing": 3892, "access": 223, "slope": 1 }, "plot_m": 140.0, "spacing_m": 230.0, "exclusion_radius_m": 115.0 }
+NETWORK bay_ridge missing: []
+NETWORK grasmere missing: []
+NETWORK staten_roads missing: []
+NETWORK outer_collectors missing: []
+NETWORK fields_bergen missing: []
+NETWORK fields_palisades missing: []
+NETWORK fields_westchester missing: []
+NETWORK fields_gold_coast missing: []
+NETWORK fields_south_shore missing: []
+NETWORK fields_staten_meadows missing: []
+LANDSCAPE_AUDIT {"build_and_audit_ms":8924,"driveway_conflicts":0,"exclusion_radius_m":115.0,"max_exclusion_disc_slope":0.0000000000106562239708614,"minimum_spacing_m":231.214721679688,"plot_m":140.0,"regions":{"bergen":474,"gold_coast":211,"palisades":144,"south_shore":446,"staten":35,"staten_meadows":74,"westchester":650},"rejected":{"access":223,"boundary_water":1289,"road":6009,"slope":1,"spacing":3892},"road_access_violations":0,"shortfall":0,"spacing_m":230.0,"target":2017,"tiers":{"outer":920,"prime":109,"suburban":1005},"validated":2034,"water_violations":0,"wet_driveway_samples":0}

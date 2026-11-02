@@ -1,0 +1,74 @@
+[
+  {
+    "asset": "assets/models/props/fire_hydrant.glb",
+    "sha256": "799422c09310a1490fc62d57d891d7bac6c09e366b6a01bb1aa88fea9687bdcd"
+  },
+  {
+    "asset": "assets/models/buildings/house_b.glb",
+    "sha256": "a998f2c293c0eac198b4745c2224f50c6f13f30a1045f8f6f01f9f53036cfacf"
+  },
+  {
+    "asset": "assets/models/buildings/house_d.glb",
+    "sha256": "5bf7eb291daa37ed128b5f2e2ae7e5704992a9fa4cf4a49d68d058ca571f9ca9"
+  },
+  {
+    "asset": "assets/models/buildings/lic_brooklyn_corner.glb",
+    "sha256": "8e1fef4f5749a7f54e487fd33baf3556c3da2cfd0ddc0fab36dcbce878d28a0e"
+  },
+  {
+    "asset": "assets/models/buildings/loft_a.glb",
+    "sha256": "950d682fc6ffe77aff6ab32c344ae0920e2a9e82f8beefbb35856cb1fddd012c"
+  },
+  {
+    "asset": "assets/models/props/reeds.glb",
+    "sha256": "ff09d47e3e14a4c8a92f477d156749085132ab306abc0e9b8d49b66f14f4957c"
+  },
+  {
+    "asset": "assets/models/props/rock_a.glb",
+    "sha256": "19bdf7091183b2bbf54f66a87bca2299e7661a4bb435226ddd5d23e3077bedaf"
+  },
+  {
+    "asset": "assets/models/buildings/rowhouse_a.glb",
+    "sha256": "7bfc1daeba9c1a9eec3487f38af525375b7555f76e61b17628634e85d5d03c6a"
+  },
+  {
+    "asset": "assets/models/buildings/rowhouse_c.glb",
+    "sha256": "4693a81bbbdc1c47af7ad23e39a24ea430e6fbba0d13f6b18c5762790f29560e"
+  },
+  {
+    "asset": "assets/models/props/street_lamp.glb",
+    "sha256": "3b2c97bed0950f76b3c4731f5b2c70da6abd3b13b22dd7692e13e5b5cbc7c6b2"
+  },
+  {
+    "asset": "assets/models/buildings/tenement_c.glb",
+    "sha256": "c638aa3ea4f9af89e8f0fe89e9b9b0beb7699b1b64477fccec435ca057ebee63"
+  },
+  {
+    "asset": "assets/models/buildings/tenement_g.glb",
+    "sha256": "5bf0e8345acd3573488e4df7bc5fe173ea73eb6987a1a7c14ea602e9443094bd"
+  },
+  {
+    "asset": "assets/models/props/trash_can.glb",
+    "sha256": "38996faa9c58a8f7d39bb7316f155acee75417bc044c4d448969c338b1ebaa4a"
+  },
+  {
+    "asset": "assets/models/props/tree_birch.glb",
+    "sha256": "ba7f102bdd1f644e95383084b02eb6b2030f95eb5968a78ed28d74bd8ac0b76b"
+  },
+  {
+    "asset": "assets/models/props/tree_maple.glb",
+    "sha256": "fb7dd8117fc6615685aca011bb9b267b435cff5de0768d2b2c07d0a03b4e6dbf"
+  },
+  {
+    "asset": "assets/models/props/tree_oak.glb",
+    "sha256": "cf540869222e4ffb7a54052366b72964480758a6f46a57647171bf86feb869fa"
+  },
+  {
+    "asset": "assets/models/buildings/warehouse_a.glb",
+    "sha256": "ea0f0335c2ded8b5a8e0f4b14a7f9e689bf58b7a74cc9862a563ba363d24f5e2"
+  },
+  {
+    "asset": "assets/models/buildings/warehouse_b.glb",
+    "sha256": "e29b74e5941c0b3f3a243a8c6d8bc98c4080e95620181e9abc2b527653f34789"
+  }
+]

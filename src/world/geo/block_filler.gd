@@ -57,6 +57,8 @@ static func make_kit(fill: Dictionary, catalog: Dictionary) -> Dictionary:
 
 ## {lots: [{id, building, transform}], props: [{prop, transform}], parking: [{transform}]}
 static func fill(block: Dictionary, sidewalk: float, curb_h: float, with_props := true) -> Dictionary:
+	if block.has("polygon"):
+		return PolygonBlockFiller.fill(block, sidewalk, curb_h, with_props)
 	var out := {"lots": [], "props": [], "parking": []}
 	var kit: Dictionary = block["kit"]
 	var rules: Dictionary = kit["fill"]

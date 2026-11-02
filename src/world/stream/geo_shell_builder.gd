@@ -1,7 +1,7 @@
 class_name GeoShellBuilder
 extends RefCounted
-## Always-loaded geometry of a geography world: open water, coastlines with
-## quay walls, park and airport grounds, lakes and paths, road surfaces in
+## Always-loaded geometry of a geography world: open water, urban park and
+## airport grounds, lakes and paths, road surfaces in
 ## 1 km tiles and the bridges (deck, towers, cables). Cheap enough to stay
 ## resident, so no zoom level ever shows a void or a hard map edge.
 
@@ -12,8 +12,8 @@ const TOWER_HEIGHT := 64.0
 static func build(world: WorldLayout, parent: Node3D) -> Dictionary:
 	var stats := {"road_chunks": 0}
 	_add(parent, "Water", _water(world), false)
-	_add(parent, "Land", _land(world), false)
-	_add(parent, "Quays", _quays(world), false)
+	# TerrainStreamer owns continuous land and natural banks.
+	# City quays are retained only where explicitly authored in future data.
 	_add(parent, "Grounds", _grounds(world), false)
 	_add(parent, "ParkFeatures", _park_features(world), false)
 	var roads_root := Node3D.new()
@@ -60,11 +60,13 @@ static func _add(parent: Node3D, node_name: String, mesh: Mesh, shadows: bool) -
 static func _water(world: WorldLayout) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	WorldShellBuilder._quad(st, world.world_rect.grow(3000.0), world.water_level, 10.0)
+	WorldShellBuilder._quad(st, world.world_rect.grow(30000.0), world.water_level, 10.0)
 	st.generate_tangents()
 	var mesh := st.commit()
 	var m := ShaderMaterial.new()
 	m.shader = WorldShellBuilder.WATER_SHADER
+	m.set_shader_parameter("shore_enabled",true)
+	m.set_shader_parameter("shore_mask",load("res://assets/textures/world_water_mask.png"))
 	m.set_shader_parameter("wave_normal", load("res://assets/textures/water_normal.png"))
 	mesh.surface_set_material(0, m)
 	return mesh
@@ -77,39 +79,6 @@ static func _fill_polygon(st: SurfaceTool, poly: PackedVector2Array, y: float, u
 		var b := poly[idx[k + 1]]
 		var c := poly[idx[k + 2]]
 		RoadBuilder._tri(st, Vector3(a.x, y, a.y), Vector3(b.x, y, b.y), Vector3(c.x, y, c.y), Vector3.UP, uv_m)
-
-
-## Land: the asphalt road material everywhere (seamless with streets).
-static func _land(world: WorldLayout) -> ArrayMesh:
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for c in world.land_polygons:
-		var poly: PackedVector2Array = c["polygon"]
-		var idx := Geometry2D.triangulate_polygon(poly)
-		for k in range(0, idx.size(), 3):
-			var p := [poly[idx[k]], poly[idx[k + 1]], poly[idx[k + 2]]]
-			RoadBuilder._emit(st, p, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0, 1, 2], Vector2.ZERO, 0.0, -0.03)
-	var mesh := st.commit()
-	if mesh.get_surface_count() > 0:
-		mesh.surface_set_material(0, Materials.get_road_material())
-	return mesh
-
-
-## Stone quay walls along every shoreline.
-static func _quays(world: WorldLayout) -> ArrayMesh:
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var y0 := world.water_level - 0.6
-	for c in world.land_polygons:
-		var poly: PackedVector2Array = c["polygon"]
-		for i in poly.size():
-			var a := poly[i]
-			var b := poly[(i + 1) % poly.size()]
-			WorldShellBuilder._wall(st, a, b, _outward(poly, a, b), y0, 0.0)
-	st.generate_tangents()
-	var mesh := st.commit()
-	mesh.surface_set_material(0, Materials.get_material("M_Quay"))
-	return mesh
 
 
 static func _grounds(world: WorldLayout) -> ArrayMesh:

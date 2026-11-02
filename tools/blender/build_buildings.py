@@ -149,6 +149,14 @@ BUILDINGS = [
      "cornice_mat": "M_Cornice_Dark", "fire_escape": True,
      "ground": shop("THE BLUE LANTERN", "M_Shopfront_Black", "M_Sign_White", awning=2, variant=3,
                     blade="BAR", neon="M_Neon_Green")},
+    # Family estates (world-map mansions by level, and grounds pieces).
+    {"id": "mansion_l1", "kind": "mansion", "builder": "mansion", "level": 1, "width": 30.0, "depth": 18.0},
+    {"id": "mansion_l2", "kind": "mansion", "builder": "mansion", "level": 2, "width": 58.0, "depth": 18.0},
+    {"id": "mansion_l3", "kind": "mansion", "builder": "mansion", "level": 3, "width": 58.0, "depth": 22.0},
+    {"id": "estate_gatehouse", "kind": "estate_part", "builder": "estate_gatehouse", "width": 14.0, "depth": 5.0},
+    {"id": "estate_wall", "kind": "estate_part", "builder": "estate_wall", "width": 20.0, "depth": 1.0},
+    {"id": "estate_garage", "kind": "estate_part", "builder": "estate_garage", "width": 15.0, "depth": 8.0},
+    {"id": "estate_fountain", "kind": "estate_part", "builder": "fountain", "width": 6.4, "depth": 6.4},
     {"id": "biz_garage_bowery", "kind": "landmark", "width": 14.0, "floors": 2, "brick": "M_Brick_Painted",
      "cornice": "simple", "frame": "M_Frame_Dark", "ac": 0.0,
      "ground": {"type": "garage", "sign": "BOWERY AUTO BODY", "sign_board": "M_Sign_White",
@@ -174,7 +182,8 @@ def main():
         builder = spec.get("builder")
         if builder == "warehouse":
             mb = build_warehouse(spec)
-        elif builder in ("house", "estate", "factory", "pier_shed"):
+        elif builder in ("house", "estate", "factory", "pier_shed", "mansion", "estate_gatehouse", "estate_wall",
+                         "estate_garage", "fountain"):
             mb = getattr(buildings_extra, "build_" + builder)(spec)
         else:
             mb = BuildingGenerator(spec).build()

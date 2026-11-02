@@ -1,0 +1,270 @@
+{
+  "build_ms": 3772,
+  "captures": [
+    {
+      "file": "/Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/art_source/world_render_poc/results/captures/richmond_pasture_close.png",
+      "frame_p50_ms": 8.343,
+      "frame_p95_ms": 8.806,
+      "gpu_average_ms": 0.0,
+      "lod": "close",
+      "max_draw_calls": 139,
+      "max_primitives": 78349,
+      "region": 0,
+      "render_cpu_average_ms": 0.39969166778028,
+      "vram_mb": 167.65625
+    },
+    {
+      "file": "/Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/art_source/world_render_poc/results/captures/richmond_pasture_medium.png",
+      "frame_p50_ms": 8.317,
+      "frame_p95_ms": 8.761,
+      "gpu_average_ms": 0.0,
+      "lod": "medium",
+      "max_draw_calls": 121,
+      "max_primitives": 39959,
+      "region": 0,
+      "render_cpu_average_ms": 0.378316667179267,
+      "vram_mb": 167.65625
+    },
+    {
+      "file": "/Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/art_source/world_render_poc/results/captures/richmond_pasture_strategic.png",
+      "frame_p50_ms": 8.326,
+      "frame_p95_ms": 8.684,
+      "gpu_average_ms": 0.0,
+      "lod": "strategic",
+      "max_draw_calls": 69,
+      "max_primitives": 17304,
+      "region": 0,
+      "render_cpu_average_ms": 0.293216666548202,
+      "vram_mb": 167.65625
+    },
+    {
+      "file": "/Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/art_source/world_render_poc/results/captures/brooklyn_waterfront_close.png",
+      "frame_p50_ms": 8.352,
+      "frame_p95_ms": 8.999,
+      "gpu_average_ms": 0.0,
+      "lod": "close",
+      "max_draw_calls": 62,
+      "max_primitives": 69461,
+      "region": 1,
+      "render_cpu_average_ms": 0.41531666778028,
+      "vram_mb": 167.65625
+    },
+    {
+      "file": "/Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/art_source/world_render_poc/results/captures/brooklyn_waterfront_medium.png",
+      "frame_p50_ms": 8.349,
+      "frame_p95_ms": 8.757,
+      "gpu_average_ms": 0.0,
+      "lod": "medium",
+      "max_draw_calls": 66,
+      "max_primitives": 56834,
+      "region": 1,
+      "render_cpu_average_ms": 0.403008333096902,
+      "vram_mb": 167.65625
+    },
+    {
+      "file": "/Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/art_source/world_render_poc/results/captures/brooklyn_waterfront_strategic.png",
+      "frame_p50_ms": 8.329,
+      "frame_p95_ms": 9.127,
+      "gpu_average_ms": 0.0,
+      "lod": "strategic",
+      "max_draw_calls": 24,
+      "max_primitives": 7585,
+      "region": 1,
+      "render_cpu_average_ms": 0.235308333206922,
+      "vram_mb": 167.65625
+    }
+  ],
+  "display_driver": "macOS",
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "gpu_measurements_available": true,
+  "regions": {
+    "brooklyn_waterfront": {
+      "buildings": 9,
+      "edge_knots_per_lod": {
+        "close": 373,
+        "medium": 373,
+        "strategic": 373
+      },
+      "lods": {
+        "close": {
+          "areas_m2": {
+            "ground": 90370.0000143051,
+            "pavement": 8231.42049505352,
+            "road": 14155.247470458,
+            "water": 12029.9999856949
+          },
+          "terrain_road_water_triangles": 17385,
+          "tile_nodes": 30
+        },
+        "medium": {
+          "areas_m2": {
+            "ground": 90370.0001096725,
+            "pavement": 8231.42050414346,
+            "road": 14155.2474602237,
+            "water": 12029.9998903275
+          },
+          "terrain_road_water_triangles": 5459,
+          "tile_nodes": 30
+        },
+        "strategic": {
+          "areas_m2": {
+            "ground": 90370.0000228882,
+            "pavement": 8231.42047078907,
+            "road": 14155.2477534413,
+            "water": 12029.9999771118
+          },
+          "terrain_road_water_triangles": 1642,
+          "tile_nodes": 30
+        }
+      },
+      "placement_checks": [
+        {
+          "footprint_m": [
+            18.2101058959961,
+            17.7054748535156
+          ],
+          "id": "corner_store",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            26.8500061035156,
+            16.0100021362305
+          ],
+          "id": "river_loft",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            32.8500061035156,
+            24.0099945068359
+          ],
+          "id": "dock_warehouse",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            28.8500061035156,
+            20.0100021362305
+          ],
+          "id": "rear_loft",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            21.1500091552734,
+            12.0
+          ],
+          "id": "rear_tenement",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            6.82015991210938,
+            21.1499938964844
+          ],
+          "id": "north_row_a",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            6.0,
+            21.1499938964844
+          ],
+          "id": "north_row_c",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            7.5,
+            21.1500091552734
+          ],
+          "id": "south_tenement",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            6.0,
+            21.1500091552734
+          ],
+          "id": "south_row",
+          "road_clear": true
+        }
+      ],
+      "shared_boundary_errors": 0,
+      "strategic_surface_triangles": 4578
+    },
+    "richmond_pasture": {
+      "buildings": 2,
+      "edge_knots_per_lod": {
+        "close": 2738,
+        "medium": 2738,
+        "strategic": 2738
+      },
+      "lods": {
+        "close": {
+          "areas_m2": {
+            "ground": 652607.821279912,
+            "pavement": 0.0,
+            "road": 9768.30149598699,
+            "water": 23232.1478539631
+          },
+          "terrain_road_water_triangles": 87149,
+          "tile_nodes": 68
+        },
+        "medium": {
+          "areas_m2": {
+            "ground": 652607.823178713,
+            "pavement": 0.0,
+            "road": 9768.30429046787,
+            "water": 23232.1597732753
+          },
+          "terrain_road_water_triangles": 25182,
+          "tile_nodes": 68
+        },
+        "strategic": {
+          "areas_m2": {
+            "ground": 652607.839923196,
+            "pavement": 0.0,
+            "road": 9768.30591788236,
+            "water": 23232.1601153314
+          },
+          "terrain_road_water_triangles": 6837,
+          "tile_nodes": 68
+        }
+      },
+      "placement_checks": [
+        {
+          "footprint_m": [
+            14.3500061035156,
+            12.3499984741211
+          ],
+          "id": "farm_house",
+          "road_clear": true
+        },
+        {
+          "footprint_m": [
+            11.2000122070312,
+            11.8499984741211
+          ],
+          "id": "lane_house",
+          "road_clear": true
+        }
+      ],
+      "retained_estate": {
+        "id": "estate:staten:-3430:6572:infill2",
+        "max_height_error_m": 0.0,
+        "world_center": [
+          -3508.0,
+          6640.0
+        ]
+      },
+      "shared_boundary_errors": 0,
+      "strategic_surface_triangles": 10467
+    }
+  },
+  "renderer": "mobile",
+  "source_sha256": "184279029673e086eba91ccd9985381be7a28508a55ec0a89e714f2fdd5d03b5",
+  "visual_review": "pending"
+}

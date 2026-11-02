@@ -52,6 +52,8 @@ var portals: Array = []          ## future-city connection points {node, name}
 
 ## Geography worlds (`schema: geography-v1`, see GeographyBuilder).
 var is_geo := false
+var terrain: TerrainField
+var estate_plots: Array = []
 var geo: GeoMap
 var districts: Array = []        ## district definitions (id, name, borough, style, territory...)
 var kits: Dictionary = {}        ## style -> BlockFiller kit (read-only after build)
@@ -557,6 +559,8 @@ func nodes_near(p: Vector2, radius: float) -> PackedInt32Array:
 
 ## World-space corners of a block (generated blocks are rotated rectangles).
 static func block_corners(b: Dictionary) -> PackedVector2Array:
+	if b.has("polygon"):
+		return b["polygon"]
 	var r: Rect2 = b["rect"]
 	var pts := PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)])
 	if b.has("xform"):

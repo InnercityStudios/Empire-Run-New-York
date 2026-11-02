@@ -55,6 +55,7 @@ func load_all(root: String) -> void:
 	scenarios["new_game"] = _read(root + "scenarios/new_game.json")
 	worlds["greater_new_york"] = _read(root + "world/greater_new_york.json")
 	worlds["nyc_1977"] = _read(root + "world/nyc_1977.json")
+	LandscapeBlueprint.apply(worlds["nyc_1977"], _read(root + "world/landscape.json"))
 	_validate()
 	for e in errors:
 		push_error("Content: " + e)

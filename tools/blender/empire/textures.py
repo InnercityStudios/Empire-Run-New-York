@@ -400,7 +400,115 @@ def build_all(out_dir):
         a, n = roof_variant(512, 110 + i, kind)
         write_png(p("roof_%s_albedo.png" % kind), a)
         write_png(p("roof_%s_normal.png" % kind), n)
+    for name, fn in (("grass", terrain_grass), ("dirt", terrain_dirt), ("rock", terrain_rock), ("sand", terrain_sand),
+                     ("mud", terrain_mud), ("forest", terrain_forest)):
+        a, n = fn(1024, 200 + len(name))
+        write_png(p("terrain_%s_albedo.png" % name), a)
+        write_png(p("terrain_%s_normal.png" % name), n)
     palette_textures(out_dir)
+
+
+# ---------------------------------------------------------------------------
+# Terrain set (blended by the terrain shader; each tile covers 6-8 m).
+# ---------------------------------------------------------------------------
+def _stamps(size, rng, count, rmin, rmax, colors, alb, height=None, elong=1.0):
+    for _ in range(count):
+        cx, cy = rng.random(2) * size
+        r = rmin + rng.random() * (rmax - rmin)
+        ang = rng.random() * np.pi
+        col = colors[rng.integers(0, len(colors))] * (0.85 + rng.random() * 0.3)
+        x0, x1 = int(cx - r * elong) - 1, int(cx + r * elong) + 2
+        y0, y1 = int(cy - r * elong) - 1, int(cy + r * elong) + 2
+        ys = np.arange(y0, y1) % size
+        xs = np.arange(x0, x1) % size
+        dy = (np.arange(y0, y1) - cy)[:, None]
+        dx = (np.arange(x0, x1) - cx)[None, :]
+        u = dx * np.cos(ang) + dy * np.sin(ang)
+        v = -dx * np.sin(ang) + dy * np.cos(ang)
+        m = ((u / (r * elong)) ** 2 + (v / r) ** 2) <= 1.0
+        sub = alb[np.ix_(ys, xs)]
+        sub[m] = col
+        alb[np.ix_(ys, xs)] = sub
+        if height is not None:
+            hs = height[np.ix_(ys, xs)]
+            hs[m] = np.maximum(hs[m], 1.0 - ((u[m] / (r * elong)) ** 2 + (v[m] / r) ** 2))
+            height[np.ix_(ys, xs)] = hs
+    return alb
+
+
+def terrain_grass(size, seed):
+    rng = _rng(seed)
+    n1 = fbm(size, size, 4, 5, rng)
+    n2 = fbm(size, size, 24, 4, rng)
+    dry = smoothstep(0.58, 0.82, fbm(size, size, 3, 4, rng))
+    alb = lerp(rgb("#3d5a22")[None, None, :], rgb("#6a8a34")[None, None, :], (n1 * 0.55 + n2 * 0.45)[..., None])
+    alb = lerp(alb, rgb("#8c8a4e")[None, None, :], (dry * 0.45)[..., None])
+    height = n2 * 0.3
+    # Blades: short streaks in varied greens, lit tips.
+    alb = _stamps(size, rng, 9000, 0.6, 1.1, [rgb(c) for c in ("#4f7228", "#5f8530", "#77993c", "#3c5a1f", "#90a04e")],
+                  alb, height, elong=4.5)
+    # Clover and low weeds.
+    alb = _stamps(size, rng, 500, 2.0, 3.6, [rgb("#47692a"), rgb("#55782e")], alb, height)
+    return alb, height_to_normal(height, 2.2)
+
+
+def terrain_dirt(size, seed):
+    rng = _rng(seed)
+    n = fbm(size, size, 6, 6, rng)
+    alb = lerp(rgb("#5e4630")[None, None, :], rgb("#8a6c4a")[None, None, :], n[..., None])
+    height = n * 0.5
+    alb = _stamps(size, rng, 2600, 1.2, 3.8, [rgb(c) for c in ("#9a8a72", "#7a6a58", "#5a4a3a", "#b0a088")], alb, height)
+    crack = 1 - smoothstep(0.004, 0.014, np.abs(fbm(size, size, 7, 4, _rng(seed + 1)) - 0.5))
+    alb *= (1.0 - crack[..., None] * 0.35)
+    return alb, height_to_normal(height - crack * 0.3, 3.0)
+
+
+def terrain_rock(size, seed):
+    rng = _rng(seed)
+    yy, xx = np.mgrid[0:size, 0:size].astype(float) / size
+    warp = fbm(size, size, 4, 4, rng)
+    strata = 0.5 + 0.5 * np.sin((yy * 9.0 + warp * 2.2) * np.pi * 2)
+    n = fbm(size, size, 12, 5, rng)
+    base = lerp(rgb("#6c665c")[None, None, :], rgb("#9a9284")[None, None, :], (strata * 0.5 + n * 0.5)[..., None])
+    crack = 1 - smoothstep(0.0, 0.05, np.abs(fbm(size, size, 8, 3, _rng(seed + 2)) - 0.5))
+    base *= (1.0 - crack[..., None] * 0.45)
+    lichen = smoothstep(0.62, 0.75, fbm(size, size, 16, 3, _rng(seed + 3)))
+    base = lerp(base, rgb("#7d8456")[None, None, :], (lichen * 0.55)[..., None])
+    height = strata * 0.4 + n * 0.6 - crack * 0.5
+    return base, height_to_normal(height, 4.5)
+
+
+def terrain_sand(size, seed):
+    rng = _rng(seed)
+    yy, xx = np.mgrid[0:size, 0:size].astype(float) / size
+    warp = fbm(size, size, 3, 3, rng)
+    ripple = 0.5 + 0.5 * np.sin((xx * 22.0 + warp * 3.0) * np.pi * 2)
+    fine = rng.random((size, size))
+    alb = lerp(rgb("#b7a27c")[None, None, :], rgb("#d6c49c")[None, None, :], (ripple * 0.3 + fbm(size, size, 8, 4, rng) * 0.7)[..., None])
+    alb *= (0.94 + fine[..., None] * 0.12)
+    return alb, height_to_normal(ripple * 0.25 + fine * 0.05, 1.6)
+
+
+def terrain_mud(size, seed):
+    rng = _rng(seed)
+    n = fbm(size, size, 5, 5, rng)
+    wet = smoothstep(0.5, 0.7, fbm(size, size, 4, 3, _rng(seed + 1)))
+    alb = lerp(rgb("#3e3022")[None, None, :], rgb("#5a4632")[None, None, :], n[..., None])
+    alb = lerp(alb, rgb("#2a2219")[None, None, :], (wet * 0.6)[..., None])
+    height = n * 0.6 * (1 - wet)
+    alb = _stamps(size, rng, 900, 0.8, 2.2, [rgb("#6a5a46"), rgb("#4a3c2c")], alb)
+    return alb, height_to_normal(height, 2.0)
+
+
+def terrain_forest(size, seed):
+    rng = _rng(seed)
+    n = fbm(size, size, 6, 4, rng)
+    alb = lerp(rgb("#2e2418")[None, None, :], rgb("#4a3a26")[None, None, :], n[..., None])
+    height = n * 0.3
+    leaves = [rgb(c) for c in ("#7a4a22", "#9a6228", "#5a3c1e", "#a8782e", "#6a5a2a", "#4e5a24")]
+    alb = _stamps(size, rng, 5200, 4.0, 8.5, leaves, alb, height, elong=1.7)
+    alb = _stamps(size, rng, 320, 1.0, 1.6, [rgb("#3a2a1a")], alb, height, elong=16.0)  # twigs
+    return alb, height_to_normal(height, 2.4)
 
 
 def roof_variant(size, seed, kind):

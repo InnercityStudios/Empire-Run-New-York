@@ -24,6 +24,8 @@ import random
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+import slice_data
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 FONT_DISPLAY = os.path.join(ROOT, "assets", "fonts", "Cinzel-Variable.ttf")
 FONT_UI = os.path.join(ROOT, "assets", "fonts", "Inter-Variable.ttf")
@@ -136,15 +138,17 @@ def rotated_rect(cx, cz, length, width, angle_deg):
 
 BOROUGHS = [
     {"id": "manhattan", "name": "Manhattan", "borough": "manhattan", "kind": "playable", "polygon": manhattan()},
-    {"id": "brooklyn", "name": "Brooklyn", "borough": "brooklyn", "kind": "playable", "polygon": brooklyn()},
+    # Brooklyn runs south to Fort Hamilton (Bay Ridge, the Verrazzano landing).
+    {"id": "brooklyn", "name": "Brooklyn", "borough": "brooklyn", "kind": "playable",
+     "polygon": [(380, 6300)] + brooklyn() + [(1950, 5000), (1950, 6300)]},
     {"id": "queens", "name": "Queens", "borough": "queens", "kind": "playable", "polygon": queens()},
     {"id": "bronx", "name": "The Bronx", "borough": "bronx", "kind": "playable", "polygon": bronx()},
     {"id": "roosevelt_island", "name": "Roosevelt Island", "borough": "manhattan", "kind": "playable",
      "polygon": rotated_rect(2210, -2700, 1300, 90, GRID_ANGLE)},
     {"id": "randalls_island", "name": "Randall's Island", "borough": "manhattan", "kind": "playable",
      "polygon": [(2980, -4520), (3280, -4560), (3360, -4880), (3120, -5000), (2900, -4800)]},
-    {"id": "staten_island", "name": "Staten Island (future)", "borough": "staten_island", "kind": "future",
-     "polygon": [(-3600, 5300), (-1300, 5000), (100, 5600), (0, 6400), (-3600, 6400)]},
+    {"id": "staten_island", "name": "Staten Island", "borough": "staten_island", "kind": "playable",
+     "polygon": slice_data.STATEN_BOROUGH},
 ]
 
 PAD = 1500  # scenery land runs this far past the extent so no map edge is ever visible
@@ -203,7 +207,7 @@ COASTS = [
     {"id": "liberty_island", "name": "Liberty Island", "kind": "scenery",
      "polygon": [(-1150, 2620), (-1020, 2600), (-1000, 2720), (-1140, 2740)]},
     {"id": "new_jersey", "name": "New Jersey", "kind": "scenery", "polygon": _coast_new_jersey()},
-    {"id": "staten_island", "name": "Staten Island", "kind": "scenery",
+    {"id": "staten_island", "name": "Staten Island", "kind": "playable", "terrain": True,
      "polygon": [(-3600 - PAD, 5300), (-1300, 5000), (100, 5600), (0, 6400 + PAD), (-3600 - PAD, 6400 + PAD)]},
 ]
 for _i, _c in enumerate(COASTS):
@@ -350,6 +354,13 @@ DISTRICTS = [
      "grid": {"angle": 0, "pitch": (220, 140)}, "territory": "neutral"},
     {"id": "throgs_neck", "name": "Throgs Neck", "borough": "bronx", "seed": (6900, -6600),
      "style": "suburban_queens", "grid": {"angle": -20, "pitch": (170, 120)}, "territory": "neutral"},
+    # Phase B slice: streets-first Bay Ridge and Grasmere, Staten Island estate country.
+    {"id": "bay_ridge", "name": "Bay Ridge", "borough": "brooklyn", "seed": (1250, 5300), "style": "rowhouse_mix",
+     "polygon": slice_data.BAY_RIDGE, "streets_first": "bay_ridge", "territory": "neutral"},
+    {"id": "grasmere", "name": "Grasmere", "borough": "staten_island", "seed": (-650, 5800), "style": "suburban_queens",
+     "polygon": slice_data.GRASMERE, "streets_first": "grasmere", "territory": "neutral"},
+    {"id": "todt_hill", "name": "Todt Hill", "borough": "staten_island", "seed": (-2600, 6600), "style": "countryside",
+     "estate_region": "staten", "territory": "neutral"},
     {"id": "randalls", "name": "Randall's Island", "borough": "manhattan", "seed": (3130, -4760), "style": "park",
      "territory": "neutral"},
     {"id": "roosevelt", "name": "Roosevelt Island", "borough": "manhattan", "seed": (2210, -2700),
@@ -380,6 +391,7 @@ STYLES = {
     "towers_in_park": {"label": "Towers in parkland", "color": "#7f8670", "floors": [12, 20], "density": 0.3},
     "airport": {"label": "Airport", "color": "#6b6e6a", "floors": [1, 3], "density": 0.1},
     "park": {"label": "Park", "color": "#4d6e38", "floors": [0, 0], "density": 0.0},
+    "countryside": {"label": "Estate countryside", "color": "#5d7a44", "floors": [0, 3], "density": 0.0},
 }
 
 # Block fill rules per style (consumed by the game's BlockFiller): building
@@ -413,6 +425,7 @@ FILL = {
                        "lawns": True},
     "airport": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
     "park": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
+    "countryside": {"kinds": [], "corners": False, "gap": [0, 0], "trees": 0.0},
     "li_tenement": {"kinds": ["midblock"], "corners": True, "gap": [0, 0], "trees": 0.62},
 }
 # Block interiors behind the frontage: backyards, work yards or paved plazas.
@@ -528,7 +541,7 @@ LI_LANDMARKS = [("lm_hq_marino", (-92, -2), "hq"), ("lm_vesuvio", (-68, -30), "r
                 ("lm_bowery_auto", (158, 0), "garage"), ("lm_grand_freight", (40, -60), "warehouse"),
                 ("lm_trattoria_napoli", (25, -40), "restaurant"), ("lm_blue_lantern", (-10, 70), "bar")]
 
-EXTENT = (-3600, -8900, 9200, 6400)
+EXTENT = (-4700, -8900, 9200, 7700)
 PLAYABLE = [(-1500, 2100), (-1700, -400), (-700, -4000), (1200, -7800), (3300, -9700), (7600, -9700), (7600, 5000),
             (400, 5000), (-200, 2600)]
 
@@ -566,6 +579,7 @@ def export_json(path, district_cells):
         "defaults": {"sidewalk_width": 4.0, "curb_height": 0.15, "corner_radius": 3.2, "lot_depth": 20.0,
                      "lane_offset": 1.9, "street_width": 12},
     }
+    print("SLICE", slice_data.add_slice(data, next(c for c in COASTS if c["id"] == "long_island")["polygon"]))
     for d in DISTRICTS:
         e = {k: v for k, v in d.items() if k != "seed"}
         e["seed"] = r2(d["seed"])

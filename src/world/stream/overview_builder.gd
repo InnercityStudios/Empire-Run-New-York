@@ -44,6 +44,16 @@ func _build(world: WorldLayout, parent: Node3D) -> void:
 			per_tile[tk] = []
 		per_tile[tk].append([t, col, key])
 	for b in world.blocks:
+		if b.has("polygon"):
+			var actual := BlockFiller.fill(b,world.sidewalk,world.curb_height,false)
+			for lot in actual["lots"]:
+				var t: Transform3D=lot["transform"]
+				var dims: Vector3=b["kit"]["dims"][lot["building"]]
+				var center: Vector3=t*Vector3(0,0,-dims.z*.5)
+				var col := Color.html(world._catalog[lot["building"]].get("facade","#7a5a48"))
+				add.call(Vector2(center.x,center.z),Vector2(dims.x,dims.z),dims.y,t.basis.z.signed_angle_to(Vector3.BACK,Vector3.UP),col,
+					world.chunk_of(WorldLayout.block_center(b)))
+			continue
 		var kit: Dictionary = world.kits.get(b["style"], world.kits.get("li_tenement", {})) if world.is_geo else {}
 		var mean_h: float = kit.get("mean_height", 18.0) if not kit.is_empty() else 18.0
 		if mean_h <= 0.0:

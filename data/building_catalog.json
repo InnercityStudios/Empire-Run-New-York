@@ -146,6 +146,54 @@
       "roof_tone": 0.25
     },
     {
+      "id": "estate_fountain",
+      "kind": "estate_part",
+      "scene": "res://assets/models/buildings/estate_fountain.glb",
+      "width": 6.4,
+      "depth": 6.4,
+      "height": 3.5,
+      "triangles": 162,
+      "materials": 2,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
+    },
+    {
+      "id": "estate_garage",
+      "kind": "estate_part",
+      "scene": "res://assets/models/buildings/estate_garage.glb",
+      "width": 15.0,
+      "depth": 8.0,
+      "height": 6.4,
+      "triangles": 22,
+      "materials": 3,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
+    },
+    {
+      "id": "estate_gatehouse",
+      "kind": "estate_part",
+      "scene": "res://assets/models/buildings/estate_gatehouse.glb",
+      "width": 14.0,
+      "depth": 5.0,
+      "height": 4.6,
+      "triangles": 310,
+      "materials": 5,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
+    },
+    {
+      "id": "estate_wall",
+      "kind": "estate_part",
+      "scene": "res://assets/models/buildings/estate_wall.glb",
+      "width": 20.0,
+      "depth": 1.0,
+      "height": 2.7,
+      "triangles": 42,
+      "materials": 2,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
+    },
+    {
       "id": "factory_a",
       "kind": "industrial",
       "scene": "res://assets/models/buildings/factory_a.glb",
@@ -239,6 +287,42 @@
       "triangles": 1886,
       "materials": 7,
       "facade": "#a2845f",
+      "roof_tone": 0.5
+    },
+    {
+      "id": "mansion_l1",
+      "kind": "mansion",
+      "scene": "res://assets/models/buildings/mansion_l1.glb",
+      "width": 30.0,
+      "depth": 18.0,
+      "height": 13.4,
+      "triangles": 1458,
+      "materials": 7,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
+    },
+    {
+      "id": "mansion_l2",
+      "kind": "mansion",
+      "scene": "res://assets/models/buildings/mansion_l2.glb",
+      "width": 58.0,
+      "depth": 18.0,
+      "height": 13.4,
+      "triangles": 2938,
+      "materials": 8,
+      "facade": "#7a5a48",
+      "roof_tone": 0.5
+    },
+    {
+      "id": "mansion_l3",
+      "kind": "mansion",
+      "scene": "res://assets/models/buildings/mansion_l3.glb",
+      "width": 58.0,
+      "depth": 22.0,
+      "height": 17.4,
+      "triangles": 3316,
+      "materials": 8,
+      "facade": "#7a5a48",
       "roof_tone": 0.5
     },
     {

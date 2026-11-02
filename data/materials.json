@@ -70,6 +70,12 @@
       "roughness": 0.85,
       "uv_m": 1.5
     },
+    "M_Foliage_Pine": {
+      "albedo": "res://assets/textures/foliage_albedo.png",
+      "color": "#8fa69a",
+      "roughness": 0.85,
+      "uv_m": 1.2
+    },
     "M_Grass": {
       "albedo": "res://assets/textures/grass_albedo.png",
       "color": "#ffffff",
@@ -99,6 +105,14 @@
       "color": "#9a958c",
       "grime": 1.0,
       "normal": "res://assets/textures/stone_normal.png",
+      "roughness": 0.9,
+      "uv_m": 3.0
+    },
+    "M_Rock": {
+      "albedo": "res://assets/textures/terrain_rock_albedo.png",
+      "color": "#ffffff",
+      "grime": 0.4,
+      "normal": "res://assets/textures/terrain_rock_normal.png",
       "roughness": 0.9,
       "uv_m": 3.0
     },
@@ -133,6 +147,14 @@
       "normal": "res://assets/textures/roof_tar_normal.png",
       "roughness": 0.9,
       "uv_m": 4.0
+    },
+    "M_Roof_Terracotta": {
+      "albedo": "res://assets/textures/shingle_albedo.png",
+      "color": "#c9785a",
+      "grime": 0.4,
+      "normal": "res://assets/textures/shingle_normal.png",
+      "roughness": 0.8,
+      "uv_m": 2.0
     },
     "M_Shingle_Brown": {
       "albedo": "res://assets/textures/shingle_albedo.png",
@@ -274,6 +296,14 @@
       "normal": "res://assets/textures/stone_normal.png",
       "roughness": 0.85,
       "uv_m": 2.0
+    },
+    "M_Stucco": {
+      "albedo": "res://assets/textures/stone_albedo.png",
+      "color": "#e6dcc4",
+      "grime": 0.6,
+      "normal": "res://assets/textures/stone_normal.png",
+      "roughness": 0.85,
+      "uv_m": 2.5
     },
     "M_Window": {
       "albedo": "res://assets/textures/window_atlas.png",

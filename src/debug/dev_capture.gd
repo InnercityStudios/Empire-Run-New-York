@@ -49,6 +49,8 @@ func _ready() -> void:
 		var main := get_tree().get_first_node_in_group("main")
 		if main and "world" in main and main.world is WorldStreamer:
 			var w: WorldStreamer = main.world
+			if w._terrain_streamer:
+				print("DevCapture: terrain ",w._terrain_streamer.stats," pending=",w._terrain_streamer.tasks.size())
 			print("DevCapture: streamer ", w.stats, " pending=", w.pending_count(),
 				" camera_distance=%.0f radius=%.0f" % [w.camera.distance, WorldStreamer.detail_radius(w.camera.distance)])
 	var main := get_tree().get_first_node_in_group("main")
@@ -104,6 +106,8 @@ func _apply_setup() -> void:
 		var p := (_args["view"] as String).split(",")
 		var cam := get_tree().get_first_node_in_group("strategy_camera")
 		if cam and p.size() >= 3:
+			if _args.has("whole-world"):
+				cam.max_distance = 50000.0
 			var v := {"x": float(p[0]), "z": float(p[1]), "distance": float(p[2])}
 			if p.size() >= 4:
 				v["yaw_deg"] = float(p[3])

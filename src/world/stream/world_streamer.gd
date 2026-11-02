@@ -40,6 +40,7 @@ var _results: Array = []
 var _mutex := Mutex.new()
 var _initial_signalled := false
 var _detail_root: Node3D
+var _terrain_streamer: TerrainStreamer
 var _tree_mesh: ArrayMesh
 var _tree_far_mesh: ArrayMesh
 
@@ -53,6 +54,11 @@ func build(p_layout: WorldLayout) -> void:
 	add_child(shell)
 	_geo = layout.is_geo
 	stats.merge(GeoShellBuilder.build(layout, shell) if _geo else WorldShellBuilder.build(layout, shell), true)
+	if layout.terrain:
+		_terrain_streamer = TerrainStreamer.new()
+		_terrain_streamer.name = "Landscape"
+		add_child(_terrain_streamer)
+		_terrain_streamer.build(layout)
 	var far_root := Node3D.new()
 	far_root.name = "FarCity"
 	add_child(far_root)
@@ -141,6 +147,8 @@ var _far_root: Node3D
 func _process(_delta: float) -> void:
 	if layout == null or camera == null:
 		return
+	if _terrain_streamer:
+		_terrain_streamer.camera = camera
 	var focus := Vector2(camera.focus.x, camera.focus.z)
 	if _geo:
 		_stream_mid(focus)
@@ -170,7 +178,7 @@ func _process(_delta: float) -> void:
 			break
 		var key: Vector2i = w[1]
 		_tasks[key] = WorkerThreadPool.add_task(_build_task.bind(key), false, "chunk %s" % key)
-	if not _initial_signalled and wanted.is_empty() and _tasks.is_empty() and (not _detail.is_empty() or radius == 0.0):
+	if not _initial_signalled and wanted.is_empty() and _tasks.is_empty() :
 		_initial_signalled = true
 		initial_detail_ready.emit()
 

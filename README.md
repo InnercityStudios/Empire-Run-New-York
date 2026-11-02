@@ -62,9 +62,14 @@ $GODOT --path . -- --new-game --capture=/tmp/shot.png --capture-delay=5 --stats 
 ## The world
 
 The game streams **Greater New York 1977** (`data/world/nyc_1977.json`, a
-12.8 × 15.3 km compressed New York: Manhattan, Brooklyn, Queens, the Bronx,
-rivers, nine bridges, 50 neighbourhoods) with Little Italy preserved at its
-original coordinates. The data is authored by `tools/geography/nyc_blueprint.py`
+27 × 24 km landscape around compressed New York: Manhattan, Brooklyn, Queens, the Bronx,
+Staten Island, rivers and bridges) with Little Italy preserved at its
+original coordinates. An additive `data/world/landscape.json` layer extends the
+landforms, roads and countryside without rewriting the city definition.
+Terrain detail streams over resident coarse heightfield tiles; 2,034 validated
+estate reservations are recorded in `data/world/estate_reservations.json`.
+See [the implementation audit](docs/WORLD_LANDSCAPE_AUDIT.md) for validation
+results and the outstanding graphical review. The city data is authored by `tools/geography/nyc_blueprint.py`
 (see `docs/GEOGRAPHY_BLUEPRINT.md`); `tools/geography/render_world.py` renders the
 generated in-game layout (dump it with `tests/tools_geo_dump.gd`). The first
 province is still available: `-- --world=greater_new_york`.
@@ -80,6 +85,8 @@ $BLENDER -b --factory-startup --python tools/blender/build_licensed_vehicles.py 
 $BLENDER -b --factory-startup --python tools/blender/build_pbr_textures.py       # Poly Haven 2K -> 1K PBR sets
 $BLENDER -b --factory-startup --python tools/blender/build_licensed_buildings.py  # licensed skyscrapers + Brooklyn building
 python3 tools/geography/nyc_blueprint.py                                 # geography data + blueprint maps
+python3 tools/geography/build_landscape.py                             # additive outer geography
+python3 tools/geography/build_water_mask.py                            # shoreline material mask (Pillow)
 python3 tools/configure_imports.py                                       # mobile texture import presets (idempotent)
 ```
 

@@ -39,6 +39,7 @@ var _li_rect: Rect2
 var _li_poly: PackedVector2Array
 var _tower_polys: Array = []
 var stats := {}
+var _inland_water: Array = []
 
 
 static func populate(world: WorldLayout, def: Dictionary, content: GameContent) -> void:
@@ -80,6 +81,16 @@ func _run(world: WorldLayout, def: Dictionary, content: GameContent) -> void:
 		_add_arterial(r)
 	for b in def.get("bridges", []):
 		_add_bridge(b)
+	for region in def.get("estate_regions", []):
+		for lake in region.get("lakes", []):
+			var poly := GeoMap.poly(lake["polygon"])
+			_inland_water.append({"polygon":poly,"bounds":GeoMap.poly_bounds(poly)})
+	for region in def.get("estate_regions", []):
+		for stream in region.get("streams", []):
+			var path := GeoMap.poly(stream["path"])
+			for poly in Geometry2D.offset_polyline(path,float(stream["width"])*.5,Geometry2D.JOIN_ROUND,Geometry2D.END_ROUND):
+				_inland_water.append({"polygon":poly,"bounds":GeoMap.poly_bounds(poly)})
+	_authored_networks(def)
 	_split_crossings()
 	stats["arterials_ms"] = Time.get_ticks_msec() - t0
 	var bounds := geo.district_bounds()
@@ -96,6 +107,9 @@ func _run(world: WorldLayout, def: Dictionary, content: GameContent) -> void:
 	_backdrop()
 	for d in w.districts:
 		w.labels.append({"text": d["name"], "pos": Vector2(d["seed"][0], d["seed"][1]), "kind": "district"})
+	w.terrain = TerrainField.build(w, def)
+	w.estate_plots = w.terrain.plots
+	w.playable = w.world_rect.grow(-120.0)
 	w.index_chunks()
 	stats["total_ms"] = Time.get_ticks_msec() - t0
 	stats["blocks"] = w.blocks.size()
@@ -321,7 +335,7 @@ static func _along(path: PackedVector2Array, d: float) -> Vector2:
 func _split_crossings() -> void:
 	var segs: Array = []
 	for li in _lines.size():
-		if _lines[li]["kind"] != "arterial":
+		if _lines[li]["kind"] not in ["arterial", "network"]:
 			continue
 		var pts: PackedVector2Array = _lines[li]["pts"]
 		for s in pts.size() - 1:
@@ -330,7 +344,7 @@ func _split_crossings() -> void:
 		for j in range(i + 1, segs.size()):
 			var a: Array = segs[i]
 			var b: Array = segs[j]
-			if a[0] == b[0]:
+			if a[0] == b[0] or (_lines[a[0]]["kind"] == "network" and _lines[b[0]]["kind"] == "network"):
 				continue
 			var x: Variant = Geometry2D.segment_intersects_segment(a[2], a[3], b[2], b[3])
 			if x == null:
@@ -390,7 +404,7 @@ func _district_groups(bounds: Dictionary) -> Array:
 	var order: Array = []
 	for di in geo.districts.size():
 		var d: Dictionary = geo.districts[di]
-		if not bounds.has(di) or not d.has("grid") or d.has("polygon") or d["style"] in ["park", "airport"]:
+		if not bounds.has(di) or not d.has("grid") or d.has("polygon") or d["style"] in ["park", "airport", "countryside"] or d.get("network", "") != "":
 			continue
 		var g: Dictionary = d["grid"]
 		var key := "%s|%s|%s|%s|%s" % [d["borough"], g["angle"], g["pitch"], g.get("irregular", false), g.get("anchor", "")]
@@ -811,7 +825,7 @@ func _stitch() -> void:
 			continue
 		var q: Vector2 = best[2]
 		if best_d > 0.3:
-			if not geo.is_land((p + q) * 0.5) or _crosses_li(p, q):
+			if not _dry_segment(p,q) or _crosses_li(p, q):
 				continue
 		_add_split(best[0], best[1], q)
 		if best_d <= 0.3:
@@ -963,34 +977,43 @@ func _connect_islands() -> void:
 				cells[k] = []
 			cells[k].append(i)
 	var linked := 0
-	for cid in sizes.size():
-		if cid == main:
-			continue
-		var best := [-1, -1]
-		var best_d := LINK_RADIUS
-		for i in n:
-			if comp[i] != cid:
-				continue
-			var p: Vector2 = w.graph_nodes[i]
-			var k0 := Vector2i(((p - Vector2(LINK_RADIUS, LINK_RADIUS)) / 128.0).floor())
-			var k1 := Vector2i(((p + Vector2(LINK_RADIUS, LINK_RADIUS)) / 128.0).floor())
-			for kx in range(k0.x, k1.x + 1):
-				for kz in range(k0.y, k1.y + 1):
-					for j in cells.get(Vector2i(kx, kz), []):
-						var d := p.distance_to(w.graph_nodes[j])
-						if d < best_d and geo.is_land((p + (w.graph_nodes[j] as Vector2)) * 0.5) \
-								and not _crosses_li(p, w.graph_nodes[j]):
-							best_d = d
-							best = [i, j]
-		if best[0] >= 0:
-			var street := "link_island_%d" % linked
-			w.streets[street] = {"name": "Service Rd", "width": 12.0}
-			w.edge(best[0], best[1], street, 12.0, 1000)
-			w.add_segment(street, w.graph_nodes[best[0]], w.graph_nodes[best[1]], 12.0, 1, Vector2(1, 1))
-			linked += 1
+	var pending := range(sizes.size())
+	pending.erase(main)
+	var previous_count := pending.size()+1
+	# Newly linked nodes must be available to the next component, otherwise
+	# roads beyond the original 350m stitching radius are silently dropped.
+	while pending.size()<previous_count and not pending.is_empty():
+		previous_count=pending.size()
+		for cid in pending.duplicate():
+			var best := [-1, -1]
+			var best_d := LINK_RADIUS
 			for i in n:
-				if comp[i] == cid:
-					comp[i] = main
+				if comp[i] != cid:
+					continue
+				var p: Vector2 = w.graph_nodes[i]
+				var k0 := Vector2i(((p - Vector2(LINK_RADIUS, LINK_RADIUS)) / 128.0).floor())
+				var k1 := Vector2i(((p + Vector2(LINK_RADIUS, LINK_RADIUS)) / 128.0).floor())
+				for kx in range(k0.x, k1.x + 1):
+					for kz in range(k0.y, k1.y + 1):
+						for j in cells.get(Vector2i(kx, kz), []):
+							var d := p.distance_to(w.graph_nodes[j])
+							if d < best_d and geo.is_land((p + (w.graph_nodes[j] as Vector2)) * 0.5) \
+									and not _crosses_li(p, w.graph_nodes[j]) and _dry_segment(p,w.graph_nodes[j]):
+								best_d = d
+								best = [i, j]
+			if best[0] >= 0:
+				var street := "link_island_%d" % linked
+				w.streets[street] = {"name": "Service Rd", "width": 12.0}
+				w.edge(best[0], best[1], street, 12.0, 1000)
+				w.add_segment(street, w.graph_nodes[best[0]], w.graph_nodes[best[1]], 12.0, 1, Vector2(1, 1))
+				linked += 1
+				for i in n:
+					if comp[i] == cid:
+						comp[i] = main
+						var key := Vector2i(((w.graph_nodes[i] as Vector2)/128.0).floor())
+						if not cells.has(key):cells[key]=[]
+						cells[key].append(i)
+				pending.erase(cid)
 	# Anything still unreachable is removed so every node can be routed to.
 	var keep := PackedInt32Array()
 	keep.resize(n)
@@ -1090,7 +1113,7 @@ func _backdrop() -> void:
 		var x := area.position.x
 		while x < area.end.x:
 			var p := Vector2(x, z)
-			if geo.is_land(p) and _far_from_boroughs(p):
+			if geo.is_land(p) and _far_from_boroughs(p) and not geo.borough_at(p).is_empty():
 				var n := rng.randi_range(1, 2)
 				for i in n:
 					var q := p + Vector2(rng.randf_range(-30, 30), rng.randf_range(-28, 28))
@@ -1105,3 +1128,97 @@ func _far_from_boroughs(p: Vector2) -> bool:
 		if not geo.borough_at(p + o).is_empty():
 			return false
 	return true
+
+
+## Authored city, suburban and rural roads share a single planar graph. The
+## same edges generate road surfaces and routing; bounded faces generate lots.
+func _authored_networks(def: Dictionary) -> void:
+	var roads := []
+	var block_regions := {}
+	for net in def.get("networks", []):
+		block_regions[net["id"]] = net.get("blocks", false)
+		for r in net["roads"]:
+			for run in _dry_road_runs(GeoMap.poly(r["path"]),float(r["width"])*.5):
+				var road: Dictionary = r.duplicate(true)
+				road["path"] = run
+				road["network"] = net["id"]
+				roads.append(road)
+	var n := StreetNetwork.build(roads)
+	for i in n.roads.size():
+		var r: Dictionary = n.roads[i]
+		var id := "net:%s:%d" % [r["network"],i]
+		w.streets[id] = {"name":r["name"],"width":r["width"]}
+	for e in n.edges:
+		var r: Dictionary = n.roads[e["road"]]
+		var id := "net:%s:%d" % [r["network"],e["road"]]
+		var a: Vector2 = n.nodes[e["a"]]
+		var b: Vector2 = n.nodes[e["b"]]
+		_new_line(id,PackedVector2Array([a,b]),float(r["width"]),int(r.get("speed",1000)),1,"net:"+r["network"],"network")
+		_add_corridor(a,b,float(r["width"])*.5)
+		if n.degree(e["a"]) == 1:_candidates.append([a,"net:"+r["network"],END_STITCH_RADIUS,0.0])
+		if n.degree(e["b"]) == 1:_candidates.append([b,"net:"+r["network"],END_STITCH_RADIUS,0.0])
+	for seg in n.segments:
+		var r: Dictionary = n.roads[seg["road"]]
+		w.add_segment("net:%s:%d"%[r["network"],seg["road"]],seg["from"],seg["to"],seg["width"],
+			0 if float(seg["width"])<10.0 else 1,seg["no_crossing"])
+	for j in n.junctions:_add_junction(j["center"],j["poly"])
+	var counts := {}
+	for poly in n.blocks:
+		var rect := GeoMap.poly_bounds(poly)
+		var center := rect.get_center()
+		var di := geo.district_at(center)
+		if di<0:continue
+		var d: Dictionary = geo.districts[di]
+		if not block_regions.get(d["id"],false):continue
+		var clear := true
+		for p in poly:
+			if not geo.is_land(p):clear=false;break
+		if not clear:continue
+		var style: String = d["style"]
+		var count: int = counts.get(d["id"],0)
+		var kit: Dictionary = w.kits[style]
+		w.blocks.append({"rect":rect,"polygon":poly,"xform":Transform2D.IDENTITY,"gen":true,"district":d["id"],
+			"region":d["id"],"style":style,"seed":hash([w.seed_value,d["id"],count]),"kit":kit,"sidewalks":true,
+			"lawn":true,"yard":"M_Grass" if d["id"]=="grasmere" else "M_Gravel","core":false,
+			"col":count,"row":0,"index":count})
+		counts[d["id"]]=count+1
+	stats["authored_faces"]=counts
+
+
+func _dry_point(p: Vector2) -> bool:
+	if not geo.is_land(p):return false
+	for lake in _inland_water:
+		if (lake["bounds"] as Rect2).has_point(p) and Geometry2D.is_point_in_polygon(p,lake["polygon"]):return false
+	return true
+
+func _dry_segment(a: Vector2, b: Vector2) -> bool:
+	var steps := maxi(1,ceili(a.distance_to(b)/4.0))
+	for k in steps+1:
+		if not _dry_point(a.lerp(b,float(k)/steps)):return false
+	return true
+
+## Clip carriageway footprints at natural water, preserving original vertices
+## within each run. Never densify a whole road just to find a shore crossing.
+func _dry_road_runs(path: PackedVector2Array, half: float) -> Array:
+	var runs := []
+	var current := PackedVector2Array()
+	var previous := Vector2.ZERO
+	for i in path.size()-1:
+		var a := path[i]
+		var b := path[i+1]
+		var dir := (b-a).normalized()
+		var side := Vector2(-dir.y,dir.x)*(half+1.0)
+		var steps := maxi(1,ceili(a.distance_to(b)/4.0))
+		for k in steps+1:
+			var p := a.lerp(b,float(k)/steps)
+			var dry := _dry_point(p) and _dry_point(p+side) and _dry_point(p-side)
+			if dry:
+				if current.is_empty():current.append(p)
+				if k==steps and p.distance_to(current[-1])>.1:current.append(p)
+				previous=p
+			elif not current.is_empty():
+				if previous.distance_to(current[-1])>.1:current.append(previous)
+				if current.size()>1:runs.append(current)
+				current=PackedVector2Array()
+	if current.size()>1:runs.append(current)
+	return runs

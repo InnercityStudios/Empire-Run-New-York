@@ -18,7 +18,9 @@ static func build(world: WorldLayout, key: Vector2i) -> Dictionary:
 	var parked: Array = c["parking"].duplicate()
 	for bi in c["blocks"]:
 		var b: Dictionary = world.blocks[bi]
-		if b["sidewalks"]:
+		if b.has("polygon"):
+			RoadBuilder.add_polygon_sidewalk(tools,b["polygon"],world.curb_height,world.sidewalk,b.get("yard","M_Grass"))
+		elif b["sidewalks"]:
 			RoadBuilder.add_sidewalk(tools, b["rect"], world.curb_height, world.corner_radius, b["lawn"], world.sidewalk,
 				b.get("xform", Transform2D.IDENTITY), b.get("yard", ""))
 		if b.get("gen", false):

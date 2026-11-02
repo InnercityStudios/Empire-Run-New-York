@@ -184,3 +184,20 @@ static func _rounded_rect(r: Rect2, radius: float) -> PackedVector2Array:
 			var a: float = c[1] + (PI * 0.5) * k / CORNER_SEGMENTS
 			pts.append(c[0] + Vector2(cos(a), sin(a)) * radius)
 	return pts
+
+
+## Polygon faces use their actual kerb boundary at every LOD.
+static func add_polygon_sidewalk(tools: Dictionary, poly: PackedVector2Array, height: float, width: float, yard: String) -> void:
+	var pavement := _tool(tools,"M_Sidewalk")
+	var inner := Geometry2D.offset_polygon(poly,-width,Geometry2D.JOIN_MITER)
+	# Fill the block, then its inset garden/courtyard. Neither can pave outside
+	# the road-derived face, including concave corners.
+	GeoShellBuilder._fill_polygon(pavement,poly,height,3.0)
+	for garden in inner:
+		GeoShellBuilder._fill_polygon(_tool(tools,yard if yard!="" else "M_Gravel"),garden,height+.012,6.0)
+	var curb := _tool(tools,"M_Curb")
+	for i in poly.size():
+		var a := poly[i]
+		var b := poly[(i+1)%poly.size()]
+		var n := Vector2(-(b-a).y,(b-a).x).normalized()
+		WorldShellBuilder._wall(curb,a,b,n,0.0,height)

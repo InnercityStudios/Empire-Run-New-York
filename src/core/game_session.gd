@@ -103,6 +103,10 @@ func _exit_tree() -> void:
 
 
 func save() -> void:
+	# Capture/benchmark runs must never overwrite a player save.
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--capture=") or arg == "--no-save":
+			return
 	if world == null:
 		return
 	_last_save_ms = Time.get_ticks_msec()

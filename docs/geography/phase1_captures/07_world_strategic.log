@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 3.2 - Forward Mobile - Using Device #0: Apple - Apple M3 Pro (Apple9)
+
+TerrainField: reservations { "target": 2017, "validated": 2034, "shortfall": 0, "tiers": { "prime": 109, "outer": 920, "suburban": 1005 }, "rejected": { "boundary_water": 1289, "road": 6009, "spacing": 3892, "access": 223, "slope": 1 }, "plot_m": 140.0, "spacing_m": 230.0, "exclusion_radius_m": 115.0 }
+WorldStreamer: 0 chunks, 385 road meshes, shell + far city in 1777 ms
+DevCapture: saved /Users/joeygray/Projects/empire-run-new-york/empire--run-new-york/docs/geography/phase1_captures/07_world_strategic.png (1600x900) err=0
+DevCapture: fps=119 draw_calls=1376 primitives=391264 objects=1836 vram_mb=312.5
+DevCapture: terrain { "coarse_tiles": 662, "detail_tiles": 0, "max_tasks": 2, "vegetation_instances": 0 } pending=0
+DevCapture: streamer { "build_ms": 1777, "far_chunks": 3295, "detail_loaded": 0, "detail_built": 207, "detail_ms_total": 10355, "road_chunks": 385, "overview_instances": 16310, "overview_tiles": 117, "mid_loaded": 3, "detail_tris_max": 454710, "detail_ms_max": 151 } pending=2 camera_distance=45000 radius=0
+DevCapture: WorldStreamer stats { "build_ms": 1777, "far_chunks": 3295, "detail_loaded": 0, "detail_built": 207, "detail_ms_total": 10355, "road_chunks": 385, "overview_instances": 16310, "overview_tiles": 117, "mid_loaded": 3, "detail_tris_max": 454710, "detail_ms_max": 151 }

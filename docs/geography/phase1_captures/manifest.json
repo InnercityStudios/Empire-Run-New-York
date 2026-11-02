@@ -1,0 +1,37 @@
+[
+  {
+    "image": "01_new_york_close.png",
+    "view": "-80,-30,110,-32",
+    "source": "Godot Mobile viewport"
+  },
+  {
+    "image": "02_new_york_medium.png",
+    "view": "400,-1700,1050,-32",
+    "source": "Godot Mobile viewport"
+  },
+  {
+    "image": "03_city_suburbs.png",
+    "view": "350,5650,2400,-15",
+    "source": "Godot Mobile viewport"
+  },
+  {
+    "image": "04_open_countryside.png",
+    "view": "-5200,-6800,1450,-20",
+    "source": "Godot Mobile viewport"
+  },
+  {
+    "image": "05_natural_banks.png",
+    "view": "-2650,5720,800,-12",
+    "source": "Godot Mobile viewport"
+  },
+  {
+    "image": "06_mansion_fields.png",
+    "view": "12500,-11500,1100,-32",
+    "source": "Godot Mobile viewport"
+  },
+  {
+    "image": "07_world_strategic.png",
+    "view": "4800,-2500,45000,0",
+    "source": "Godot Mobile viewport"
+  }
+]

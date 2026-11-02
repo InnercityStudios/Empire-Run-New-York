@@ -83,17 +83,14 @@ static func to_mesh(arrays: Array) -> ArrayMesh:
 
 static func _flat(v: PackedVector3Array, n: PackedVector3Array, c: PackedColorArray, q: PackedVector2Array, y: float,
 		col: Color) -> void:
-	var a := Vector3(q[0].x, y, q[0].y)
-	var b := Vector3(q[1].x, y, q[1].y)
-	var cc := Vector3(q[2].x, y, q[2].y)
-	var d := Vector3(q[3].x, y, q[3].y)
-	var pav := Color(col.r, col.g, col.b, 0.6)
-	# Clockwise seen from above (Godot front faces).
-	var order := [a, b, cc, a, cc, d] if (b - a).cross(cc - a).y < 0.0 else [a, cc, b, a, d, cc]
-	for p in order:
-		v.append(p)
-		n.append(Vector3.UP)
-		c.append(pav)
+	var idx := Geometry2D.triangulate_polygon(q)
+	for k in range(0,idx.size(),3):
+		var a := Vector3(q[idx[k]].x,y,q[idx[k]].y)
+		var b := Vector3(q[idx[k+1]].x,y,q[idx[k+1]].y)
+		var d := Vector3(q[idx[k+2]].x,y,q[idx[k+2]].y)
+		var order := [a,b,d] if (b-a).cross(d-a).y<0.0 else [a,d,b]
+		for p in order:
+			v.append(p);n.append(Vector3.UP);c.append(Color(col.r,col.g,col.b,.6))
 
 
 static func _box(v: PackedVector3Array, n: PackedVector3Array, c: PackedColorArray, t: Transform3D, mn: Vector3,

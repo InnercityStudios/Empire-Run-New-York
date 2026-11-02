@@ -212,3 +212,135 @@ def build_pier_shed(spec):
     front = Facade(mb, (x0, 0, 0), (1, 0, 0), W, h)
     front.box(W * 0.1, W * 0.9, h - 1.6, h - 0.4, 0, 0.12, "M_Sign_White")
     return mb
+
+
+# ---------------------------------------------------------------------------
+# Family estates: an Italianate villa that grows with the mansion level.
+# Same conventions (front at y = 0 facing -Y, depth +Y, origin front-centre).
+# ---------------------------------------------------------------------------
+def _villa_block(mb, rng, x0, x1, y0, y1, floors, wall, roof, shutters=True, hip=True, fh=3.6, base=0.8):
+    W, D = x1 - x0, y1 - y0
+    H = base + floors * fh
+    mb.add_box((x0 - 0.15, y0 - 0.15, 0), (x1 + 0.15, y1 + 0.15, base), "M_Stone", skip=("nz",))
+    mb.add_box((x0, y0, base), (x1, y1, H), wall, skip=("nz", "pz") if hip else ("nz",),
+               mats={"pz": "M_Roof_Gravel"})
+    for face, (o, r, length) in {"front": ((x0, y0, 0), (1, 0, 0), W), "back": ((x1, y1, 0), (-1, 0, 0), W),
+                                 "left": ((x0, y1, 0), (0, -1, 0), D), "right": ((x1, y0, 0), (0, 1, 0), D)}.items():
+        f = Facade(mb, o, r, length, H)
+        n = max(1, int(length / 3.4))
+        for k in range(floors):
+            z = base + k * fh
+            for i in range(n):
+                c = length * (i + 0.5) / n
+                _window(f, c - 0.6, c + 0.6, z + 0.9, z + 2.9, "M_Frame_White", rng, 0.2)
+                if shutters and face in ("front", "back"):
+                    for sgn in (-1, 1):
+                        f.box(c + sgn * 0.62 - (0.45 if sgn < 0 else 0), c + sgn * 0.62 + (0.45 if sgn > 0 else 0),
+                              z + 0.9, z + 2.9, 0.0, 0.06, "M_Shutter_Green")
+        f.box(0, length, base + fh - 0.2, base + fh, 0, 0.15, "M_Cornice_Cream")
+    # Bracketed eaves
+    mb.add_box((x0 - 0.6, y0 - 0.6, H), (x1 + 0.6, y1 + 0.6, H + 0.35), "M_Cornice_Cream")
+    if hip:
+        _hip(mb, x0 - 0.3, x1 + 0.3, y0 - 0.3, y1 + 0.3, H + 0.35, min(W, D) * 0.22, roof)
+    else:
+        for sx in (x0, x1 - 0.25):
+            mb.add_box((sx, y0, H + 0.35), (sx + 0.25, y1, H + 1.3), "M_Cornice_Cream")
+        mb.add_box((x0, y0, H + 0.35), (x1, y0 + 0.25, H + 1.3), "M_Cornice_Cream")
+    return H
+
+
+def build_mansion(spec):
+    level = spec.get("level", 1)
+    rng = random.Random(spec["id"])
+    mb = MeshBuilder(spec["id"])
+    mb.shade_fn = _ground_ao
+    wall, roof = "M_Stucco", "M_Roof_Terracotta"
+    W, D = 30.0, 18.0
+    x0, x1 = -W * 0.5, W * 0.5
+    H = _villa_block(mb, rng, x0, x1, 0.0, D, 2, wall, roof)
+    # Portico with columns, pediment and a balcony above.
+    pw = 10.0
+    mb.add_box((-pw * 0.5, -5.0, 0), (pw * 0.5, 0, 0.8), "M_Stone", skip=("nz",))
+    for i in range(4):
+        px = -pw * 0.5 + 0.7 + (pw - 1.4) * i / 3
+        mb.add_cylinder((px, -4.3, 0.8), 0.32, 3.6, 10, "M_Stucco", cap_top=False)
+    mb.add_box((-pw * 0.5 - 0.3, -5.1, 4.4), (pw * 0.5 + 0.3, 0, 5.0), "M_Cornice_Cream")
+    for i in range(9):
+        bx = -pw * 0.5 + 0.4 + (pw - 0.8) * i / 8
+        mb.add_box((bx - 0.07, -5.0, 5.0), (bx + 0.07, -4.86, 5.8), "M_Cornice_Cream", skip=("nz",))
+    mb.add_box((-pw * 0.5, -5.05, 5.75), (pw * 0.5, -4.8, 5.9), "M_Cornice_Cream")
+    # Front steps
+    for k in range(3):
+        mb.add_box((-3.0, -6.6 + k * 0.5, 0), (3.0, -5.0, 0.27 * (k + 1)), "M_Stone", skip=("nz",))
+    # Chimneys
+    for cx in (x0 + 3.0, x1 - 3.8):
+        mb.add_box((cx, D * 0.55, H), (cx + 0.9, D * 0.55 + 0.9, H + 5.4), "M_Brick_Red", skip=("nz",),
+                   mats={"pz": "M_Tarpaper"})
+    if level >= 2:
+        # Two-storey wings with roof terraces and balustrades.
+        for sgn in (-1, 1):
+            wx0, wx1 = (x0 - 14.0, x0 - 0.4) if sgn < 0 else (x1 + 0.4, x1 + 14.0)
+            _villa_block(mb, rng, wx0, wx1, 2.0, 16.0, 2, wall, roof, hip=False)
+    if level >= 3:
+        # Belvedere tower and rear loggia.
+        _villa_block(mb, rng, -3.4, 3.4, 5.8, 12.6, 2, wall, roof, shutters=False, base=H + 0.35)
+        for i in range(6):
+            lx = x0 + 2.0 + (W - 4.0) * i / 5
+            mb.add_cylinder((lx, D + 3.6, 0.8), 0.28, 3.6, 8, "M_Stucco", cap_top=False)
+        mb.add_box((x0 + 1.4, D, 0), (x1 - 1.4, D + 4.2, 0.8), "M_Stone", skip=("nz",))
+        mb.add_box((x0 + 1.4, D, 4.4), (x1 - 1.4, D + 4.3, 4.9), "M_Cornice_Cream")
+    return mb
+
+
+def build_estate_gatehouse(spec):
+    """Gate: two stone piers with lamps, wrought-iron gates, a guard lodge."""
+    mb = MeshBuilder(spec["id"])
+    mb.shade_fn = _ground_ao
+    for sx in (-4.6, 3.4):
+        mb.add_box((sx, -0.6, 0), (sx + 1.2, 0.6, 3.4), "M_Stone", skip=("nz",))
+        mb.add_box((sx - 0.15, -0.75, 3.4), (sx + 1.35, 0.75, 3.7), "M_Cornice_Cream")
+        mb.add_cylinder((sx + 0.6, 0, 3.7), 0.22, 0.6, 8, "M_Iron")
+    for i in range(14):
+        gx = -3.3 + i * 0.5
+        mb.add_box((gx - 0.03, -0.03, 0.1), (gx + 0.03, 0.03, 2.6 + 0.3 * math.sin(i / 13 * math.pi)), "M_Iron")
+    for z in (0.5, 2.2):
+        mb.add_box((-3.4, -0.04, z), (3.4, 0.04, z + 0.08), "M_Iron")
+    mb.add_box((5.4, 1.0, 0), (9.4, 5.0, 3.2), "M_Stucco", skip=("nz",))
+    _hip(mb, 5.1, 9.7, 0.7, 5.3, 3.2, 1.4, "M_Roof_Terracotta")
+    f = Facade(mb, (5.4, 1.0, 0), (1, 0, 0), 4.0, 3.2)
+    f.quad(0.6, 1.6, 0.0, 2.3, -0.05, "M_Door")
+    _window(f, 2.2, 3.4, 1.0, 2.3, "M_Frame_White", random.Random(3), 0.15)
+    return mb
+
+
+def build_estate_wall(spec):
+    """20 m of stone boundary wall with piers and coping (origin at centre)."""
+    mb = MeshBuilder(spec["id"])
+    mb.add_box((-10, -0.3, 0), (10, 0.3, 2.2), "M_Stone", skip=("nz",))
+    mb.add_box((-10, -0.42, 2.2), (10, 0.42, 2.4), "M_Cornice_Cream")
+    for px in (-10.0, 0.0):
+        mb.add_box((px - 0.5, -0.5, 0), (px + 0.5, 0.5, 2.7), "M_Stone", skip=("nz",))
+    return mb
+
+
+def build_estate_garage(spec):
+    mb = MeshBuilder(spec["id"])
+    mb.shade_fn = _ground_ao
+    W, D, H = 15.0, 8.0, 4.4
+    mb.add_box((-W * 0.5, 0, 0), (W * 0.5, D, H), "M_Stucco", skip=("nz",))
+    _hip(mb, -W * 0.5 - 0.4, W * 0.5 + 0.4, -0.4, D + 0.4, H, 2.0, "M_Roof_Terracotta")
+    f = Facade(mb, (-W * 0.5, 0, 0), (1, 0, 0), W, H)
+    for i in range(3):
+        c = W * (i + 0.5) / 3
+        f.quad(c - 1.9, c + 1.9, 0.0, 3.2, -0.08, "M_Shutter_Green")
+    return mb
+
+
+def build_fountain(spec):
+    mb = MeshBuilder(spec["id"])
+    mb.add_cylinder((0, 0, 0), 3.2, 0.7, 16, "M_Stone", cap_top=False)
+    mb.add_cylinder((0, 0, 0.55), 3.0, 0.02, 16, "M_FountainWater")
+    mb.add_cylinder((0, 0, 0), 0.5, 2.2, 10, "M_Stone")
+    mb.add_cylinder((0, 0, 2.2), 1.3, 0.3, 12, "M_Stone")
+    mb.add_cylinder((0, 0, 2.5), 0.25, 1.0, 8, "M_Stone")
+    return mb

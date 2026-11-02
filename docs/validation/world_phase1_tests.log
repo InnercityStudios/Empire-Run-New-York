@@ -1,0 +1,80 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: Condition "ret != noErr" is true. Returning: ""
+   at: get_system_ca_certificates (platform/macos/os_macos.mm:1035)
+TerrainField: reservations { "target": 2017, "validated": 2034, "shortfall": 0, "tiers": { "prime": 109, "outer": 920, "suburban": 1005 }, "rejected": { "boundary_water": 1289, "road": 6009, "spacing": 3892, "access": 223, "slope": 1 }, "plot_m": 140.0, "spacing_m": 230.0, "exclusion_radius_m": 115.0 }
+    nyc_1977: 5595 blocks, 381 lots, 15562 nodes, 22628 edges, 3295 chunks, 0 backdrop boxes in 7190 ms
+  PASS test_geography.test_little_italy_preserved
+  PASS test_geography.test_network_fully_connected
+  PASS test_geography.test_little_italy_to_williamsburg_over_the_river
+  PASS test_geography.test_every_borough_reachable
+  PASS test_geography.test_every_bridge_carries_traffic
+  PASS test_geography.test_blocks_on_land_and_outside_little_italy
+TerrainField: reservations { "target": 2017, "validated": 2034, "shortfall": 0, "tiers": { "prime": 109, "outer": 920, "suburban": 1005 }, "rejected": { "boundary_water": 1289, "road": 6009, "spacing": 3892, "access": 223, "slope": 1 }, "plot_m": 140.0, "spacing_m": 230.0, "exclusion_radius_m": 115.0 }
+  PASS test_geography.test_world_is_deterministic
+    shell 385 road tiles in 192 ms; overview 16310 instances / 117 tiles in 217 ms
+    Williamsburg detail chunk (9, -1): 43 lots, 115674 tris
+  PASS test_geography.test_streaming_builders
+  PASS test_geography.test_v2_save_migrates_to_new_map
+TerrainField: reservations { "target": 2017, "validated": 2034, "shortfall": 0, "tiers": { "prime": 109, "outer": 920, "suburban": 1005 }, "rejected": { "boundary_water": 1289, "road": 6009, "spacing": 3892, "access": 223, "slope": 1 }, "plot_m": 140.0, "spacing_m": 230.0, "exclusion_radius_m": 115.0 }
+  PASS test_landscape.test_estate_capacity_and_clearance
+  PASS test_landscape.test_adjacent_terrain_tiles_share_positions_and_normals
+  PASS test_landscape.test_authored_blocks_use_road_faces_and_contained_buildings
+  PASS test_landscape.test_planar_network_splits_crossings_t_junctions_and_duplicate_edges
+  PASS test_landscape.test_roads_and_driveways_in_outer_landscape_stay_dry
+  PASS test_landscape.test_rendered_authored_roads_match_final_navigation
+  PASS test_landscape.test_reserved_driveways_clear_neighbour_exclusion_zones
+  PASS test_layout.test_grid_dimensions
+  PASS test_layout.test_all_landmarks_placed
+  PASS test_layout.test_buildings_stay_off_the_road
+  PASS test_layout.test_lots_do_not_overlap_along_faces
+  PASS test_layout.test_road_graph_connected
+  PASS test_layout.test_landmarks_front_onto_roads
+  PASS test_layout.test_layout_is_deterministic
+  PASS test_layout.test_little_italy_layout_preserved
+  PASS test_layout.test_lot_ids_unique_and_stable
+  PASS test_simulation.test_content_loads_without_errors
+  PASS test_simulation.test_starting_income_is_stored
+  PASS test_simulation.test_income_caps_at_storage
+  PASS test_simulation.test_collect_moves_cash_and_resets
+  PASS test_simulation.test_cannot_collect_rival_business
+  PASS test_simulation.test_upgrade_timer_and_banking
+  PASS test_simulation.test_purchase_neutral_business
+  PASS test_simulation.test_purchase_requires_cash
+  PASS test_simulation.test_crew_moves_along_streets_and_arrives
+  PASS test_simulation.test_crew_station_and_unstation
+  PASS test_simulation.test_cannot_command_rival_crew
+  PASS test_simulation.test_power_formula
+  PASS test_simulation.test_simulation_is_deterministic
+  PASS test_simulation.test_save_round_trip
+  PASS test_simulation.test_offline_catch_up_is_bounded
+  PASS test_simulation.test_location_keys_round_trip
+  PASS test_simulation.test_routes_prefer_faster_roads
+  PASS test_simulation.test_v1_save_migrates
+    shell: 188 road chunk meshes in 12 ms
+  PASS test_streaming.test_shell_builds_for_whole_world
+    far city: 125176 triangles for the whole province in 90 ms
+  PASS test_streaming.test_far_city_covers_every_chunk_with_buildings
+    detail chunk (-1, 0): 133 lots, 526776 tris, 24 surfaces, merge 220 ms
+  PASS test_streaming.test_detail_chunk_for_little_italy
+    world: 18 regions, 7960 lots, 41633 props, 899 nodes, 1363 edges, 341 chunks, 3919 park trees in 222 ms
+  PASS test_world.test_little_italy_preserved_inside_world
+  PASS test_world.test_road_network_fully_connected
+  PASS test_world.test_cross_world_route_uses_arterials
+  PASS test_world.test_bridge_reaches_future_city_portal
+  PASS test_world.test_open_spaces_exist
+  PASS test_world.test_world_is_deterministic
+  PASS test_world.test_every_lot_in_a_chunk
+TESTS: 53 passed, 0 failed
+WARNING: 199 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 133 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
+ERROR: Pages in use exist at exit in PagedAllocator: N12VariantPools12BucketMediumE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+ERROR: Pages in use exist at exit in PagedAllocator: N12VariantPools11BucketSmallE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+ERROR: 25 RID allocations of type 'N13RendererDummy15MaterialStorage13DummyMaterialE' were leaked at exit.
+ERROR: 6 RID allocations of type 'N13RendererDummy15MaterialStorage11DummyShaderE' were leaked at exit.
+ERROR: 68 RID allocations of type 'N13RendererDummy9DummyMeshE' were leaked at exit.
+ERROR: 30 RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit.
