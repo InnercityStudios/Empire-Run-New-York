@@ -33,6 +33,9 @@ const NAV := [
 
 var markers: WorldMarkers
 var root: Control
+## Full-screen parent for modal overlays (menus, panels, dialogue): unlike
+## root it is not inset by the safe area, so scrims reach the screen edges.
+var overlays: Control
 var strategy_camera: StrategyCamera
 var _layout: WorldLayout
 var _cash_label: Label
@@ -70,6 +73,13 @@ var _obj_text: Label
 var _obj_bar: ProgressBar
 var _obj_count: Label
 var _obj_target := ""
+var _obj_title: Label
+var _obj_sub: Label
+var _obj_go: Button
+var _obj_claim: Button
+var _level_label: Label
+var _crest_holder: Control
+var _back := Callable()
 var _refresh_accum := 0.0
 var _shown_cash := 0.0
 var _last_cash := -1
@@ -84,6 +94,15 @@ func _ready() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
+	var top := CanvasLayer.new()
+	top.layer = 20
+	add_child(top)
+	overlays = Control.new()
+	overlays.name = "Overlays"
+	overlays.theme = root.theme
+	overlays.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlays.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(overlays)
 	markers = WorldMarkers.new()
 	markers.name = "WorldMarkers"
 	root.add_child(markers)
@@ -96,6 +115,28 @@ func _ready() -> void:
 	_build_banner()
 	_apply_safe_area()
 	get_viewport().size_changed.connect(_apply_safe_area)
+	_back = _on_back
+	App.push_back(_back)
+	App.profile_changed.connect(_refresh_crest)
+
+
+func _exit_tree() -> void:
+	App.pop_back(_back)
+
+
+## Back (Escape / Android): close the newest HUD layer, else open the pause menu.
+func _on_back() -> bool:
+	if _menu and is_instance_valid(_menu):
+		_toggle_menu()
+	elif _inbox and is_instance_valid(_inbox):
+		_toggle_inbox()
+	elif _panel and is_instance_valid(_panel):
+		_close_panel()
+	elif not _selection.is_empty():
+		close_selection.emit()
+	else:
+		_toggle_menu()
+	return true
 
 
 ## Called by Main once the world exists (minimap and location need it).
@@ -187,8 +228,14 @@ func _build_profile() -> void:
 	# Crest in a gold ring.
 	var crest := Control.new()
 	crest.custom_minimum_size = Vector2(84, 84)
-	crest.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	crest.mouse_filter = Control.MOUSE_FILTER_STOP
+	crest.tooltip_text = "Profile"
 	box.add_child(crest)
+	crest.gui_input.connect(func(e: InputEvent):
+		if _tapped(e):
+			open_profile())
+	press_feedback(crest)
+	_crest_holder = crest
 	var img := TextureRect.new()
 	img.texture = load("res://assets/branding/app_icon.png")
 	img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -198,6 +245,8 @@ func _build_profile() -> void:
 	var mask := ShaderMaterial.new()
 	mask.shader = preload("res://src/ui/shaders/circle_mask.gdshader")
 	img.material = mask
+	img.name = "AppIcon"
+	img.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	crest.add_child(img)
 	crest.draw.connect(func():
 		crest.draw_circle(Vector2(42, 42), 41, Color(0, 0, 0, 0.55))
@@ -218,7 +267,12 @@ func _build_profile() -> void:
 	_power_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
 	_power_label.add_theme_constant_override("shadow_outline_size", 5)
 	pw.add_child(_power_label)
+	_level_label = UiTheme.label("", 17, UiTheme.GOLD_LIGHT, "body_bold")
+	_level_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	_level_label.add_theme_constant_override("shadow_outline_size", 5)
+	pw.add_child(_level_label)
 	names.add_child(pw)
+	_refresh_crest()
 	# Location chip: district under the camera; tap toggles the minimap.
 	var chip := _glass(Vector4(12, 7, 10, 7), 12)
 	chip.name = "Location"
@@ -692,7 +746,10 @@ func _build_objective() -> void:
 	v.add_theme_constant_override("separation", 4)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(v)
-	v.add_child(UiTheme.label("Next Objective", 19, UiTheme.GOLD_LIGHT, "display"))
+	_obj_title = UiTheme.label("Next Objective", 19, UiTheme.GOLD_LIGHT, "display")
+	_obj_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_obj_title.custom_minimum_size = Vector2(300, 0)
+	v.add_child(_obj_title)
 	_obj_text = UiTheme.label("", 17, UiTheme.CREAM, "body_medium")
 	_obj_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_obj_text.custom_minimum_size = Vector2(300, 0)
@@ -708,7 +765,20 @@ func _build_objective() -> void:
 	ph.add_child(_obj_bar)
 	_obj_count = UiTheme.label("", 14, UiTheme.MUTED, "body_medium")
 	ph.add_child(_obj_count)
+	_obj_sub = UiTheme.label("", 14, UiTheme.MUTED, "body_medium")
+	v.add_child(_obj_sub)
+	# Tapping the card opens the chapter book.
+	_objective.mouse_filter = Control.MOUSE_FILTER_STOP
+	_objective.gui_input.connect(func(e: InputEvent):
+		if _tapped(e):
+			open_chapters())
+	_obj_claim = UiKit.button("Claim", "primary", "cash", 150)
+	_obj_claim.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_obj_claim.visible = false
+	_obj_claim.pressed.connect(func(): action_requested.emit("claim_chapter", {}))
+	h.add_child(_obj_claim)
 	var go := UiTheme.icon_button("chevron", 46)
+	_obj_go = go
 	go.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	go.pressed.connect(func():
 		if _obj_target != "" and Game.layout.landmarks.has(_obj_target):
@@ -716,21 +786,53 @@ func _build_objective() -> void:
 	h.add_child(go)
 
 
+## Objective card: the current chapter's first unfinished objective, or the
+## reward claim once every objective is met.
 func _refresh_objective(world: SimWorld) -> void:
-	var defs: Array = world.content.scenarios.get("new_game", {}).get("objectives", [])
-	var o := ObjectiveTracker.current(world, defs)
+	var chapters: Array = world.content.chapters
 	var narrow := get_viewport().get_visible_rect().size.x < 1700.0
-	_objective.visible = not o.is_empty() and (_selection.is_empty() or not narrow)
-	if o.is_empty():
+	var idx := world.chapter_index
+	_objective.visible = idx < chapters.size() and (_selection.is_empty() or not narrow)
+	if idx >= chapters.size():
 		return
-	_obj_text.text = o["text"]
-	_obj_target = o["landmark"]
-	var cur: int = o["current"]
-	var tgt: int = o["target"]
+	var ch: Dictionary = chapters[idx]
+	var fid := world.player_faction_id
+	var status := ChapterRules.status(world, fid, idx)
+	_obj_title.text = "Chapter %d  ·  %s" % [int(ch.get("number", idx + 1)), ch.get("title", "")]
+	var objs: Array = ch.get("objectives", [])
+	var done := 0
+	var first := {}
+	var first_def := {}
+	for o in objs:
+		var p := ChapterRules.objective_progress(world, fid, o)
+		if p["done"]:
+			done += 1
+		elif first.is_empty():
+			first = p
+			first_def = o
+	_obj_claim.visible = status == "ready"
+	_obj_go.visible = status == "active" and String(first.get("landmark", "")) != ""
+	_obj_bar.get_parent().visible = status == "active"
+	if status == "locked":
+		var need := int(ch.get("unlock", {}).get("family_power", 0))
+		_obj_text.text = "Reach %d family power to begin this chapter." % need
+		_obj_sub.text = "Power %d / %d" % [world.faction_power(fid), need]
+		_obj_target = ""
+		return
+	if status == "ready":
+		_obj_text.text = "Every objective is complete."
+		_obj_sub.text = "Reward  %s" % UiTheme.money(int(ch.get("rewards", {}).get("cash", 0)))
+		_obj_target = ""
+		return
+	_obj_text.text = String(first_def.get("text", ""))
+	_obj_target = String(first.get("landmark", ""))
+	var cur: int = first["current"]
+	var tgt: int = first["target"]
 	_obj_bar.max_value = tgt
 	_obj_bar.value = mini(cur, tgt)
-	_obj_count.text = ("%s / %s" % [UiTheme.short_money(cur), UiTheme.short_money(tgt)]) if tgt >= 1000 \
-		else "%d / %d" % [cur, tgt]
+	_obj_count.text = ChaptersPanel.progress_text(mini(cur, tgt), tgt,
+		String(first_def.get("type", "")) in ["income", "collected_total"])
+	_obj_sub.text = "%d of %d objectives complete" % [done, objs.size()]
 
 
 # --- Bottom sheet ----------------------------------------------------------------------------
@@ -895,46 +997,91 @@ func _toggle_inbox() -> void:
 
 func _toggle_menu() -> void:
 	if _menu and is_instance_valid(_menu):
-		_menu.queue_free()
+		UiKit.close_modal(_menu)
 		_menu = null
 		return
-	_menu = Control.new()
-	_menu.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_menu.mouse_filter = Control.MOUSE_FILTER_STOP
-	root.add_child(_menu)
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.45)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.gui_input.connect(func(e: InputEvent):
-		if e is InputEventMouseButton and e.pressed:
+	var m := UiKit.modal(overlays, 520.0, "")
+	_menu = m["root"]
+	(m["dim"] as ColorRect).gui_input.connect(func(e: InputEvent):
+		if _tapped(e):
 			_toggle_menu())
-	_menu.add_child(dim)
-	var panel := _glass(Vector4(28, 22, 28, 24), 16)
-	panel.accent = true
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(440, 0)
-	panel.position = Vector2(-220, -200)
-	_menu.add_child(panel)
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 12)
-	panel.content.add_child(v)
+	var v: VBoxContainer = m["body"]
 	var logo := TextureRect.new()
 	logo.texture = load("res://assets/branding/logo_empire.png")
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	logo.custom_minimum_size = Vector2(380, 150)
+	logo.custom_minimum_size = Vector2(380, 140)
 	v.add_child(logo)
-	var district := UiTheme.label("New York  ·  1977", UiTheme.SIZE_SMALL, UiTheme.MUTED)
-	district.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(district)
-	var resume := UiTheme.button("Resume")
-	resume.pressed.connect(_toggle_menu)
-	v.add_child(resume)
-	var restart := UiTheme.button("Restart chapter", "", true)
+	for item in [["Resume", "chevron", _toggle_menu], ["Chapters", "target", open_chapters],
+			["Profile", "people", open_profile], ["Settings", "gear", func(): SettingsPanel.open(overlays)],
+			["Save and exit to menu", "home", _exit_to_menu]]:
+		var b := UiKit.menu_button(item[0], "", item[1])
+		b.custom_minimum_size = Vector2(460, 64)
+		var cb: Callable = item[2]
+		b.pressed.connect(func():
+			if cb != _toggle_menu:
+				_toggle_menu()
+			cb.call())
+		v.add_child(b)
+	var restart := UiKit.button("Restart from chapter 1", "danger", "", 460)
 	restart.pressed.connect(func():
-		_toggle_menu()
-		action_requested.emit("restart", {}))
+		ConfirmDialog.ask(overlays, "Restart the family?",
+			"All progress in this game is lost and the story starts again from Chapter 1.", "Restart",
+			func():
+				_toggle_menu()
+				action_requested.emit("restart", {}), true))
 	v.add_child(restart)
+
+
+## Development captures: open an overlay by name.
+func dev_open(kind: String) -> void:
+	match kind:
+		"menu":
+			_toggle_menu()
+		"chapters":
+			open_chapters()
+		"profile":
+			open_profile()
+		"settings":
+			SettingsPanel.open(overlays)
+
+
+func open_profile() -> void:
+	ProfilePanel.open(overlays)
+
+
+func open_chapters() -> void:
+	ChaptersPanel.open(overlays, func(): action_requested.emit("claim_chapter", {}))
+
+
+func _exit_to_menu() -> void:
+	Game.end()
+	App.launch_mode = ""
+	App.skip_splash = true
+	App.change_scene("res://scenes/boot.tscn")
+
+
+## The player's crest from the local profile (the app icon until one exists).
+func _refresh_crest() -> void:
+	if _crest_holder == null:
+		return
+	var old := _crest_holder.get_node_or_null("ProfileCrest")
+	if old:
+		old.queue_free()
+	var icon := _crest_holder.get_node_or_null("AppIcon")
+	if not App.has_profile():
+		if icon:
+			icon.visible = true
+		return
+	if icon:
+		icon.visible = false
+	var p := App.profile
+	var c := UiKit.crest(p.get("crest", "shield"), UiKit.initials_for(p.get("username", "")),
+		Color(p.get("family_color", "#c9a24a")), 60)
+	c.name = "ProfileCrest"
+	c.position = Vector2(12, 12)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_crest_holder.add_child(c)
 
 
 # --- Per-frame -------------------------------------------------------------------------------
@@ -966,6 +1113,7 @@ func _refresh_now() -> void:
 	var f := world.player()
 	_family_label.text = f.name
 	_power_label.text = "Power  %s" % UiTheme.money(world.faction_power(f.id)).trim_prefix("$")
+	_level_label.text = "·  Level %d" % (world.chapter_index + 1)
 	_income_label.text = UiTheme.short_money(world.faction_income_per_hour(f.id))
 	var soldiers := 0
 	for c in world.crews.values():

@@ -18,6 +18,8 @@ var characters: Dictionary = {}
 var abilities: Dictionary = {}
 var headquarters: Dictionary = {}
 var building_catalog: Dictionary = {}
+## Chapter framework (data/chapters/chapters.json): objectives, unlocks, rewards.
+var chapters: Array = []
 ## World the client plays (override with `-- --world=<id>`).
 const DEFAULT_WORLD := "nyc_1977"
 var districts: Dictionary = {}
@@ -53,6 +55,7 @@ func load_all(root: String) -> void:
 		building_catalog[b["id"]] = b
 	districts["little_italy"] = _read(root + "districts/little_italy.json")
 	scenarios["new_game"] = _read(root + "scenarios/new_game.json")
+	chapters = _read(root + "chapters/chapters.json").get("chapters", [])
 	worlds["greater_new_york"] = _read(root + "world/greater_new_york.json")
 	worlds["nyc_1977"] = _read(root + "world/nyc_1977.json")
 	_validate()

@@ -13,7 +13,8 @@ config_version=5
 config/name="Empire: Run New York"
 config/description="Persistent online Mafia empire-building strategy set in 1970s New York."
 config/version="0.1.0"
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://scenes/boot.tscn"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/bg_color=Color(0.039, 0.035, 0.031, 1)
 boot_splash/image="res://assets/branding/logo_empire.png"
@@ -21,6 +22,7 @@ config/icon="res://assets/branding/app_icon.png"
 
 [autoload]
 
+App="*res://src/app/app_state.gd"
 Content="*res://src/core/content_db.gd"
 Materials="*res://src/world/material_library.gd"
 Game="*res://src/core/game_session.gd"

@@ -1,0 +1,922 @@
+{
+ "version": 1,
+ "note": "Chapters 2-30 are placeholders pending story approval.",
+ "chapters": [
+  {
+   "id": "ch01",
+   "number": 1,
+   "title": "Little Italy",
+   "placeholder": false,
+   "summary": "Secure the family's footing on Mulberry Street.",
+   "intro_dialogue": "ch01_intro",
+   "unlock": {},
+   "objectives": [
+    {
+     "type": "business_level",
+     "business": "biz_vesuvio",
+     "target": 3,
+     "text": "Upgrade Ristorante Vesuvio to Lv 3"
+    },
+    {
+     "type": "own_business",
+     "business": "biz_grand_freight",
+     "target": 1,
+     "text": "Take over Grand Street Freight"
+    },
+    {
+     "type": "business_level",
+     "business": "biz_bowery_auto",
+     "target": 2,
+     "text": "Upgrade Bowery Auto Body to Lv 2"
+    },
+    {
+     "type": "income",
+     "target": 5000,
+     "text": "Raise family income to $5,000/h"
+    }
+   ],
+   "rewards": {
+    "cash": 5000
+   }
+  },
+  {
+   "id": "ch02",
+   "number": 2,
+   "title": "Chapter 2",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 310
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 6500,
+     "text": "Raise family income to $6,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 24251,
+     "text": "Collect $24,251 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 4,
+     "text": "Complete 4 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 5000
+   }
+  },
+  {
+   "id": "ch03",
+   "number": 3,
+   "title": "Chapter 3",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 370
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 8000,
+     "text": "Raise family income to $8,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 46396,
+     "text": "Collect $46,396 in total"
+    },
+    {
+     "type": "family_power",
+     "target": 435,
+     "text": "Reach 435 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 7500
+   }
+  },
+  {
+   "id": "ch04",
+   "number": 4,
+   "title": "Chapter 4",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 430
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 9500,
+     "text": "Raise family income to $9,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 73516,
+     "text": "Collect $73,516 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 6,
+     "text": "Complete 6 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 10000
+   }
+  },
+  {
+   "id": "ch05",
+   "number": 5,
+   "title": "Chapter 5",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 490
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 11000,
+     "text": "Raise family income to $11,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 105061,
+     "text": "Collect $105,061 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 12500
+   }
+  },
+  {
+   "id": "ch06",
+   "number": 6,
+   "title": "Chapter 6",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 550
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 12500,
+     "text": "Raise family income to $12,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 140647,
+     "text": "Collect $140,647 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 8,
+     "text": "Complete 8 business upgrades"
+    },
+    {
+     "type": "family_power",
+     "target": 570,
+     "text": "Reach 570 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 15000
+   }
+  },
+  {
+   "id": "ch07",
+   "number": 7,
+   "title": "Chapter 7",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 610
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 14000,
+     "text": "Raise family income to $14,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 179989,
+     "text": "Collect $179,989 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 17500
+   }
+  },
+  {
+   "id": "ch08",
+   "number": 8,
+   "title": "Chapter 8",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 670
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 15500,
+     "text": "Raise family income to $15,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 222860,
+     "text": "Collect $222,860 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 10,
+     "text": "Complete 10 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 20000
+   }
+  },
+  {
+   "id": "ch09",
+   "number": 9,
+   "title": "Chapter 9",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 730
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 17000,
+     "text": "Raise family income to $17,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 269077,
+     "text": "Collect $269,077 in total"
+    },
+    {
+     "type": "family_power",
+     "target": 705,
+     "text": "Reach 705 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 22500
+   }
+  },
+  {
+   "id": "ch10",
+   "number": 10,
+   "title": "Chapter 10",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 790
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 18500,
+     "text": "Raise family income to $18,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 318485,
+     "text": "Collect $318,485 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 12,
+     "text": "Complete 12 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 25000
+   }
+  },
+  {
+   "id": "ch11",
+   "number": 11,
+   "title": "Chapter 11",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 850
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 20000,
+     "text": "Raise family income to $20,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 370952,
+     "text": "Collect $370,952 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 27500
+   }
+  },
+  {
+   "id": "ch12",
+   "number": 12,
+   "title": "Chapter 12",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 910
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 21500,
+     "text": "Raise family income to $21,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 426363,
+     "text": "Collect $426,363 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 14,
+     "text": "Complete 14 business upgrades"
+    },
+    {
+     "type": "family_power",
+     "target": 840,
+     "text": "Reach 840 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 30000
+   }
+  },
+  {
+   "id": "ch13",
+   "number": 13,
+   "title": "Chapter 13",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 970
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 23000,
+     "text": "Raise family income to $23,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 484617,
+     "text": "Collect $484,617 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 32500
+   }
+  },
+  {
+   "id": "ch14",
+   "number": 14,
+   "title": "Chapter 14",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1030
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 24500,
+     "text": "Raise family income to $24,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 545625,
+     "text": "Collect $545,625 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 16,
+     "text": "Complete 16 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 35000
+   }
+  },
+  {
+   "id": "ch15",
+   "number": 15,
+   "title": "Chapter 15",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1090
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 26000,
+     "text": "Raise family income to $26,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 609306,
+     "text": "Collect $609,306 in total"
+    },
+    {
+     "type": "family_power",
+     "target": 975,
+     "text": "Reach 975 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 37500
+   }
+  },
+  {
+   "id": "ch16",
+   "number": 16,
+   "title": "Chapter 16",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1150
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 27500,
+     "text": "Raise family income to $27,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 675588,
+     "text": "Collect $675,588 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 18,
+     "text": "Complete 18 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 40000
+   }
+  },
+  {
+   "id": "ch17",
+   "number": 17,
+   "title": "Chapter 17",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1210
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 29000,
+     "text": "Raise family income to $29,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 744403,
+     "text": "Collect $744,403 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 42500
+   }
+  },
+  {
+   "id": "ch18",
+   "number": 18,
+   "title": "Chapter 18",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1270
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 30500,
+     "text": "Raise family income to $30,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 815691,
+     "text": "Collect $815,691 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 20,
+     "text": "Complete 20 business upgrades"
+    },
+    {
+     "type": "family_power",
+     "target": 1110,
+     "text": "Reach 1110 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 45000
+   }
+  },
+  {
+   "id": "ch19",
+   "number": 19,
+   "title": "Chapter 19",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1330
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 32000,
+     "text": "Raise family income to $32,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 889397,
+     "text": "Collect $889,397 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 47500
+   }
+  },
+  {
+   "id": "ch20",
+   "number": 20,
+   "title": "Chapter 20",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1390
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 33500,
+     "text": "Raise family income to $33,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 965468,
+     "text": "Collect $965,468 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 22,
+     "text": "Complete 22 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 50000
+   }
+  },
+  {
+   "id": "ch21",
+   "number": 21,
+   "title": "Chapter 21",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1450
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 35000,
+     "text": "Raise family income to $35,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1043856,
+     "text": "Collect $1,043,856 in total"
+    },
+    {
+     "type": "family_power",
+     "target": 1245,
+     "text": "Reach 1245 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 52500
+   }
+  },
+  {
+   "id": "ch22",
+   "number": 22,
+   "title": "Chapter 22",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1510
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 36500,
+     "text": "Raise family income to $36,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1124517,
+     "text": "Collect $1,124,517 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 24,
+     "text": "Complete 24 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 55000
+   }
+  },
+  {
+   "id": "ch23",
+   "number": 23,
+   "title": "Chapter 23",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1570
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 38000,
+     "text": "Raise family income to $38,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1207409,
+     "text": "Collect $1,207,409 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 57500
+   }
+  },
+  {
+   "id": "ch24",
+   "number": 24,
+   "title": "Chapter 24",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1630
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 39500,
+     "text": "Raise family income to $39,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1292492,
+     "text": "Collect $1,292,492 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 26,
+     "text": "Complete 26 business upgrades"
+    },
+    {
+     "type": "family_power",
+     "target": 1380,
+     "text": "Reach 1380 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 60000
+   }
+  },
+  {
+   "id": "ch25",
+   "number": 25,
+   "title": "Chapter 25",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1690
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 41000,
+     "text": "Raise family income to $41,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1379729,
+     "text": "Collect $1,379,729 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 62500
+   }
+  },
+  {
+   "id": "ch26",
+   "number": 26,
+   "title": "Chapter 26",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1750
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 42500,
+     "text": "Raise family income to $42,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1469086,
+     "text": "Collect $1,469,086 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 28,
+     "text": "Complete 28 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 65000
+   }
+  },
+  {
+   "id": "ch27",
+   "number": 27,
+   "title": "Chapter 27",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1810
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 44000,
+     "text": "Raise family income to $44,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1560529,
+     "text": "Collect $1,560,529 in total"
+    },
+    {
+     "type": "family_power",
+     "target": 1515,
+     "text": "Reach 1515 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 67500
+   }
+  },
+  {
+   "id": "ch28",
+   "number": 28,
+   "title": "Chapter 28",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1870
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 45500,
+     "text": "Raise family income to $45,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1654027,
+     "text": "Collect $1,654,027 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 30,
+     "text": "Complete 30 business upgrades"
+    }
+   ],
+   "rewards": {
+    "cash": 70000
+   }
+  },
+  {
+   "id": "ch29",
+   "number": 29,
+   "title": "Chapter 29",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1930
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 47000,
+     "text": "Raise family income to $47,000/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1749551,
+     "text": "Collect $1,749,551 in total"
+    }
+   ],
+   "rewards": {
+    "cash": 72500
+   }
+  },
+  {
+   "id": "ch30",
+   "number": 30,
+   "title": "Chapter 30",
+   "placeholder": true,
+   "summary": "Story pending approval.",
+   "intro_dialogue": "",
+   "unlock": {
+    "family_power": 1990
+   },
+   "objectives": [
+    {
+     "type": "income",
+     "target": 48500,
+     "text": "Raise family income to $48,500/h"
+    },
+    {
+     "type": "collected_total",
+     "target": 1847072,
+     "text": "Collect $1,847,072 in total"
+    },
+    {
+     "type": "upgrades_total",
+     "target": 32,
+     "text": "Complete 32 business upgrades"
+    },
+    {
+     "type": "family_power",
+     "target": 1650,
+     "text": "Reach 1650 family power"
+    }
+   ],
+   "rewards": {
+    "cash": 75000
+   }
+  }
+ ]
+}

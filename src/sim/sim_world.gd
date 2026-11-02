@@ -34,6 +34,10 @@ var businesses: Dictionary = {}
 var crews: Dictionary = {}
 var headquarters: Dictionary = {}       ## faction id -> HeadquartersState
 var ai_next_ms := 0
+## Per-faction statistics: {collected, upgrades, acquired} (profile and chapters).
+var stats: Dictionary = {}
+## Chapter progress of the player family: index of the current chapter (0-based).
+var chapter_index := 0
 var _events: Array = []
 
 
@@ -205,6 +209,8 @@ func execute(cmd: Dictionary) -> Dictionary:
 			return _cmd_acquire(fid, cmd.get("business", ""))
 		"move_crew":
 			return _cmd_move(fid, cmd.get("crew", ""), cmd)
+		"claim_chapter":
+			return _cmd_claim_chapter(fid)
 		"recall_crew":
 			var hq: HeadquartersState = headquarters.get(fid)
 			if hq == null:
@@ -250,9 +256,60 @@ func _cmd_collect_all(fid: String) -> Dictionary:
 	return {"ok": true, "amount": total}
 
 
+## New-game setup: the player's chosen family name, boss and colour. The
+## headquarters takes the family name ("<Family> Social Club").
+func apply_identity(fid: String, family: String, boss: String, color: String) -> void:
+	var f: FactionState = factions.get(fid)
+	if f == null:
+		return
+	if family != "":
+		f.name = "%s Family" % family
+		var hq: HeadquartersState = headquarters.get(fid)
+		if hq:
+			hq.name = "%s Social Club" % family
+	if boss != "":
+		f.boss = boss
+	if color != "":
+		f.color = color
+
+
+func stats_for(fid: String) -> Dictionary:
+	if not stats.has(fid):
+		stats[fid] = {"collected": 0, "upgrades": 0, "acquired": 0}
+	return stats[fid]
+
+
+func _bump(fid: String, key: String, amount := 1) -> void:
+	var s := stats_for(fid)
+	s[key] = int(s.get(key, 0)) + amount
+
+
+## Chapter reward claim: validated against the live state, one chapter at a time.
+func _cmd_claim_chapter(fid: String) -> Dictionary:
+	if fid != player_faction_id:
+		return _fail("not_player")
+	var chapters: Array = content.chapters
+	if chapter_index >= chapters.size():
+		return _fail("no_chapter")
+	var ch: Dictionary = chapters[chapter_index]
+	if not ChapterRules.unlocked(self, fid, ch):
+		return _fail("chapter_locked")
+	if not ChapterRules.is_complete(self, fid, ch):
+		return _fail("chapter_incomplete")
+	var reward := int(ch.get("rewards", {}).get("cash", 0))
+	var f: FactionState = factions[fid]
+	f.cash += reward
+	chapter_index += 1
+	_emit("cash_changed", {"faction": fid, "cash": f.cash})
+	_emit("chapter_completed", {"chapter": ch.get("number", chapter_index), "reward": reward,
+		"next": chapter_index})
+	return {"ok": true, "reward": reward, "chapter": chapter_index}
+
+
 func _collect(b: BusinessState, amount: int) -> void:
 	var f: FactionState = factions[b.owner_id]
 	f.cash += amount
+	_bump(f.id, "collected", amount)
 	b.banked = 0
 	b.last_accrual_ms = now_ms
 	_emit("business_collected", {"business": b.id, "faction": f.id, "amount": amount})
@@ -285,6 +342,7 @@ func _finish_upgrade(b: BusinessState) -> void:
 	b.bank(now_ms, content)
 	b.level += 1
 	b.upgrade_finish_ms = 0
+	_bump(b.owner_id, "upgrades")
 	_emit("upgrade_complete", {"business": b.id, "level": b.level})
 
 
@@ -304,6 +362,7 @@ func _cmd_acquire(fid: String, bid: String) -> Dictionary:
 	b.owner_id = fid
 	b.banked = 0
 	b.last_accrual_ms = now_ms
+	_bump(fid, "acquired")
 	_emit("cash_changed", {"faction": fid, "cash": f.cash})
 	_emit("business_acquired", {"business": b.id, "faction": fid, "price": price})
 	return {"ok": true, "price": price}
@@ -423,6 +482,7 @@ func _emit(type: String, data: Dictionary) -> void:
 # --- Persistence ------------------------------------------------------------------------
 func to_dict() -> Dictionary:
 	var d := {
+		"stats": stats.duplicate(true), "chapter_index": chapter_index,
 		"version": SAVE_VERSION, "world": world_id, "now_ms": now_ms, "rng": rng.state, "player": player_faction_id,
 		"ai_next_ms": ai_next_ms, "factions": [], "businesses": [], "crews": [], "headquarters": [],
 	}
@@ -463,6 +523,13 @@ static func from_dict(d: Dictionary, p_content: GameContent, p_roads: RoadGraph,
 	w.rng.state = int(d["rng"])
 	w.player_faction_id = d.get("player", "")
 	w.ai_next_ms = int(d.get("ai_next_ms", w.now_ms + AI_INTERVAL_MS))
+	# Optional fields (older saves start with empty statistics and chapter 1).
+	for fid in d.get("stats", {}):
+		var fs: Dictionary = d["stats"][fid]
+		w.stats[fid] = {}
+		for k in fs:
+			w.stats[fid][k] = int(fs[k])  # JSON numbers load as floats
+	w.chapter_index = int(d.get("chapter_index", 0))
 	for f in d.get("factions", []):
 		var fs := FactionState.from_dict(f)
 		w.factions[fs.id] = fs

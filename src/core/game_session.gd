@@ -35,12 +35,14 @@ func start(p_layout: WorldLayout) -> void:
 	var content: GameContent = Content.db
 	var roads := SimBootstrap.roads_for(layout)
 	var locations := SimBootstrap.landmark_locations(layout, roads)
-	var fresh := "new-game" in OS.get_cmdline_user_args() or "--new-game" in OS.get_cmdline_user_args()
+	var fresh := "new-game" in OS.get_cmdline_user_args() or "--new-game" in OS.get_cmdline_user_args() \
+		or App.launch_mode == "new"
 	if not fresh:
 		world = _load(content, roads, locations)
 	if world == null:
 		world = SimWorld.create_new(content, roads, locations, content.scenarios["new_game"], now_ms())
 		world.world_id = layout.id
+		_apply_profile_identity()
 		_dirty = true
 	player_id = world.player_faction_id
 	world.advance_to(now_ms())
@@ -71,9 +73,22 @@ func execute(cmd: Dictionary) -> Dictionary:
 func restart() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 	world = SimWorld.create_new(Content.db, world.roads, world.landmark_locations, Content.db.scenarios["new_game"], now_ms())
+	_apply_profile_identity()
 	player_id = world.player_faction_id
 	_dirty = true
 	session_started.emit()
+
+
+## Leave the running game (back to the main menu): save, then stop the session.
+func end() -> void:
+	save()
+	world = null
+
+
+## Stop the session without saving (local progress reset).
+func discard() -> void:
+	world = null
+	_dirty = false
 
 
 func _process(_delta: float) -> void:
@@ -121,6 +136,15 @@ func save() -> void:
 		push_error("Game: save rename failed (%s)" % error_string(err))
 		return
 	_dirty = false
+
+
+## A new world takes the player's family identity from the local profile.
+func _apply_profile_identity() -> void:
+	if not App.has_profile():
+		return
+	var p := App.profile
+	world.apply_identity(world.player_faction_id, String(p.get("family_name", "")), String(p.get("username", "")),
+		String(p.get("family_color", "")))
 
 
 func _load(content: GameContent, roads: RoadGraph, locations: Dictionary) -> SimWorld:

@@ -15,6 +15,8 @@ const ERROR_TEXT := {
 	"unreachable": "No route to that location.",
 	"not_owner": "That isn't yours to command.",
 	"no_idle_crew": "All crews are busy.",
+	"chapter_incomplete": "Finish every objective first.",
+	"chapter_locked": "The family needs more power for this chapter.",
 }
 
 @onready var world: WorldStreamer = $World
@@ -35,18 +37,22 @@ var _crew_root: Node3D
 func _ready() -> void:
 	add_to_group("main")
 	_show_loading()
-	await get_tree().process_frame
+	await _loading_stage(0.08, "Reading the map")
 	var world_id := GameContent.DEFAULT_WORLD
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--world="):
 			world_id = a.get_slice("=", 1)
 	var layout := WorldLayout.build(Content.db.worlds[world_id], Content.db)
+	await _loading_stage(0.3, "Raising the city")
 	world.build(layout)
+	await _loading_stage(0.55, "Putting traffic on the streets")
 	world.camera = camera
 	camera.set_bounds(layout.playable)
 	if layout.is_geo:
 		camera.max_distance = 3200.0
 	camera.distance_changed.connect(atmosphere.on_camera_distance)
+	if atmosphere.sun:
+		App.register_sun(atmosphere.sun)
 	camera.tapped.connect(_on_tap)
 	camera.follow_cancelled.connect(func(): _set_follow(""))
 
@@ -69,6 +75,7 @@ func _ready() -> void:
 	fader.camera = camera.camera
 	add_child(fader)
 
+	await _loading_stage(0.7, "Opening the family books")
 	hud = Hud.new()
 	hud.name = "Hud"
 	add_child(hud)
@@ -90,6 +97,7 @@ func _ready() -> void:
 	Game.start(layout)
 	_add_ambience()
 	_intro()
+	_loading.set_progress(0.85, "Bringing the neighbourhood into view")
 	world.initial_detail_ready.connect(_hide_loading, CONNECT_ONE_SHOT)
 	get_tree().create_timer(12.0).timeout.connect(_hide_loading)
 
@@ -125,71 +133,51 @@ func _street_widths() -> Dictionary:
 
 
 # --- Loading screen and ambience ----------------------------------------------------
-const TITLE_THEME := preload("res://assets/audio/music/title_theme.wav")
-const TITLE_THEME_DB := -14.0  # subtle: a backdrop to the art, not a fanfare
-const TITLE_THEME_UNDER_DB := -22.0  # sits under the city bed once play begins
-
-var _loading: CanvasLayer
-var _title_music: AudioStreamPlayer
-var _title_fade: Tween
+var _loading: LoadingScreen
 
 
 func _show_loading() -> void:
-	_title_music = AudioStreamPlayer.new()
-	_title_music.name = "TitleTheme"
-	_title_music.stream = TITLE_THEME
-	_title_music.volume_db = -40.0
-	add_child(_title_music)
-	_title_music.play()
-	_title_fade = create_tween()
-	_title_fade.tween_property(_title_music, "volume_db", TITLE_THEME_DB, 2.0)
-	_loading = CanvasLayer.new()
-	_loading.layer = 50
+	App.play_title()
+	_loading = LoadingScreen.new()
 	add_child(_loading)
-	var bg := ColorRect.new()
-	bg.color = Color(0.04, 0.035, 0.03)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_loading.add_child(bg)
-	var art := TextureRect.new()
-	art.texture = load("res://assets/branding/loading_screen.png")
-	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	art.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_loading.add_child(art)
-	var shade := ColorRect.new()
-	shade.color = Color(0, 0, 0, 0.35)
-	shade.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	shade.offset_top = -86
-	_loading.add_child(shade)
-	var label := UiTheme.label("Loading Greater New York  ·  1977", UiTheme.SIZE_SMALL, UiTheme.CREAM, "body_medium")
-	label.name = "Status"
-	label.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	label.offset_top = -58
-	label.offset_left = -300
-	label.offset_right = 300
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_loading.add_child(label)
+
+
+## Report a build stage and let the loading screen draw before the next one.
+func _loading_stage(value: float, stage: String) -> void:
+	_loading.set_progress(value, stage)
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 
 func _hide_loading() -> void:
 	if _loading == null or not is_instance_valid(_loading):
 		return
-	var layer := _loading
+	_loading.dismiss()
 	_loading = null
-	var tw := create_tween()
-	for c in layer.get_children():
-		tw.parallel().tween_property(c, "modulate:a", 0.0, 0.6)
-	tw.tween_callback(layer.queue_free)
-	_settle_title_music()
+	# The theme loops for the session; it drops under the city when play begins.
+	App.duck_music()
+	get_tree().create_timer(3.0).timeout.connect(_chapter_intro)
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--ui-open="):
+			hud.dev_open(arg.get_slice("=", 1))
 
 
-## The theme loops for the session; it drops under the city when play begins.
-func _settle_title_music() -> void:
-	if _title_music == null:
+## The current chapter's intro conversation, once per profile. Skipped in
+## developer captures unless --ui-dialogue asks for it.
+func _chapter_intro() -> void:
+	var args := OS.get_cmdline_user_args()
+	var capturing := Array(args).any(func(a: String): return a.begins_with("--capture"))
+	if not Game.is_running() or (capturing and not "--ui-dialogue" in args):
 		return
-	if _title_fade:
-		_title_fade.kill()
-	create_tween().tween_property(_title_music, "volume_db", TITLE_THEME_UNDER_DB, 2.5)
+	var chapters: Array = Content.db.chapters
+	if Game.world.chapter_index >= chapters.size():
+		return
+	var id := String(chapters[Game.world.chapter_index].get("intro_dialogue", ""))
+	if id == "" or (App.has_seen(id) and not "--ui-dialogue" in args):
+		return
+	var box := DialogueBox.play(hud.overlays, id)
+	if box:
+		App.mark_seen(id)
 
 
 var ambience: AmbienceDirector
@@ -411,6 +399,8 @@ func _on_action(action: String, payload: Dictionary) -> void:
 					_command({"type": "recall_crew", "crew": id})
 		"follow":
 			_set_follow(payload["crew"] if payload["on"] else "")
+		"claim_chapter":
+			_command({"type": "claim_chapter"})
 		"restart":
 			_set_follow("")
 			Game.restart()
@@ -456,6 +446,10 @@ func _on_sim_event(e: Dictionary) -> void:
 			if c.owner_id == Game.player_id:
 				var where := hud.landmark_display_name(w, e["landmark"])
 				hud.toast("%s arrived%s." % [c.name, (" at " + where) if where != "" else ""], "crew")
+		"chapter_completed":
+			hud.toast("Chapter %d complete. %s added to the family." % [e["chapter"], UiTheme.money(e["reward"])],
+				"cash")
+			_chapter_intro()
 		"crew_departed":
 			if selection.get("id") == e["crew"]:
 				hud.show_selection(selection)
