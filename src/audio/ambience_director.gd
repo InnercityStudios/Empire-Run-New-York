@@ -29,15 +29,18 @@ func _ready() -> void:
 	_bed.stream = BED
 	_bed.volume_db = -14.0
 	_bed.autoplay = true
+	_bed.bus = "Ambience"
 	add_child(_bed)
 	_sirens = AudioStreamPlayer.new()
 	_sirens.stream = SIRENS
+	_sirens.bus = "SFX"
 	add_child(_sirens)
 	_horn = AudioStreamPlayer3D.new()
 	_horn.stream = HORN
 	_horn.unit_size = 18.0
 	_horn.max_distance = 400.0
 	_horn.volume_db = -6.0
+	_horn.bus = "SFX"
 	add_child(_horn)
 	_next_siren = _rng.randf_range(SIREN_INTERVAL.x * 0.4, SIREN_INTERVAL.y * 0.6)
 	_next_horn = _rng.randf_range(HORN_INTERVAL.x, HORN_INTERVAL.y)

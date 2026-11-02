@@ -1,0 +1,10 @@
+{
+ "id": "ch01_intro",
+ "note": "Placeholder tutorial lines. Speaker, portrait and wording await story approval. Voice files are optional: assets/audio/dialogue/<line id>.ogg|mp3|wav.",
+ "lines": [
+  {"id": "ch01_intro_001", "speaker": "Advisor", "portrait": "", "text": "Welcome to Little Italy. Our businesses earn while you're away — tap a gold marker to collect the takings."},
+  {"id": "ch01_intro_002", "speaker": "Advisor", "portrait": "", "text": "Upgrades raise income and storage. Ristorante Vesuvio is the place to start."},
+  {"id": "ch01_intro_003", "speaker": "Advisor", "portrait": "", "text": "Grand Street Freight is independent. Buy it before the Morettis do."},
+  {"id": "ch01_intro_004", "speaker": "Advisor", "portrait": "", "text": "Your objectives are on the right. Complete them all to close the chapter and claim the reward."}
+ ]
+}
